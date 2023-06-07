@@ -66,6 +66,9 @@ def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
     patch_map = np.arange(hp.nside2npix(patch_nside))
     patch_thetas, patch_phis = hp.pix2ang(patch_nside, patch_map)  # theta and phi are the centrepoints of the patches
 
+    patch_thetas = np.rad2deg(patch_thetas)
+    patch_phis = np.rad2deg(patch_phis)
+
     if mask is None:
         return [(i, j) for i, j in zip(patch_thetas, patch_phis)]
 
