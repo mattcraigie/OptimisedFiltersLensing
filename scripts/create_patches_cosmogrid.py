@@ -24,7 +24,7 @@ def process_cosmo_dir(cosmo_dir,
         full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
         cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
 
-    cosmo_patches = np.stack(cosmo_patches)
+    cosmo_patches = np.stack(cosmo_patches).reshape((num_perms * len(patch_centres), patch_size, patch_size))
     np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
 
 
