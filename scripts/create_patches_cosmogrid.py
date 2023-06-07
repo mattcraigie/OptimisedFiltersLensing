@@ -1,4 +1,4 @@
-from ostlensing.dataloading import get_cosmogrid_patches
+from ostlensing.dataloading import make_patches_cosmogrid
 
 if __name__ == '__main__':
-    get_cosmogrid_patches("/pscratch/sd/m/mcraigie/cosmogrid/patches/")
+    make_patches_cosmogrid(output_path="/pscratch/sd/m/mcraigie/cosmogrid/patches/")
