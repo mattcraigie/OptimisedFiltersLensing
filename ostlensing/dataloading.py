@@ -149,15 +149,15 @@ def make_patches_cosmogrid(output_path,
     pool = mp.Pool()
 
     process_function = partial(process_cosmo_dir,
-                               main_path,
-                               output_path,
-                               num_perms,
-                               fname,
-                               map_type,
-                               redshift_bin,
-                               patch_centres,
-                               patch_size,
-                               resolution)
+                               main_path=main_path,
+                               output_path=output_path,
+                               num_perms=num_perms,
+                               fname=fname,
+                               map_type=map_type,
+                               redshift_bin=redshift_bin,
+                               patch_centres=patch_centres,
+                               patch_size=patch_size,
+                               resolution=resolution)
 
     pool.map(process_function, cosmo_dirs)
     pool.close()
