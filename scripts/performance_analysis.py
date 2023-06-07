@@ -1,10 +1,12 @@
-from training import train_loop, batch_apply, mse_and_admissibility
-from dataloading import make_dataloaders, data_preprocessing_cosmogrid
-from ostmodel import OptimisableSTRegressor
+from ostlensing.training import train_loop, batch_apply, mse_and_admissibility
+from ostlensing.dataloading import make_dataloaders, data_preprocessing_cosmogrid
+from ostlensing.ostmodel import OptimisableSTRegressor
 import torch
 from torch import nn, optim
+
 import matplotlib.pyplot as plt
 import numpy as np
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -58,6 +60,7 @@ def main():
                                        activation=nn.LeakyReLU,
                                        seed=0)
         model.to(device)
+        model = nn.DataParallel(model)
         train_loss, val_loss, model_params, filters = full_train(data_subset, targets_subset, model, num_epochs)
         model.load_state_dict(model_params)
         test_score = full_test(data_test, targets_test, model)
