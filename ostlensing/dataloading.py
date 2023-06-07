@@ -128,6 +128,7 @@ def get_cosmogrid_patches(output_path,
 
         for n, permute_dir in enumerate(permute_dirs):
             p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
+            print(p)
             f = h5py.File(p, 'r')
             full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
             cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
