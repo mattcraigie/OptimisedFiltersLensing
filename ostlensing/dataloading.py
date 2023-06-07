@@ -8,6 +8,7 @@ import os
 import h5py
 import time
 import multiprocessing as mp
+from functools import partial
 
 class GeneralDataset(Dataset):
     def __init__(self, data, targets):
@@ -101,8 +102,8 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
     patch_set = np.stack(patch_set)
     return patch_set
 
-def process_cosmo_dir(main_path,
-                      cosmo_dir,
+def process_cosmo_dir(cosmo_dir,
+                      main_path,
                       output_path,
                       num_perms,
                       fname,
@@ -146,15 +147,18 @@ def make_patches_cosmogrid(output_path,
 
     # run loop with mp
     pool = mp.Pool()
-    pool.map(lambda cd: process_cosmo_dir(main_path,
-                                          cd,
-                                          output_path,
-                                          num_perms,
-                                          fname,
-                                          map_type,
-                                          redshift_bin,
-                                          patch_centres,
-                                          patch_size,
-                                          resolution), cosmo_dirs)
+
+    process_function = partial(process_cosmo_dir,
+                               main_path,
+                               output_path,
+                               num_perms,
+                               fname,
+                               map_type,
+                               redshift_bin,
+                               patch_centres,
+                               patch_size,
+                               resolution)
+
+    pool.map(process_function, cosmo_dirs)
     pool.close()
     pool.join()
