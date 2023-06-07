@@ -95,7 +95,7 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
                                           no_plot=True,
                                           reso=resolution,
                                           return_projected_map=True)
-        gnomonic_projection = gnomonic_projection.astype(np.half)
+        gnomonic_projection = gnomonic_projection.astype(np.half).compressed()  # convert to normal array
         patch_set.append(gnomonic_projection)
     patch_set = np.stack(patch_set)
     return patch_set
@@ -128,7 +128,6 @@ def get_cosmogrid_patches(output_path,
 
         for n, permute_dir in enumerate(permute_dirs):
             p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
-            print(p)
             f = h5py.File(p, 'r')
             full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
             cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
