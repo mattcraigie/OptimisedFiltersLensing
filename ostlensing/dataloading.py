@@ -124,7 +124,7 @@ def get_cosmogrid_patches(output_path,
     patch_set = []
     for m, cosmo_dir in enumerate(cosmo_dirs):
         cosmo_patches = []
-        permute_dirs = np.sort([pa for pa in os.listdir(main_path + cosmo_dir) if 'perm' in pa])[:num_perms]
+        permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
 
         for n, permute_dir in enumerate(permute_dirs):
             p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
