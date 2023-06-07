@@ -7,7 +7,7 @@ import healpy as hp
 import os
 import h5py
 import time
-
+import multiprocessing as mp
 
 class GeneralDataset(Dataset):
     def __init__(self, data, targets):
@@ -101,8 +101,30 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
     patch_set = np.stack(patch_set)
     return patch_set
 
+def process_cosmo_dir(main_path,
+                      cosmo_dir,
+                      output_path,
+                      num_perms,
+                      fname,
+                      map_type,
+                      redshift_bin,
+                      patch_centres,
+                      patch_size,
+                      resolution):
+    cosmo_patches = []
+    permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
 
-def get_cosmogrid_patches(output_path,
+    for n, permute_dir in enumerate(permute_dirs):
+        p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
+        f = h5py.File(p, 'r')
+        full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
+        cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
+
+    cosmo_patches = np.stack(cosmo_patches)
+    np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
+
+
+def make_patches_cosmogrid(output_path,
                           patch_nside=4,
                           patch_size=128,
                           resolution=7,  # arcmin
@@ -122,21 +144,17 @@ def get_cosmogrid_patches(output_path,
 
     patch_centres = compute_patch_centres(patch_nside, mask, threshold)
 
-    patch_set = []
-    for m, cosmo_dir in enumerate(cosmo_dirs):
-        start = time.time()
-        cosmo_patches = []
-        permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
-
-        for n, permute_dir in enumerate(permute_dirs):
-            p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
-            f = h5py.File(p, 'r')
-            full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
-            cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
-
-        cosmo_patches = np.stack(cosmo_patches)
-        np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
-        elapsed = time.time() - start
-        print('{}: {:.2f} seconds'.format(cosmo_dir, elapsed))
-
-    return patch_set
+    # run loop with mp
+    pool = mp.Pool()
+    pool.map(lambda cd: process_cosmo_dir(main_path,
+                                          cd,
+                                          output_path,
+                                          num_perms,
+                                          fname,
+                                          map_type,
+                                          redshift_bin,
+                                          patch_centres,
+                                          patch_size,
+                                          resolution), cosmo_dirs)
+    pool.close()
+    pool.join()
