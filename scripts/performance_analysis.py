@@ -60,7 +60,6 @@ def main():
                                        activation=nn.LeakyReLU,
                                        seed=0)
         model.to(device)
-        model = nn.DataParallel(model)
         train_loss, val_loss, model_params, filters = full_train(data_subset, targets_subset, model, num_epochs)
         model.load_state_dict(model_params)
         test_score = full_test(data_test, targets_test, model)
