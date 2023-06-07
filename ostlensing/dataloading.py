@@ -68,7 +68,7 @@ def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
     patch_thetas, patch_phis = hp.pix2ang(patch_nside, patch_map)  # theta and phi are the centrepoints of the patches
 
     if mask is None:
-        return zip(patch_thetas, patch_phis)
+        return [(i, j) for i, j in zip(patch_thetas, patch_phis)]
 
     # Downside the mask to the smaller map size. ud_grade uses an averaging to downsample. As a result, the pixel value
     # in the smaller map will represent the number of pixels in the mask
