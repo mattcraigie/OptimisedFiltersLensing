@@ -110,8 +110,8 @@ def get_cosmogrid_patches(output_path,
                           map_type='kg',
                           redshift_bin=3):
 
-    main_path = r'//global/cfs/cdirs/des/cosmogrid/DESY3/grid/'
-    fname = r'/projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
+    main_path = r'//global/cfs/cdirs/des/cosmogrid/DESY3/grid'
+    fname = r'projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
 
     cosmo_dirs = os.listdir(main_path)
     cosmo_dirs = np.sort(cosmo_dirs)
