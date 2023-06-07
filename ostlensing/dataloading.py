@@ -1,3 +1,4 @@
+import warnings
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -70,6 +71,8 @@ def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
     if mask is None:
         return [(i, j) for i, j in zip(patch_thetas, patch_phis)]
 
+    warnings.warn('Masking not tested yet')
+
     # Downside the mask to the smaller map size. ud_grade uses an averaging to downsample. As a result, the pixel value
     # in the smaller map will represent the number of pixels in the mask
     mask_downsized = hp.ud_grade(mask, patch_nside)
@@ -98,18 +101,20 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
     return patch_set
 
 
-def get_cosmogrid_patches(patch_nside, patch_size, resolution, threshold=0.2):
+def get_cosmogrid_patches(output_path,
+                          patch_nside=4,
+                          patch_size=128,
+                          resolution=7,  # arcmin
+                          threshold=0.2,
+                          num_perms=1,
+                          map_type='kg',
+                          redshift_bin=3):
 
     main_path = r'//global/cfs/cdirs/des/cosmogrid/DESY3/grid/'
-    output_path = r'/outputs/'
     fname = r'/projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
 
     cosmo_dirs = os.listdir(main_path)
     cosmo_dirs = np.sort(cosmo_dirs)
-
-    num_perms = 4
-    map_type = 'kg'
-    zbin = 1  # 1, 2, 3, 4
 
     # replace with DES mask? Or are they in-built?
     mask = None
@@ -124,7 +129,7 @@ def get_cosmogrid_patches(patch_nside, patch_size, resolution, threshold=0.2):
         for n, permute_dir in enumerate(permute_dirs):
             p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
             f = h5py.File(p, 'r')
-            full_map = f[map_type]['desy3metacal{}'.format(zbin)][()]
+            full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
             cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
 
         cosmo_patches = np.stack(cosmo_patches)
