@@ -6,6 +6,7 @@ import numpy as np
 import healpy as hp
 import os
 import h5py
+import time
 
 
 class GeneralDataset(Dataset):
@@ -123,6 +124,7 @@ def get_cosmogrid_patches(output_path,
 
     patch_set = []
     for m, cosmo_dir in enumerate(cosmo_dirs):
+        start = time.time()
         cosmo_patches = []
         permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
 
@@ -134,5 +136,7 @@ def get_cosmogrid_patches(output_path,
 
         cosmo_patches = np.stack(cosmo_patches)
         np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
+        elapsed = time.time() - start
+        print('{}: {:.2f} seconds'.format(cosmo_dir, elapsed))
 
     return patch_set
