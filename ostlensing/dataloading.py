@@ -92,6 +92,7 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
                                           no_plot=True,
                                           reso=resolution,
                                           return_projected_map=True)
+        gnomonic_projection = gnomonic_projection.astype(np.half)
         patch_set.append(gnomonic_projection)
     patch_set = np.stack(patch_set)
     return patch_set
