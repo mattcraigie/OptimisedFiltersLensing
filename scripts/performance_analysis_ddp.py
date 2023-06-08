@@ -61,8 +61,8 @@ def demo_basic(rank, world_size):
     setup(rank, world_size)
     path = "//pscratch/sd/m/mcraigie/cosmogrid/"
 
-    num_epochs = 10
-    data_amounts = range(5, 25, 5)
+    num_epochs = 500
+    data_amounts = range(10, 105, 5)
     model_name = 'ost'
 
     # load train+val and test data
@@ -96,7 +96,7 @@ def demo_basic(rank, world_size):
         model.to(rank)
         ddp_model = DDP(model, device_ids=[rank])
 
-        optimizer = optim.Adam(model.parameters(), lr=1e-3)
+        optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
         # train the model
         train_losses, val_losses, best_model_params, best_filters = train_loop(ddp_model,
