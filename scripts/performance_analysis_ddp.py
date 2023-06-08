@@ -14,7 +14,7 @@ import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 
-def mse_and_admissibility_ddp(output, target, model, weighting):
+def mse_and_admissibility_ddp(output, target, model, weighting=1.0):
     return mse_and_admissibility(output, target, model.module, weighting)
 
 
