@@ -74,12 +74,14 @@ def data_preprocessing(path, test=False, return_scalers=False):
     else:
         return data[train_indices], targets[train_indices]
 
+
 def make_dataloaders(data, targets, batch_size=8, seed=42, test=False):
     dataset = GeneralDataset(data, targets)
     if test:
         return DataLoader(dataset, batch_size=batch_size)
 
     # randomly split data into train and validation sets
+    # need to put this in shared function
     np.random.seed(seed)
     num_data = len(dataset)
     indices = list(range(num_data))
@@ -88,7 +90,6 @@ def make_dataloaders(data, targets, batch_size=8, seed=42, test=False):
     train_indices, val_indices = indices[split:], indices[:split]
     train_sampler = SubsetRandomSampler(train_indices)
     val_sampler = SubsetRandomSampler(val_indices)
-
 
     train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
     val_loader = DataLoader(dataset, batch_size=batch_size, sampler=val_sampler)
