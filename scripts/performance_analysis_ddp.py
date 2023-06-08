@@ -66,7 +66,7 @@ def demo_basic(rank, world_size):
     data_test, targets_test = data_preprocessing(path, test=True)
 
     # make test loader outside the loop
-    test_loader = make_dataloaders(data_test, targets_test)
+    test_loader = make_dataloaders(data_test, targets_test, test=True)
 
     # setup train and test losses
     train_criterion = mse_and_admissibility_ddp
@@ -107,9 +107,6 @@ def demo_basic(rank, world_size):
         if rank == 0:
             model.load_state_dict(best_model_params)
             with torch.no_grad():
-                for i in test_loader:
-                    print(i)
-                    break
                 test_loss = validate(model, test_criterion, test_loader, rank)
                 model_results.append(test_loss)
 
