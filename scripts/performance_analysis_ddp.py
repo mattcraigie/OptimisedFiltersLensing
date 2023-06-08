@@ -54,6 +54,7 @@ def demo_basic(rank, world_size):
                                    output_size=1,
                                    activation=nn.LeakyReLU,
                                    seed=0)
+    model.to(rank)
     ddp_model = DDP(model, device_ids=[rank])
     data = torch.randn((100, 10, 32, 32))
     targets = torch.randn((100, 1))
