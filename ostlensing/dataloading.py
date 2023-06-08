@@ -19,44 +19,63 @@ class GeneralDataset(Dataset):
         return self.data[idx], self.targets[idx]
 
 
-def patch_preprocessing(path, test=False):
+class Scaler(object):
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def transform(self, data):
+        return (data - self.mean) / self.std
+
+    def inverse_transform(self, data):
+        return data * self.std + self.mean
+
+
+def data_preprocessing(path, test=False):
     # # use os to list all files in the directory, and load them one by one and stack them together
 
     patch_path = 'patches'
-    cosmology_path = 'cosmogrid_params.csv'
+    targets_path = 'params.csv'
 
     data = []
     all_dirs = os.listdir(os.path.join(path, patch_path))
     all_dirs = np.sort(all_dirs)
 
-    for dir in all_dirs:
-        data.append(np.load(os.path.join(path, dir)))
+    for dir_ in all_dirs:
+        data.append(np.load(os.path.join(path, dir_)))
 
-    df = pd.read_csv('cosmogrid_params.csv')
+    df = pd.read_csv(targets_path)
     use_params = ['s8']
     # use_params = ['As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Ol', 'Om', 'm_nu', 'ns', 's8', 'w0']
 
     targets = df[use_params].values
 
     data = torch.from_numpy(data).float().log()
-    data = (data - data.mean()) / data.std()
-    data_mean = data.mean()
-    data_std = data.std()
+    data_scaler = Scaler(data.mean(), data.std())
+    data = data_scaler.transform(data)
 
     targets = torch.from_numpy(targets).float()
-    targets = (targets - targets.mean(0)) / targets.std(0)
-    targets_mean = targets.mean()
-    targets_std = targets.std()
+    target_scaler = Scaler(targets.mean(0), targets.std(0))
+    targets = target_scaler.transform(targets)
 
-    print(data.shape, targets.shape)
+    test_fraction = 0.2
+    num_data = len(data)
+    indices = list(range(num_data))
+    split = int(np.floor(test_fraction * num_data))
+    np.random.shuffle(indices)
+    train_indices, test_indices = indices[split:], indices[:split]
+
+    if test:
+        return data[test_indices], targets[test_indices]
+    else:
+        return data[train_indices], targets[train_indices], data_scaler, target_scaler
 
 
-    return data, targets
 
-
-
-def make_dataloaders(data, targets, batch_size=8, seed=42):
+def make_dataloaders(data, targets, batch_size=8, seed=42, test=False):
     dataset = GeneralDataset(data, targets)
+    if test:
+        return DataLoader(dataset, batch_size=batch_size)
 
     # randomly split data into train and validation sets
     np.random.seed(seed)

@@ -1,5 +1,5 @@
 from ostlensing.training import batch_apply, mse_and_admissibility, train, validate
-from ostlensing.dataloading import make_dataloaders
+from ostlensing.dataloading import make_dataloaders, data_preprocessing
 from ostlensing.ostmodel import OptimisableSTRegressor
 import matplotlib.pyplot as plt
 import numpy as np
@@ -55,40 +55,67 @@ def train_loop(model, optimizer, criterion, train_loader, val_loader, device, ep
 def demo_basic(rank, world_size):
     print(f"Running basic DDP example on rank {rank}.")
     setup(rank, world_size)
+    path = "$PSCRATCH/sd/m/mcraigie/cosmogrid/"
 
-    # create model and move it to GPU with id rank
-    model = OptimisableSTRegressor(size=32,
-                                   num_scales=4,
-                                   num_angles=4,
-                                   reduction=None,
-                                   hidden_sizes=(32, 32),
-                                   output_size=1,
-                                   activation=nn.LeakyReLU,
-                                   seed=0)
-    model.to(rank)
-    ddp_model = DDP(model, device_ids=[rank])
-    data = torch.randn((100, 10, 32, 32))
-    targets = torch.randn((100, 1))
+    num_epochs = 10
+    data_amounts = range(100, 500, 100)
+    model_name = 'ost'
 
-    train_loader, val_loader = make_dataloaders(data, targets)
+    # load train+val and test data
+    data, targets = data_preprocessing(path)
+    data_test, targets_test = data_preprocessing(path, test=True)
 
-    num_epochs = 100
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
-    criterion = mse_and_admissibility_ddp
+    # make test loader outside the loop
+    test_loader = make_dataloaders(data_test, targets_test)
 
-    train_losses, val_losses, best_model_params, best_filters = train_loop(ddp_model,
-                                                                           optimizer,
-                                                                           criterion,
-                                                                           train_loader,
-                                                                           val_loader,
-                                                                           rank,
-                                                                           num_epochs)
+    # setup train and test losses
+    train_criterion = mse_and_admissibility_ddp
+    test_criterion = nn.MSELoss()
+
+    model_results = []
+    for amount in data_amounts:
+
+        # trim to data subset and make train and val loaders
+        print(amount)
+        data_subset, targets_subset = data[:amount], targets[:amount]
+        train_loader, val_loader = make_dataloaders(data_subset, targets_subset, test=True)
+
+        # setup the model, send it to DDP and train
+        model = OptimisableSTRegressor(size=32,
+                                       num_scales=4,
+                                       num_angles=4,
+                                       reduction=None,
+                                       hidden_sizes=(32, 32),
+                                       output_size=1,
+                                       activation=nn.LeakyReLU,
+                                       seed=0)
+        model.to(rank)
+        ddp_model = DDP(model, device_ids=[rank])
+
+        optimizer = optim.Adam(model.parameters(), lr=1e-3)
+
+        # train the model
+        train_losses, val_losses, best_model_params, best_filters = train_loop(ddp_model,
+                                                                               optimizer,
+                                                                               train_criterion,
+                                                                               train_loader,
+                                                                               val_loader,
+                                                                               rank,
+                                                                               num_epochs)
+
+        # test the best validated model with unseen data. Only test on one GPU.
+        if rank == 0:
+            model.load_state_dict(best_model_params)
+            with torch.no_grad():
+                test_loss = validate(model, test_criterion, test_loader, rank)
+                model_results.append(test_loss)
+
+    if rank == 0:  # only save the results once!
+        model_results = np.array(model_results)
+        np.save('model_{}_performance.npy'.format(model_name), model_results)
 
     cleanup()
 
-    if rank == 0:
-        plt.imshow(best_filters[0, 0].cpu().detach().numpy())
-        plt.savefig('learned_filter.png')
 
 def run_demo(demo_fn, world_size):
     mp.spawn(demo_fn,
