@@ -47,6 +47,8 @@ def train_loop(model, optimizer, criterion, train_loader, val_loader, device, ep
     best_filters = None
 
     for epoch in range(1, epochs + 1):
+        if epoch % 10 == 0:
+            print(f"Epoch {epoch}")
         train_loss = train(model, optimizer, criterion, train_loader, device)
         val_loss = validate(model, criterion, val_loader, device)
         train_losses.append(train_loss)
