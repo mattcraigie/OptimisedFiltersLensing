@@ -4,7 +4,8 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
 import healpy as hp
-
+import os
+import pandas as pd
 
 class GeneralDataset(Dataset):
     def __init__(self, data, targets):
@@ -18,27 +19,40 @@ class GeneralDataset(Dataset):
         return self.data[idx], self.targets[idx]
 
 
-def data_preprocessing_cosmogrid(test=False):
-    # note that our data will come in the form (num_data, sub_batch, size, size)
-    # where sub_batch is all the fields from the same cosmology
+def patch_preprocessing(path, test=False):
+    # # use os to list all files in the directory, and load them one by one and stack them together
 
-    if not test:
-        torch.manual_seed(0)
-        num = 1000
-    else:
-        torch.manual_seed(1)
-        num = 100
+    patch_path = 'patches'
+    cosmology_path = 'cosmogrid_params.csv'
 
-    sub_num = 10
-    sigs = torch.rand(num, 1, 1, 1)
-    data = torch.normal(0, 1, size=(num, sub_num, 32, 32)) * sigs
-    targets = sigs[:, :, 0, 0]
+    data = []
+    all_dirs = os.listdir(os.path.join(path, patch_path))
+    all_dirs = np.sort(all_dirs)
+
+    for dir in all_dirs:
+        data.append(np.load(os.path.join(path, dir)))
+
+    df = pd.read_csv('cosmogrid_params.csv')
+    use_params = ['s8']
+    # use_params = ['As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Ol', 'Om', 'm_nu', 'ns', 's8', 'w0']
+
+    targets = df[use_params].values
+
+    data = torch.from_numpy(data).float().log()
+    data = (data - data.mean()) / data.std()
+    data_mean = data.mean()
+    data_std = data.std()
+
+    targets = torch.from_numpy(targets).float()
+    targets = (targets - targets.mean(0)) / targets.std(0)
+    targets_mean = targets.mean()
+    targets_std = targets.std()
+
+    print(data.shape, targets.shape)
+
+
     return data, targets
 
-
-def data_preprocessing_dirac():
-    # Data from the Dirac sims
-    return data_preprocessing_cosmogrid(test=True)
 
 
 def make_dataloaders(data, targets, batch_size=8, seed=42):
