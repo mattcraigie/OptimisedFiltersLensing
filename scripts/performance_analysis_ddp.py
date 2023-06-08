@@ -107,7 +107,7 @@ def demo_basic(rank, world_size):
         if rank == 0:
             model.load_state_dict(best_model_params)
             with torch.no_grad():
-                for i, j in test_loader:
+                for i in test_loader:
                     print(i)
                     break
                 test_loss = validate(model, test_criterion, test_loader, rank)
