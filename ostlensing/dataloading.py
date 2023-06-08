@@ -42,7 +42,7 @@ def data_preprocessing(path, test=False):
     all_dirs = np.sort(all_dirs)
 
     for dir_ in all_dirs:
-        data.append(np.load(os.path.join(path, dir_)))
+        data.append(np.load(os.path.join(path, patch_path, dir_)))
 
     df = pd.read_csv(targets_path)
     use_params = ['s8']
