@@ -1,7 +1,6 @@
-from ostlensing.training import batch_apply, mse_and_admissibility, train, validate
+from ostlensing.training import mse_and_admissibility, train, validate
 from ostlensing.dataloading import make_dataloaders, data_preprocessing
 from ostlensing.ostmodel import OptimisableSTRegressor
-import matplotlib.pyplot as plt
 import numpy as np
 
 import os
@@ -14,13 +13,7 @@ import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 
-def mse_and_admissibility_ddp(output, target, model, weighting=1.0):
-    return mse_and_admissibility(output, target, model.module, weighting)
-
-
-def mse(output, target, model):
-    return nn.functional.mse_loss(output, target)
-
+# DDP functions
 
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = 'localhost'
@@ -33,6 +26,18 @@ def setup(rank, world_size):
 def cleanup():
     dist.destroy_process_group()
 
+
+# Adjusted loss functions
+
+def mse_and_admissibility_ddp(output, target, model, weighting=1.0):
+    return mse_and_admissibility(output, target, model.module, weighting)
+
+
+def mse(output, target, model):
+    return nn.functional.mse_loss(output, target)
+
+
+# Analysis functions
 
 def train_loop(model, optimizer, criterion, train_loader, val_loader, device, epochs=10):
     train_losses = []
@@ -56,7 +61,7 @@ def train_loop(model, optimizer, criterion, train_loader, val_loader, device, ep
     return train_losses, val_losses, best_model_params, best_filters
 
 
-def demo_basic(rank, world_size):
+def test_performance(rank, world_size):
     print(f"Running basic DDP example on rank {rank}.")
     setup(rank, world_size)
     path = "//pscratch/sd/m/mcraigie/cosmogrid/"
@@ -84,7 +89,7 @@ def demo_basic(rank, world_size):
         data_subset, targets_subset = data[:amount], targets[:amount]
         train_loader, val_loader = make_dataloaders(data_subset, targets_subset)
 
-        # setup the model, send it to DDP and train
+        # set up the model, send it to DDP and train
         model = OptimisableSTRegressor(size=32,
                                        num_scales=4,
                                        num_angles=4,
@@ -121,71 +126,12 @@ def demo_basic(rank, world_size):
     cleanup()
 
 
-def run_demo(demo_fn, world_size):
-    mp.spawn(demo_fn,
+def main(func, world_size):
+    mp.spawn(func,
              args=(world_size,),
              nprocs=world_size,
              join=True)
 
 
 if __name__ == '__main__':
-    # Specify the number of processes or workers
-    world_size = 4
-
-    # Run the DDP example
-    run_demo(demo_basic, world_size)
-
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#
-#
-
-#
-#
-# def full_test(data, targets, model):
-#     with torch.no_grad():
-#         predictions = batch_apply(data, 64, model, device).cpu()
-#         return nn.functional.mse_loss(predictions, targets).item()
-#
-#
-# def show_performance(path):
-#     results = np.load(path)
-#     plt.plot(results)
-#     plt.show()
-#
-#
-# def main():
-#     torch.manual_seed(0)
-#
-#     num_epochs = 10
-#     data_amounts = range(100, 500, 100)
-#     model_name = 'ost'
-#
-#     data, targets = data_preprocessing_cosmogrid()
-#     data_test, targets_test = data_preprocessing_cosmogrid(test=True)
-#
-#     model_results = []
-#     for amount in data_amounts:
-#         print(amount)
-#         data_subset, targets_subset = data[:amount], targets[:amount]
-#         model = OptimisableSTRegressor(size=32,
-#                                        num_scales=4,
-#                                        num_angles=4,
-#                                        reduction=None,
-#                                        hidden_sizes=(32, 32),
-#                                        output_size=1,
-#                                        activation=nn.LeakyReLU,
-#                                        seed=0)
-#         model.to(device)
-#         train_loss, val_loss, model_params, filters = full_train(data_subset, targets_subset, model, num_epochs)
-#         model.load_state_dict(model_params)
-#         test_score = full_test(data_test, targets_test, model)
-#         model_results.append(test_score)
-#
-#     model_results = np.array(model_results)
-#     np.save('model_{}_performance.npy'.format(model_name), model_results)
-#
-#     show_performance('model_{}_performance.npy'.format(model_name))
-#
-#
-# if __name__ == '__main__':
-#     main()
+    main(test_performance, world_size=4)
