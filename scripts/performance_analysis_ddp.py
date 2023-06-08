@@ -78,7 +78,7 @@ def demo_basic(rank, world_size):
         # trim to data subset and make train and val loaders
         print(amount)
         data_subset, targets_subset = data[:amount], targets[:amount]
-        train_loader, val_loader = make_dataloaders(data_subset, targets_subset, test=True)
+        train_loader, val_loader = make_dataloaders(data_subset, targets_subset)
 
         # setup the model, send it to DDP and train
         model = OptimisableSTRegressor(size=32,
