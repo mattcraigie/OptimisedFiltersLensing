@@ -14,6 +14,10 @@ import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 
+def mse_and_admissibility_ddp(output, target, model, weighting):
+    return mse_and_admissibility(output, target, model.module, weighting)
+
+
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '12355'
