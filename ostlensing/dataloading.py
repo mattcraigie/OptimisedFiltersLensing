@@ -31,7 +31,7 @@ class Scaler(object):
         return data * self.std + self.mean
 
 
-def data_preprocessing(path, test=False, subset=None):
+def data_preprocessing(path, test=False, return_scalers=False):
     # # use os to list all files in the directory, and load them one by one and stack them together
 
     patch_path = 'patches'
@@ -41,11 +41,8 @@ def data_preprocessing(path, test=False, subset=None):
     all_dirs = os.listdir(os.path.join(path, patch_path))
     all_dirs = np.sort(all_dirs)
 
-    if subset is not None:
-        all_dirs = all_dirs[:subset]
-
     data = []
-    for dir_ in all_dirs:
+    for dir_ in all_dirs[:20]:
         data.append(np.load(os.path.join(path, patch_path, dir_)))
     data = np.stack(data)
 
@@ -54,9 +51,6 @@ def data_preprocessing(path, test=False, subset=None):
     # use_params = ['As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Ol', 'Om', 'm_nu', 'ns', 's8', 'w0']
 
     targets = df[use_params].values
-
-    if subset is not None:
-        targets = targets[:subset]
 
     data = torch.from_numpy(data).float().log()
     data_scaler = Scaler(data.mean(), data.std())
@@ -75,9 +69,10 @@ def data_preprocessing(path, test=False, subset=None):
 
     if test:
         return data[test_indices], targets[test_indices]
-    else:
+    elif return_scalers:
         return data[train_indices], targets[train_indices], data_scaler, target_scaler
-
+    else:
+        return data[train_indices], targets[train_indices]
 
 def make_dataloaders(data, targets, batch_size=8, seed=42, test=False):
     dataset = GeneralDataset(data, targets)

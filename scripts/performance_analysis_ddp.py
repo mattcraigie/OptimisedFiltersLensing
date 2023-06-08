@@ -62,8 +62,8 @@ def demo_basic(rank, world_size):
     model_name = 'ost'
 
     # load train+val and test data
-    data, targets = data_preprocessing(path, subset=20)
-    data_test, targets_test = data_preprocessing(path, test=True, subset=20)
+    data, targets = data_preprocessing(path)
+    data_test, targets_test = data_preprocessing(path, test=True)
 
     # make test loader outside the loop
     test_loader = make_dataloaders(data_test, targets_test)
