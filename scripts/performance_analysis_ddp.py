@@ -18,6 +18,10 @@ def mse_and_admissibility_ddp(output, target, model, weighting=1.0):
     return mse_and_admissibility(output, target, model.module, weighting)
 
 
+def mse(output, target, model):
+    return nn.functional.mse_loss(output, target)
+
+
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '12355'
@@ -70,7 +74,7 @@ def demo_basic(rank, world_size):
 
     # setup train and test losses
     train_criterion = mse_and_admissibility_ddp
-    test_criterion = nn.MSELoss()
+    test_criterion = mse
 
     model_results = []
     for amount in data_amounts:
