@@ -76,7 +76,7 @@ def demo_basic(rank, world_size):
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
     criterion = mse_and_admissibility_ddp
 
-    train_losses, val_losses, best_model_params, best_filters = train_loop(model,
+    train_losses, val_losses, best_model_params, best_filters = train_loop(ddp_model,
                                                                            optimizer,
                                                                            criterion,
                                                                            train_loader,
