@@ -44,7 +44,7 @@ def data_preprocessing(path, test=False):
     for dir_ in all_dirs:
         data.append(np.load(os.path.join(path, patch_path, dir_)))
 
-    df = pd.read_csv(targets_path)
+    df = pd.read_csv(os.path.join(path, targets_path))
     use_params = ['s8']
     # use_params = ['As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Ol', 'Om', 'm_nu', 'ns', 's8', 'w0']
 
