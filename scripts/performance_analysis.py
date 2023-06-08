@@ -1,5 +1,5 @@
 from ostlensing.training import train_loop, batch_apply, mse_and_admissibility
-from ostlensing.dataloading import make_dataloaders, data_preprocessing_cosmogrid
+from ostlensing.dataloading import make_dataloaders, data_preprocessing
 from ostlensing.ostmodel import OptimisableSTRegressor
 import torch
 from torch import nn, optim

@@ -55,7 +55,7 @@ def train_loop(model, optimizer, criterion, train_loader, val_loader, device, ep
 def demo_basic(rank, world_size):
     print(f"Running basic DDP example on rank {rank}.")
     setup(rank, world_size)
-    path = "$PSCRATCH/sd/m/mcraigie/cosmogrid/"
+    path = "//pscratch/sd/m/mcraigie/cosmogrid/patches"
 
     num_epochs = 10
     data_amounts = range(100, 500, 100)

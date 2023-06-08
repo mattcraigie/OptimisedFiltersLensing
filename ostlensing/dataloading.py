@@ -71,7 +71,6 @@ def data_preprocessing(path, test=False):
         return data[train_indices], targets[train_indices], data_scaler, target_scaler
 
 
-
 def make_dataloaders(data, targets, batch_size=8, seed=42, test=False):
     dataset = GeneralDataset(data, targets)
     if test:
