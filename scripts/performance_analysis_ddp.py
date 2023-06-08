@@ -62,7 +62,7 @@ def demo_basic(rank, world_size):
     path = "//pscratch/sd/m/mcraigie/cosmogrid/"
 
     num_epochs = 10
-    data_amounts = range(100, 500, 100)
+    data_amounts = range(5, 25, 5)
     model_name = 'ost'
 
     # load train+val and test data
