@@ -31,16 +31,20 @@ class Scaler(object):
         return data * self.std + self.mean
 
 
-def data_preprocessing(path, test=False):
+def data_preprocessing(path, test=False, subset=None):
     # # use os to list all files in the directory, and load them one by one and stack them together
 
     patch_path = 'patches'
     targets_path = 'params.csv'
 
-    data = []
+
     all_dirs = os.listdir(os.path.join(path, patch_path))
     all_dirs = np.sort(all_dirs)
 
+    if subset is not None:
+        all_dirs = all_dirs[:subset]
+
+    data = []
     for dir_ in all_dirs:
         data.append(np.load(os.path.join(path, patch_path, dir_)))
     data = np.stack(data)
@@ -50,6 +54,9 @@ def data_preprocessing(path, test=False):
     # use_params = ['As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Ol', 'Om', 'm_nu', 'ns', 's8', 'w0']
 
     targets = df[use_params].values
+
+    if subset is not None:
+        targets = targets[:subset]
 
     data = torch.from_numpy(data).float().log()
     data_scaler = Scaler(data.mean(), data.std())
