@@ -1,4 +1,4 @@
-from ostlensing.training import train_loop, batch_apply, mse_and_admissibility
+from ostlensing.training import batch_apply, mse_and_admissibility, train, validate
 from ostlensing.dataloading import make_dataloaders
 from ostlensing.ostmodel import OptimisableSTRegressor
 import matplotlib.pyplot as plt
@@ -28,6 +28,28 @@ def setup(rank, world_size):
 
 def cleanup():
     dist.destroy_process_group()
+
+
+def train_loop(model, optimizer, criterion, train_loader, val_loader, device, epochs=10):
+    train_losses = []
+    val_losses = []
+    best_loss = float('inf')
+    best_model_params = None
+    best_filters = None
+
+    for epoch in range(1, epochs + 1):
+        train_loss = train(model, optimizer, criterion, train_loader, device)
+        val_loss = validate(model, criterion, val_loader, device)
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
+
+        # save best model
+        if val_loss < best_loss:
+            best_loss = val_loss
+            best_model_params = model.module.state_dict()  # modified
+            best_filters = model.module.filters.filter_tensor  # modified
+
+    return train_losses, val_losses, best_model_params, best_filters
 
 
 def full_train(data, targets, model, num_epochs, rank):
