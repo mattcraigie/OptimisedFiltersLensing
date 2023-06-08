@@ -52,21 +52,6 @@ def train_loop(model, optimizer, criterion, train_loader, val_loader, device, ep
     return train_losses, val_losses, best_model_params, best_filters
 
 
-def full_train(data, targets, model, num_epochs, rank):
-    train_loader, val_loader = make_dataloaders(data, targets)
-
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
-    criterion = mse_and_admissibility_ddp
-
-    return train_loop(model,
-                      optimizer,
-                      criterion,
-                      train_loader,
-                      val_loader,
-                      rank,
-                      num_epochs)
-
-
 def demo_basic(rank, world_size):
     print(f"Running basic DDP example on rank {rank}.")
     setup(rank, world_size)
@@ -84,10 +69,26 @@ def demo_basic(rank, world_size):
     ddp_model = DDP(model, device_ids=[rank])
     data = torch.randn((100, 10, 32, 32))
     targets = torch.randn((100, 1))
-    full_train(data, targets, ddp_model, 100, rank)
+
+    train_loader, val_loader = make_dataloaders(data, targets)
+
+    num_epochs = 100
+    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    criterion = mse_and_admissibility_ddp
+
+    train_losses, val_losses, best_model_params, best_filters = train_loop(model,
+                                                                           optimizer,
+                                                                           criterion,
+                                                                           train_loader,
+                                                                           val_loader,
+                                                                           rank,
+                                                                           num_epochs)
 
     cleanup()
 
+    if rank == 0:
+        plt.imshow(best_filters[0, 0].cpu().detach().numpy())
+        plt.savefig('learned_filter.png')
 
 def run_demo(demo_fn, world_size):
     mp.spawn(demo_fn,
