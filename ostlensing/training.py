@@ -2,13 +2,19 @@ import torch
 import torch.nn as nn
 
 
-# ~~~ Training Functions ~~~ #
+# ~~~ Loss Functions ~~~ #
 
 def mse_and_admissibility(output, target, model, weighting=1.0):
     loss = nn.functional.mse_loss(output, target)
     loss += weighting * model.filters.filter_tensor[1, 0, 0, 0]**2  # (zero-freq fourier mode / mean config space)
     return loss
 
+
+def mse(output, target, model):
+    return nn.functional.mse_loss(output, target)
+
+
+# ~~~ Training Functions ~~~ #
 
 def train(model, optimizer, criterion, train_loader, device):
     model.train()
@@ -35,7 +41,7 @@ def validate(model, criterion, val_loader, device):
     return val_loss / len(val_loader.dataset)
 
 
-def train_loop(model, optimizer, criterion, train_loader, val_loader, device, epochs=10):
+def train_loop(model, optimizer, train_criterion, val_criterion, train_loader, val_loader, device, epochs=10):
     train_losses = []
     val_losses = []
     best_loss = float('inf')
@@ -43,8 +49,8 @@ def train_loop(model, optimizer, criterion, train_loader, val_loader, device, ep
     best_filters = None
 
     for epoch in range(1, epochs + 1):
-        train_loss = train(model, optimizer, criterion, train_loader, device)
-        val_loss = validate(model, criterion, val_loader, device)
+        train_loss = train(model, optimizer, train_criterion, train_loader, device)
+        val_loss = validate(model, val_criterion, val_loader, device)
         train_losses.append(train_loss)
         val_losses.append(val_loss)
 

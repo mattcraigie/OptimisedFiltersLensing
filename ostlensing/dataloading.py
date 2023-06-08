@@ -6,6 +6,10 @@ import numpy as np
 import healpy as hp
 import os
 import pandas as pd
+from training import batch_apply
+
+
+# Data handling functions and class
 
 class GeneralDataset(Dataset):
     def __init__(self, data, targets):
@@ -31,71 +35,114 @@ class Scaler(object):
         return data * self.std + self.mean
 
 
-def data_preprocessing(path, test=False, return_scalers=False):
-    # # use os to list all files in the directory, and load them one by one and stack them together
-
-    patch_path = 'patches'
-    targets_path = 'params.csv'
+def norm_scale(x, axis=None):
+    scaler = Scaler(np.mean(x, axis), np.std(x, axis))
+    return scaler.transform(x), scaler
 
 
-    all_dirs = os.listdir(os.path.join(path, patch_path))
-    all_dirs = np.sort(all_dirs)
-
-    data = []
-    for dir_ in all_dirs[:1000]:
-        data.append(np.load(os.path.join(path, patch_path, dir_)))
-    data = np.stack(data)
-
-    df = pd.read_csv(os.path.join(path, targets_path))
-    use_params = ['s8']
-    # use_params = ['As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Ol', 'Om', 'm_nu', 'ns', 's8', 'w0']
-
-    targets = df[use_params].values
-
-    data = torch.from_numpy(data).float().log()
-    data_scaler = Scaler(data.mean(), data.std())
-    data = data_scaler.transform(data)
-
-    targets = torch.from_numpy(targets).float()
-    target_scaler = Scaler(targets.mean(0), targets.std(0))
-    targets = target_scaler.transform(targets)
-
-    test_fraction = 0.2
-    num_data = len(data)
-    indices = list(range(num_data))
-    split = int(np.floor(test_fraction * num_data))
-    np.random.shuffle(indices)
-    train_indices, test_indices = indices[split:], indices[:split]
-
-    if test:
-        return data[test_indices], targets[test_indices]
-    elif return_scalers:
-        return data[train_indices], targets[train_indices], data_scaler, target_scaler
-    else:
-        return data[train_indices], targets[train_indices]
+def data_shuffler(*args):
+    size = args[0].shape[0]
+    perm = torch.randperm(size)
+    return tuple([arg[perm] for arg in args])
 
 
-def make_dataloaders(data, targets, batch_size=8, seed=42, test=False):
-    dataset = GeneralDataset(data, targets)
-    if test:
-        return DataLoader(dataset, batch_size=batch_size)
+class DataHandler(object):
+    """There are three types of data: patches, features and targets. They are all handled differently."""
+    def __init__(self, load_subset=-1, val_ratio=0.2, test_ratio=0.2, patches=False, ):
+        self.load_subset = load_subset
+        self.val_ratio = val_ratio
+        self.test_ratio = test_ratio
 
-    # randomly split data into train and validation sets
-    # need to put this in shared function
-    np.random.seed(seed)
-    num_data = len(dataset)
-    indices = list(range(num_data))
-    split = int(np.floor(0.2 * num_data))
-    np.random.shuffle(indices)
-    train_indices, val_indices = indices[split:], indices[:split]
-    train_sampler = SubsetRandomSampler(train_indices)
-    val_sampler = SubsetRandomSampler(val_indices)
+        self.data = None
+        self.targets = None
 
-    train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
-    val_loader = DataLoader(dataset, batch_size=batch_size, sampler=val_sampler)
+        self.data_scaler = None
+        self.targets_scaler = None
 
-    return train_loader, val_loader
+        self.dataset = None
 
+    def load_patches(self, path):
+        all_dirs = os.listdir(path)
+        all_dirs = np.sort(all_dirs)
+
+        patches = []
+        for dir_ in all_dirs[:self.load_subset]:
+            patches.append(np.load(os.path.join(path, dir_)))
+
+        return np.stack(patches)
+
+    def load_features(self, path):
+        features = np.load(path)
+        features = features[:self.load_subset]
+
+        return features
+
+    def add_data(self, path, patches=False, normalise=True, log=False):
+        if patches:
+            data = self.load_patches(path)
+        else:
+            data = self.load_features(path)
+
+        if log:
+            data = np.log(data)
+
+        if normalise:
+            data, self.data_scaler = norm_scale(data, axis=0)
+
+        self.data = torch.from_numpy(data).float()
+
+        if self.targets is not None:
+            assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
+            self.data, self.targets = data_shuffler(self.data, self.targets)
+            self.dataset = GeneralDataset(self.data, self.targets)
+
+
+    def add_targets(self, path, normalise=True, use_params=('s8',)):
+        df = pd.read_csv(path)
+        targets = df[list(use_params)].values
+        targets = targets[:self.load_subset]
+
+        if normalise:
+            targets, self.targets_scaler = norm_scale(targets, axis=0)
+
+        self.targets = torch.from_numpy(targets).float()
+
+        if self.data is not None:
+            assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
+            self.data, self.targets = data_shuffler(self.data, self.targets)
+            self.dataset = GeneralDataset(self.data, self.targets)
+
+    def get_test_loader(self, batch_size=128):
+        assert self.dataset is not None, 'Data and targets must be loaded before getting loaders'
+        num_data = len(self.dataset)
+        test_split = int(self.test_ratio * num_data)
+        test_indices = np.arange(test_split)
+        test_sampler = SubsetRandomSampler(test_indices)
+        return DataLoader(self.dataset, batch_size=batch_size, sampler=test_sampler)
+
+    def get_train_val_loaders(self, subset=-1, batch_size=128):
+
+        # make the samplers
+        num_data = len(self.dataset)
+        test_split = int(self.test_ratio * num_data)
+        remaining = int((1 - self.test_ratio) * num_data)
+        remaining = remaining if subset == -1 else subset
+
+        val_split = int(self.val_ratio * remaining)
+
+        val_indices = np.arange(test_split, test_split + val_split)
+        train_indices = np.arange(test_split + val_split, test_split + val_split + remaining)
+
+        val_sampler = SubsetRandomSampler(val_indices)
+        train_sampler = SubsetRandomSampler(train_indices)
+
+        val_loader = DataLoader(self.dataset, batch_size=batch_size, sampler=val_sampler)
+        train_loader = DataLoader(self.dataset, batch_size=batch_size, sampler=train_sampler)
+
+        return train_loader, val_loader
+
+
+# Patch making functions
 
 def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
     # compute patch centres by using a smaller healpix map with patch_nside, and taking midpoints from the larger pixels
@@ -136,3 +183,22 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
         patch_set.append(gnomonic_projection)
     patch_set = np.stack(patch_set)
     return patch_set
+
+
+# Other functions
+
+def load_and_apply(load_path, save_path, function, device):
+
+    all_dirs = os.listdir(os.path.join(load_path))
+    all_dirs = np.sort(all_dirs)
+
+    data = []
+    for dir_ in all_dirs[:1000]:
+        fields = torch.from_numpy(np.load(os.path.join(load_path, dir_)))
+        results = batch_apply(fields, 64, function, device=device)
+        data.append(results.cpu().numpy())
+    data = np.stack(data)
+
+    np.save(save_path, data)
+
+

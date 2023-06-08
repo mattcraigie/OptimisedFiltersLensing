@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import FourierSubNetFilters, SubNet
+from scattering_transform.filters import FourierSubNetFilters, SubNet, Morlet
 
 
 class MLP(nn.Module):
@@ -60,6 +60,25 @@ class OptimisableSTRegressor(nn.Module):
         x = self.batch_norm(x)
         return self.regressor(x)
 
-    def to(self, device):
-        super(OptimisableSTRegressor, self).to(device)
-        self.st.to(device)
+
+class PrecalcRegressor(nn.Module):
+    def __init__(self,
+                 input_size,
+                 hidden_sizes=(32, 32, 32),
+                 output_size=1,
+                 activation=nn.LeakyReLU,
+                 seed=0
+                 ):
+
+        super(PrecalcRegressor, self).__init__()
+        torch.manual_seed(seed)
+        self.batch_norm = nn.BatchNorm1d(input_size)
+        self.regressor = MLP(input_size=input_size,
+                             hidden_sizes=hidden_sizes,
+                             output_size=output_size,
+                             activation=activation)
+
+    def forward(self, x):
+        x = x.mean(1)  # 'channel' mean, i.e. mean across all patches for the same cosmology
+        x = self.batch_norm(x)
+        return self.regressor(x)
