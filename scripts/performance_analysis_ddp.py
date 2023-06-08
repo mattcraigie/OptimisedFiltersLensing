@@ -34,7 +34,7 @@ def full_train(data, targets, model, num_epochs, rank):
     train_loader, val_loader = make_dataloaders(data, targets)
 
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
-    criterion = mse_and_admissibility
+    criterion = mse_and_admissibility_ddp
 
     return train_loop(model,
                       optimizer,
