@@ -42,7 +42,7 @@ def data_preprocessing(path, test=False, return_scalers=False):
     all_dirs = np.sort(all_dirs)
 
     data = []
-    for dir_ in all_dirs[:100]:
+    for dir_ in all_dirs[:1000]:
         data.append(np.load(os.path.join(path, patch_path, dir_)))
     data = np.stack(data)
 

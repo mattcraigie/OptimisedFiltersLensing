@@ -66,8 +66,8 @@ def test_performance(rank, world_size):
     setup(rank, world_size)
     path = "//pscratch/sd/m/mcraigie/cosmogrid/"
 
-    num_epochs = 500
-    data_amounts = range(10, 105, 5)
+    num_epochs = 100
+    data_amounts = [100, 500, 1000]
     model_name = 'ost'
 
     # load train+val and test data
@@ -101,7 +101,7 @@ def test_performance(rank, world_size):
         model.to(rank)
         ddp_model = DDP(model, device_ids=[rank])
 
-        optimizer = optim.Adam(model.parameters(), lr=1e-4)
+        optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
         # train the model
         train_losses, val_losses, best_model_params, best_filters = train_loop(ddp_model,
