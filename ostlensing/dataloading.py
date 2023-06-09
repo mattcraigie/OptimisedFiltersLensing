@@ -6,7 +6,7 @@ import numpy as np
 import healpy as hp
 import os
 import pandas as pd
-from training import batch_apply
+from .training import batch_apply
 
 
 # Data handling functions and class
