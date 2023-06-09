@@ -132,7 +132,7 @@ class DataHandler:
         val_split = int(self.val_ratio * remaining)
 
         val_indices = np.arange(test_split, test_split + val_split)
-        train_indices = np.arange(test_split + val_split, test_split + val_split + remaining)
+        train_indices = np.arange(test_split + val_split, num_data)
 
         val_sampler = SubsetRandomSampler(val_indices)
         train_sampler = SubsetRandomSampler(train_indices)
