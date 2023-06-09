@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import FourierSubNetFilters, SubNet, Morlet
+from scattering_transform.filters import FourierSubNetFilters, SubNet
 
 
 class MLP(nn.Module):

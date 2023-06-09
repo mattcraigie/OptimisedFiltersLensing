@@ -1,6 +1,6 @@
 from ostlensing.training import mse_and_admissibility, mse, train_loop, validate
 from ostlensing.dataloading import DataHandler
-from ostlensing.ostmodel import OptimisableSTRegressor
+from ostlensing.models import OptimisableSTRegressor
 import numpy as np
 
 import os

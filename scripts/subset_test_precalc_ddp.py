@@ -1,22 +1,20 @@
-from ostlensing.training import mse, Trainer
-from ostlensing.dataloading import DataHandler, load_and_apply
-from ostlensing.ostmodel import PreCalcRegressor
 import numpy as np
-
 import os
 import torch
-import torch.distributed as dist
 import torch.nn as nn
 import torch.optim as optim
 import torch.multiprocessing as mp
-
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from .subset_test_ost_ddp import setup, cleanup, mse
+from ostlensing.training import mse, Trainer
+from ostlensing.dataloading import DataHandler, load_and_apply
+from ostlensing.models import PreCalcRegressor
+from subset_test_ost_ddp import setup, cleanup, mse
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import Morlet, FixedFilterBank
 from scattering_transform.power_spectrum import PowerSpectrum
+
 
 # Pre-calculation functions
 
@@ -40,7 +38,7 @@ def pre_calc_ost():
     filter_name = 'name'
     filter_path = os.path.join(path, '/saved_filters/{}.pyt'.format(filter_name))
     load_path = os.path.join(path, '/patches/')
-    save_path = os.path.join(path, '/pre_calc_mst.npy')
+    save_path = os.path.join(path, '/pre_calc_ost_{}.npy'.format(filter_name))
 
     if not os.path.exists(save_path):
         filters = torch.load(filter_path)
