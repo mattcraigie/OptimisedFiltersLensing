@@ -124,12 +124,9 @@ class DataHandler:
     def get_train_val_loaders(self, subset=-1, batch_size=128):
 
         # make the samplers
-        num_data = len(self.dataset)
+        num_data = len(self.dataset) if subset == -1 else subset
         test_split = int(self.test_ratio * num_data)
-        remaining = int((1 - self.test_ratio) * num_data)
-        remaining = remaining if subset == -1 else subset
-
-        val_split = int(self.val_ratio * remaining)
+        val_split = int(self.val_ratio * num_data)
 
         val_indices = np.arange(test_split, test_split + val_split)
         train_indices = np.arange(test_split + val_split, num_data)
