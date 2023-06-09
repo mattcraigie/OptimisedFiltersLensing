@@ -49,7 +49,7 @@ def test_performance(rank, world_size):
 
     # load train+val and test data
     data_handler = DataHandler(load_subset=1000, val_ratio=0.2, test_ratio=0.2)
-    data_handler.add_data(os.path.join(path, '/patches/'), patches=True, normalise=True, log=True)
+    data_handler.add_data(os.path.join(path, 'patches'), patches=True, normalise=True, log=True)
     data_handler.add_targets(os.path.join(path, 'params.csv'), normalise=True)
 
     # make test loader outside the loop
