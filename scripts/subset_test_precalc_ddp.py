@@ -1,6 +1,6 @@
-from ostlensing.training import mse_and_admissibility, mse, train, validate
+from ostlensing.training import mse, Trainer
 from ostlensing.dataloading import DataHandler, load_and_apply
-from ostlensing.ostmodel import PrecalcRegressor
+from ostlensing.ostmodel import PreCalcRegressor
 import numpy as np
 
 import os
@@ -12,10 +12,11 @@ import torch.multiprocessing as mp
 
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from .performance_analysis_ddp import setup, cleanup, mse, train_loop
+from .subset_test_ost_ddp import setup, cleanup, mse
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import Morlet, FixedFilterBank
+from scattering_transform.power_spectrum import PowerSpectrum
 
 # Pre-calculation functions
 
@@ -56,6 +57,7 @@ def pre_calc_pk():
     save_path = os.path.join(path, '/pre_calc_pk.npy')
 
     if not os.path.exists(save_path):
+        power_spectrum = PowerSpectrum(size=128, num_bins=20)
         load_and_apply(load_path, save_path, lambda x: power_spectrum(x), device=torch.device('cuda:0'))
 
 
@@ -89,7 +91,7 @@ def test_performance(rank, world_size):
         train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset)
 
         # set up the model, send it to DDP and train
-        model = PrecalcRegressor(data_handler.data.shape[-1],
+        model = PreCalcRegressor(data_handler.data.shape[-1],
                                  hidden_sizes=(32, 32, 32),
                                  output_size=1,
                                  activation=nn.LeakyReLU,
@@ -100,21 +102,14 @@ def test_performance(rank, world_size):
         optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
         # train the model
-        train_losses, val_losses, best_model_params, best_filters = train_loop(ddp_model,
-                                                                               optimizer,
-                                                                               train_criterion,
-                                                                               test_criterion,
-                                                                               train_loader,
-                                                                               val_loader,
-                                                                               rank,
-                                                                               num_epochs)
+        trainer = Trainer(ddp_model, optimizer, train_criterion, test_criterion, train_loader, val_loader, rank,
+                          distributed=True)
+        trainer.train_loop(num_epochs)
 
         # test the best validated model with unseen data. Only test on one GPU.
         if rank == 0:
-            model.load_state_dict(best_model_params)
-            with torch.no_grad():
-                test_loss = validate(model, test_criterion, test_loader, rank)
-                model_results.append(test_loss)
+            test_loss = trainer.test(test_loader, load_best=True)
+            model_results.append(test_loss)
 
     if rank == 0:  # only save the results once!
         model_results = np.array(model_results)

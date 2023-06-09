@@ -1,4 +1,4 @@
-from ostlensing.training import mse_and_admissibility, train, validate
+from ostlensing.training import mse_and_admissibility, Trainer
 from ostlensing.dataloading import DataHandler
 from ostlensing.ostmodel import OptimisableSTRegressor
 import numpy as np
@@ -38,29 +38,6 @@ def mse(output, target, model):
 
 
 # Analysis functions
-
-def train_loop(model, optimizer, train_criterion, val_criterion, train_loader, val_loader, device, epochs):
-    train_losses = []
-    val_losses = []
-    best_loss = float('inf')
-    best_model_params = None
-
-    for epoch in range(1, epochs + 1):
-        if epoch % 10 == 0:
-            print(f"Epoch {epoch}")
-        train_loss = train(model, optimizer, train_criterion, train_loader, device)
-        val_loss = validate(model, val_criterion, val_loader, device)
-
-        if device == 0:
-            train_losses.append(train_loss)
-            val_losses.append(val_loss)
-
-            # save best model
-            if val_loss < best_loss:
-                best_loss = val_loss
-                best_model_params = model.module.state_dict()  # modified
-
-    return train_losses, val_losses, best_model_params
 
 
 def test_performance(rank, world_size):
@@ -104,21 +81,15 @@ def test_performance(rank, world_size):
         optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
         # train the model
-        train_losses, val_losses, best_model_params = train_loop(ddp_model,
-                                                                 optimizer,
-                                                                 train_criterion,
-                                                                 test_criterion,
-                                                                 train_loader,
-                                                                 val_loader,
-                                                                 rank,
-                                                                 num_epochs)
+        trainer = Trainer(ddp_model, optimizer, train_criterion, test_criterion, train_loader, val_loader, rank,
+                          distributed=True)
+        trainer.train_loop(num_epochs)
 
         # test the best validated model with unseen data. Only test on one GPU.
         if rank == 0:
-            model.load_state_dict(best_model_params)
-            with torch.no_grad():
-                test_loss = validate(model, test_criterion, test_loader, rank)
-                model_results.append(test_loss)
+            test_loss = trainer.test(test_loader, load_best=True)
+            model_results.append(test_loss)
+
 
     if rank == 0:  # only save the results once!
         model_results = np.array(model_results)

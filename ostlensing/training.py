@@ -14,55 +14,6 @@ def mse(output, target, model):
     return nn.functional.mse_loss(output, target)
 
 
-# ~~~ Training Functions ~~~ #
-
-def train(model, optimizer, criterion, train_loader, device):
-    model.train()
-    train_loss = 0
-    for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
-        output = model(data)
-        loss = criterion(output, target, model)
-        loss.backward()
-        optimizer.step()
-        train_loss += loss.item()
-    return train_loss / len(train_loader.dataset)
-
-
-def validate(model, criterion, val_loader, device):
-    model.eval()
-    val_loss = 0
-    with torch.no_grad():
-        for batch_idx, (data, target) in enumerate(val_loader):
-            data, target = data.to(device), target.to(device)
-            output = model(data)
-            loss = criterion(output, target, model)
-            val_loss += loss.item()
-    return val_loss / len(val_loader.dataset)
-
-
-def train_loop(model, optimizer, train_criterion, val_criterion, train_loader, val_loader, device, epochs=10):
-    train_losses = []
-    val_losses = []
-    best_loss = float('inf')
-    best_model_params = None
-    best_filters = None
-
-    for epoch in range(1, epochs + 1):
-        train_loss = train(model, optimizer, train_criterion, train_loader, device)
-        val_loss = validate(model, val_criterion, val_loader, device)
-        train_losses.append(train_loss)
-        val_losses.append(val_loss)
-
-        # save best model
-        if val_loss < best_loss:
-            best_loss = val_loss
-            best_model_params = model.state_dict()
-            best_filters = model.filters.filter_tensor
-
-    return train_losses, val_losses, best_model_params, best_filters
-
-
 def batch_apply(data, bs, func, device):
     results = []
     num_batches = data.shape[0] // bs
@@ -72,3 +23,86 @@ def batch_apply(data, bs, func, device):
         x = x.to(device)
         results.append(func(x))
     return torch.cat(results, dim=0)
+
+
+# ~~~ Trainer Class ~~~ #
+
+class Trainer:
+    # implement gradient averaging
+    def __init__(self, model, optimizer, train_criterion, val_criterion, train_loader, val_loader, device,
+                 distributed=False):
+        self.model = model
+        self.optimizer = optimizer
+        self.train_criterion = train_criterion
+        self.val_criterion = val_criterion
+        self.train_loader = train_loader
+        self.val_loader = val_loader
+        self.device = device
+        self.best_loss = float('inf')
+        self.best_model_params = None
+        self.train_losses = []
+        self.val_losses = []
+        self.distributed = distributed
+
+    def _run_epoch(self, loader, criterion, mode='train'):
+        if mode == 'train':
+            self.model.train()
+        else:
+            self.model.eval()
+
+        total_loss = 0
+        num_samples = len(loader.dataset)
+
+        with torch.set_grad_enabled(mode == 'train'):
+            for batch_idx, (data, target) in enumerate(loader):
+                data, target = data.to(self.device), target.to(self.device)
+                self.optimizer.zero_grad()
+                output = self.model(data)
+                loss = criterion(output, target, self.model)
+
+                if mode == 'train':
+                    loss.backward()
+                    self.optimizer.step()
+
+                total_loss += loss.item()
+
+        avg_loss = total_loss / num_samples
+        return avg_loss
+
+    def train(self):
+        train_loss = self._run_epoch(self.train_loader, self.train_criterion, mode='train')
+        return train_loss
+
+    def validate(self):
+        val_loss = self._run_epoch(self.val_loader, self.val_criterion, mode='eval')
+        return val_loss
+
+    def train_loop(self, epochs=10):
+        for epoch in range(1, epochs + 1):
+            train_loss = self.train()
+            val_loss = self.validate()
+            self.train_losses.append(train_loss)
+            self.val_losses.append(val_loss)
+
+            # save best model
+            if self.distributed and self.device != 0:
+                continue
+
+            if val_loss < self.best_loss:
+                self.best_loss = val_loss
+                self.best_model_params = self.model.state_dict()
+
+    def get_best_model(self):
+        self.model.load_state_dict(self.best_model_params)
+        return self.model
+
+    def test(self, test_loader, load_best=True):
+        if load_best:
+            self.model.load_state_dict(self.best_model_params)
+        # for test, we must also specify a test_loader
+        test_loss = self._run_epoch(test_loader, self.val_criterion, mode='eval')
+        return test_loss
+
+
+
+

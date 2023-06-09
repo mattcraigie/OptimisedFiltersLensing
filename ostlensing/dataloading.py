@@ -23,7 +23,7 @@ class GeneralDataset(Dataset):
         return self.data[idx], self.targets[idx]
 
 
-class Scaler(object):
+class Scaler:
     def __init__(self, mean, std):
         self.mean = mean
         self.std = std
@@ -46,10 +46,11 @@ def data_shuffler(*args):
     return tuple([arg[perm] for arg in args])
 
 
-class DataHandler(object):
+class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
-    def __init__(self, load_subset=-1, val_ratio=0.2, test_ratio=0.2, patches=False, ):
+    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2):
         self.load_subset = load_subset
+        self.sub_batch_subset = sub_batch_subset
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
 
@@ -67,13 +68,13 @@ class DataHandler(object):
 
         patches = []
         for dir_ in all_dirs[:self.load_subset]:
-            patches.append(np.load(os.path.join(path, dir_)))
+            patches.append(np.load(os.path.join(path, dir_))[:self.sub_batch_subset])
 
         return np.stack(patches)
 
     def load_features(self, path):
         features = np.load(path)
-        features = features[:self.load_subset]
+        features = features[:self.load_subset, :self.sub_batch_subset]
 
         return features
 

@@ -61,7 +61,7 @@ class OptimisableSTRegressor(nn.Module):
         return self.regressor(x)
 
 
-class PrecalcRegressor(nn.Module):
+class PreCalcRegressor(nn.Module):
     def __init__(self,
                  input_size,
                  hidden_sizes=(32, 32, 32),
@@ -70,7 +70,7 @@ class PrecalcRegressor(nn.Module):
                  seed=0
                  ):
 
-        super(PrecalcRegressor, self).__init__()
+        super(PreCalcRegressor, self).__init__()
         torch.manual_seed(seed)
         self.batch_norm = nn.BatchNorm1d(input_size)
         self.regressor = MLP(input_size=input_size,
