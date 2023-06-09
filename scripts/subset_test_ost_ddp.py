@@ -105,4 +105,6 @@ def main(func, world_size):
 
 
 if __name__ == '__main__':
+    print("starting...")
     main(test_performance, world_size=4)
+    print("finished!")
