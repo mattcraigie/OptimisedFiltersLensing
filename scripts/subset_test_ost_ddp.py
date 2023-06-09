@@ -49,7 +49,7 @@ def test_performance(rank, world_size):
     model_name = 'ost'
 
     # load train+val and test data
-    data_handler = DataHandler(load_subset=1000, val_ratio=0.2, test_ratio=0.2)
+    data_handler = DataHandler(load_subset=100, sub_batch_subset=10, val_ratio=0.2, test_ratio=0.2)
     data_handler.add_data(os.path.join(path, 'patches'), patches=True, normalise=True, log=True)
     data_handler.add_targets(os.path.join(path, 'params.csv'), normalise=True)
 

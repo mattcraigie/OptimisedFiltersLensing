@@ -60,6 +60,10 @@ class OptimisableSTRegressor(nn.Module):
         x = self.batch_norm(x)
         return self.regressor(x)
 
+    def to(self, device):
+        super(OptimisableSTRegressor, self).to(device)
+        self.st.to(device)
+        return self
 
 class PreCalcRegressor(nn.Module):
     def __init__(self,
