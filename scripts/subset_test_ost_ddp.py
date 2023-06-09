@@ -45,7 +45,7 @@ def test_performance(rank, world_size):
     path = "//pscratch/sd/m/mcraigie/cosmogrid/"
 
     num_epochs = 100
-    data_subsets = [100, 500, 1000]
+    data_subsets = [10, 50, 100]
     model_name = 'ost'
 
     # load train+val and test data

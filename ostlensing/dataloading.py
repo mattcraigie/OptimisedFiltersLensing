@@ -121,10 +121,14 @@ class DataHandler:
         test_sampler = SubsetRandomSampler(test_indices)
         return DataLoader(self.dataset, batch_size=batch_size, sampler=test_sampler)
 
-    def get_train_val_loaders(self, subset=-1, batch_size=128):
+    def get_train_val_loaders(self, subset=None, batch_size=128):
+
+        if subset >= len(self.dataset) or subset is None:
+            raise ValueError(
+                "Subset must be smaller than or equal to the loaded data. Load more data or adjust subset.")
 
         # make the samplers
-        num_data = len(self.dataset) if subset == -1 else subset
+        num_data = len(self.dataset) if subset is None else subset
         test_split = int(self.test_ratio * num_data)
         val_split = int(self.val_ratio * num_data)
 
