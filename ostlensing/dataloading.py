@@ -123,7 +123,7 @@ class DataHandler:
 
     def get_train_val_loaders(self, subset=None, batch_size=128):
 
-        if subset >= len(self.dataset) or subset is None:
+        if subset > len(self.dataset) or subset is None:
             raise ValueError(
                 "Subset must be smaller than or equal to the loaded data. Load more data or adjust subset.")
 
