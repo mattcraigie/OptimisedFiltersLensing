@@ -1,7 +1,8 @@
 import warnings
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import TensorDataset, DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data.distributed import DistributedSampler
 import numpy as np
 import healpy as hp
 import os
@@ -10,17 +11,6 @@ from .training import batch_apply
 
 
 # Data handling functions and class
-
-class GeneralDataset(Dataset):
-    def __init__(self, data, targets):
-        self.data = data
-        self.targets = targets
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        return self.data[idx], self.targets[idx]
 
 
 class Scaler:
@@ -60,8 +50,6 @@ class DataHandler:
         self.data_scaler = None
         self.targets_scaler = None
 
-        self.dataset = None
-
     def load_patches(self, path):
         all_dirs = os.listdir(path)
         all_dirs = np.sort(all_dirs)
@@ -95,7 +83,6 @@ class DataHandler:
         if self.targets is not None:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
             self.data, self.targets = data_shuffler(self.data, self.targets)
-            self.dataset = GeneralDataset(self.data, self.targets)
 
 
     def add_targets(self, path, normalise=True, use_params=('s8',)):
@@ -111,35 +98,45 @@ class DataHandler:
         if self.data is not None:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
             self.data, self.targets = data_shuffler(self.data, self.targets)
-            self.dataset = GeneralDataset(self.data, self.targets)
 
-    def get_test_loader(self, batch_size=128):
-        assert self.dataset is not None, 'Data and targets must be loaded before getting loaders'
-        num_data = len(self.dataset)
+    def get_test_loader(self, batch_size=128, ddp=False):
+        assert self.data is not None and self.targets is not None, \
+            'Data and targets must be loaded before getting dataloaders'
+        num_data = len(self.data)
         test_split = int(self.test_ratio * num_data)
-        test_indices = np.arange(test_split)
-        test_sampler = SubsetRandomSampler(test_indices)
-        return DataLoader(self.dataset, batch_size=batch_size, sampler=test_sampler)
+        test_dataset = TensorDataset(self.data[:test_split], self.targets[:test_split])
+        if ddp:
+            test_sampler = DistributedSampler(test_dataset)
+            return DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler)
+        else:
+            return DataLoader(test_dataset, batch_size=batch_size)
 
-    def get_train_val_loaders(self, subset=None, batch_size=128):
+    def get_train_val_loaders(self, subset=None, batch_size=128, ddp=False):
+        assert self.data is not None and self.targets is not None, \
+            'Data and targets must be loaded before getting dataloaders'
 
-        if subset > len(self.dataset) or subset is None:
+        if subset > len(self.data) or subset is None:
             raise ValueError(
                 "Subset must be smaller than or equal to the loaded data. Load more data or adjust subset.")
 
         # make the samplers
-        num_data = len(self.dataset) if subset is None else subset
+        num_data = len(self.data) if subset is None else subset
         test_split = int(self.test_ratio * num_data)
         val_split = int(self.val_ratio * num_data)
 
-        val_indices = np.arange(test_split, test_split + val_split)
-        train_indices = np.arange(test_split + val_split, num_data)
+        train_dataset = TensorDataset(self.data[test_split + val_split:],
+                                      self.targets[test_split + val_split:])
+        val_dataset = TensorDataset(self.data[test_split:test_split + val_split],
+                                    self.targets[test_split:test_split + val_split])
 
-        val_sampler = SubsetRandomSampler(val_indices)
-        train_sampler = SubsetRandomSampler(train_indices)
-
-        val_loader = DataLoader(self.dataset, batch_size=batch_size, sampler=val_sampler)
-        train_loader = DataLoader(self.dataset, batch_size=batch_size, sampler=train_sampler)
+        if ddp:
+            val_sampler = DistributedSampler(train_dataset)
+            train_sampler = DistributedSampler(val_dataset)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
+        else:
+            val_loader = DataLoader(val_dataset, batch_size=batch_size)
+            train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
         return train_loader, val_loader
 

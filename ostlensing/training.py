@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.distributed as dist
 
 
 # ~~~ Loss Functions ~~~ #
@@ -30,7 +31,7 @@ def batch_apply(data, bs, func, device):
 class Trainer:
     # implement gradient averaging
     def __init__(self, model, optimizer, train_criterion, val_criterion, train_loader, val_loader, device,
-                 distributed=False):
+                 ddp=False):
         self.model = model
         self.optimizer = optimizer
         self.train_criterion = train_criterion
@@ -42,7 +43,7 @@ class Trainer:
         self.best_model_params = None
         self.train_losses = []
         self.val_losses = []
-        self.distributed = distributed
+        self.ddp = ddp  # distributed data parallel
 
     def _run_epoch(self, loader, criterion, mode='train'):
         if mode == 'train':
@@ -67,6 +68,11 @@ class Trainer:
                 total_loss += loss.item()
 
         avg_loss = total_loss / num_samples
+
+        # accumulate and average across GPUs if using DDP
+        if self.ddp:
+            avg_loss = dist.reduce(avg_loss, dst=0, op=dist.ReduceOp.SUM) / dist.get_world_size()
+
         return avg_loss
 
     def train(self):
@@ -79,14 +85,16 @@ class Trainer:
 
     def train_loop(self, epochs=10):
         for epoch in range(1, epochs + 1):
+
             train_loss = self.train()
             val_loss = self.validate()
+
+            if self.ddp and self.device != 0:
+                continue
+
+            # only save losses for rank 0
             self.train_losses.append(train_loss)
             self.val_losses.append(val_loss)
-
-            # save best model
-            if self.distributed and self.device != 0:
-                continue
 
             if val_loss < self.best_loss:
                 self.best_loss = val_loss
