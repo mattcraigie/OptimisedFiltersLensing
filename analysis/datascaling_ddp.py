@@ -65,8 +65,8 @@ def data_scaling(rank, args):
     learning_rate = train_config['learning_rate']
 
     # analysis params
-    analysis_params = config['analysis_params']
-    data_subsets = analysis_params['data_subsets']
+    analysis_config = config['analysis']
+    data_subsets = analysis_config['data_subsets']
 
     # load train+val and test data with DataHandler
     data_handler = DataHandler(load_subset=load_subset,

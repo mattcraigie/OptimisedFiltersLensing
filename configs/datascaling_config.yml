@@ -1,0 +1,23 @@
+data:
+  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
+  data_subpath: 'patches'                                   # patches or pre_calc
+  is_patches: True                                          # True if the data is a set of patches
+  load_subset: 100                                          # Subset of cosmologies to load (saves memory), -1 for all
+  sub_batch_subset: 20                                      # Subset of patches per cosmology, -1 for all
+  val_ratio: 0.2                                            # Portion of data to use for validation
+  test_ratio: 0.2                                           # Portion of data to use for testing
+
+model:
+  model_type: 'ost'                                         # Type of model to use, currently 'ost' or 'pre_calc'
+  model_args:                                               # Model keywords arguments to be passed to the constructor
+    a: 'a'
+    b: 'b'
+    c: 'c'
+
+training:
+  num_epochs: 100                                           # Number of training epochs
+  batch_size: 128                                           # Batch size
+  learning_rate: 0.001                                      # Learning rate
+
+analysis:
+  data_subsets: [10, 50, 100]                               # Subsets of the data for the scaling analysis

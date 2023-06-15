@@ -3,3 +3,5 @@ torch~=2.0.1+cu117
 numpy~=1.24.1
 matplotlib~=3.7.1
 git+https://github.com/mattcraigie/scattering-transform
+PyYAML~=6.0
+pandas~=2.0.2
