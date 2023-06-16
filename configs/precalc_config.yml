@@ -5,4 +5,5 @@ kwargs:
   size: 128
   num_scales: 6
   num_angles: 6
+  reduction: None
 
