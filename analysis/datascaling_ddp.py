@@ -16,6 +16,8 @@ from ddp_nersc import ddp_main, setup, cleanup
 
 # help options: berkeley group desi -  nersc channel desi anthony kremin,
 
+model_map = {'ost': OptimisableSTRegressor, 'pre_calc': PreCalcRegressor}
+
 
 # Adjusted loss functions
 
@@ -93,11 +95,10 @@ def data_scaling(rank, args):
         train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
         # set up the model
-        if model_type == 'ost':
-            model_class = OptimisableSTRegressor
-        elif model_type == 'pre_calc':
-            model_class = PreCalcRegressor
-        else:
+        print(model_type)
+        try:
+            model_class = model_map[model_type]
+        except KeyError:
             raise ValueError('Model type not recognised.')
 
         try:
