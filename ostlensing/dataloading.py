@@ -192,9 +192,9 @@ def load_and_apply(load_path, save_path, function, device):
     all_dirs = np.sort(all_dirs)
 
     data = []
-    for dir_ in all_dirs[:1000]:
-        fields = torch.from_numpy(np.load(os.path.join(load_path, dir_)))
-        results = batch_apply(fields, 64, function, device=device)
+    for dir_ in all_dirs:
+        fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
+        results = batch_apply(fields, 16, function, device=device)
         data.append(results.cpu().numpy())
     data = np.stack(data)
 
