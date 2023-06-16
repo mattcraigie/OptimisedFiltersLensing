@@ -67,7 +67,7 @@ class Trainer:
 
                 total_loss += loss.item()
 
-        avg_loss = torch.tensor(total_loss / num_samples)
+        avg_loss = torch.tensor(total_loss / num_samples, device=self.device)
 
         # accumulate and average across GPUs if using DDP
         if self.ddp:
