@@ -12,7 +12,7 @@ import torch.distributed as dist
 
 
 def setup(gpu, args):
-    rank = args.nr * args.gpus + gpu
+    rank = gpu  # + args.nr * args.gpus
     dist.init_process_group(
         backend='nccl',
         init_method='env://',
