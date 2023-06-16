@@ -126,7 +126,7 @@ def data_scaling(rank, args):
     if rank == 0:  # only save the results once!
 
         df = pd.DataFrame({'data_subset': data_subsets, 'test_loss': model_results})
-        df.to_csv(os.path.join('outputs', 'data_scaling_{}.csv'.format(model_type)), index=False)
+        df.to_csv(os.path.join('../outputs', 'data_scaling_{}.csv'.format(model_type)), index=False)
 
     cleanup()
 
