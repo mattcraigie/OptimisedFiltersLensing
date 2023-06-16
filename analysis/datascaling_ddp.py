@@ -86,6 +86,9 @@ def data_scaling(rank, args):
 
     model_results = []
     for subset in data_subsets:
+        if rank == 0:
+            print(f"Running analysis for data subset {subset}.")
+
         # make train and val loaders with the subset of data
         train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
@@ -118,7 +121,7 @@ def data_scaling(rank, args):
 
         # only save results for rank 0
         if rank == 0:
-            model_results.append(test_loss)
+            model_results.append(test_loss.cpu())
 
     if rank == 0:  # only save the results once!
 
