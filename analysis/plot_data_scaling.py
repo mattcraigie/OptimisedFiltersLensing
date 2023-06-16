@@ -7,4 +7,4 @@ plt.plot(df['data_subset'], df['test_loss'])
 plt.xlabel('Number of training cosmologies')
 plt.ylabel('Test loss')
 
-plt.savefig('data_scaling.png')
+plt.savefig('outputs/data_scaling.png')
