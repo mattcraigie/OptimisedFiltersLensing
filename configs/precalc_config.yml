@@ -6,4 +6,5 @@ kwargs:
   num_scales: 6
   num_angles: 6
   reduction: 'rot_avg'
+  device: 'cuda:0'
 

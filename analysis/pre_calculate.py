@@ -9,25 +9,28 @@ from scattering_transform.power_spectrum import PowerSpectrum
 from ostlensing.dataloading import load_and_apply
 
 
-def st_func(filters, reduction):
+def st_func(filters, reduction, device):
     st = ScatteringTransform2d(filters)
+    st.to(device)
     reducer = Reducer(filters, reduction=reduction)
     return lambda x: reducer(st(x))
 
 
-def mst(size, num_scales, num_angles, reduction):
+def mst(size, num_scales, num_angles, reduction, device):
     morlet = Morlet(size, num_scales, num_angles)
-    return st_func(morlet, reduction)
+    return st_func(morlet, reduction, device)
 
 
-def ost(filter_path, reduction):
+def ost(filter_path, reduction, device):
     filters = torch.load(filter_path)
     filter_bank = FixedFilterBank(filters)
-    return st_func(filter_bank, reduction)
+    return st_func(filter_bank, reduction, device)
 
 
-def pk(size, num_bins):
-    return PowerSpectrum(size, num_bins)
+def pk(size, num_bins, device):
+    ps = PowerSpectrum(size, num_bins)
+    ps.to(device)
+    return ps
 
 
 def pre_calc(load_path, save_path, method, kwargs):
