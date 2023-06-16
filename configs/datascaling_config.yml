@@ -1,21 +1,21 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'mst_precalc'                                   # patches or pre_calc
-  is_patches: False                                          # True if the data is a set of patches
-  load_subset: -1                                          # Subset of cosmologies to load (saves memory), -1 for all
+  data_subpath: 'mst_precalc.npy'                           # patches or pre_calc
+  is_patches: False                                         # True if the data is a set of patches
+  load_subset: -1                                           # Subset of cosmologies to load (saves memory), -1 for all
   sub_batch_subset: -1                                      # Subset of patches per cosmology, -1 for all
   val_ratio: 0.2                                            # Portion of data to use for validation
   test_ratio: 0.2                                           # Portion of data to use for testing
 
 model:
-  model_type: 'pre_calc'                                         # Type of model to use, currently 'ost' or 'pre_calc'
+  model_type: 'pre_calc'                                    # Type of model to use, currently 'ost' or 'pre_calc'
   model_args:                                               # Model keywords arguments to be passed to the constructor
     input_size: 22
 
 training:
-  num_epochs: 100                                           # Number of training epochs
-  batch_size: 16                                           # Batch size
+  num_epochs: 500                                           # Number of training epochs
+  batch_size: 128                                           # Batch size
   learning_rate: 0.001                                      # Learning rate
 
 analysis:
-  data_subsets: [10, 50, 100]                               # Subsets of the data for the scaling analysis
+  data_subsets: [10, 50, 100, 500, 1000, 1750, 2500]        # Subsets of the data for the scaling analysis
