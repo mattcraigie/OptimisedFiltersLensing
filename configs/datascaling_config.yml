@@ -18,4 +18,4 @@ training:
   learning_rate: 0.001                                      # Learning rate
 
 analysis:
-  data_subsets: [10, 50, 100]                               # Subsets of the data for the scaling analysis
+  data_subsets: [5, 7, 10]                               # Subsets of the data for the scaling analysis
