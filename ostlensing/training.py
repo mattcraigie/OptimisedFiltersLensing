@@ -67,13 +67,9 @@ class Trainer:
 
                 total_loss += loss.item()
 
-        avg_loss = torch.tensor(total_loss / num_samples, device=self.device)
+        avg_loss = total_loss / num_samples
 
-        # accumulate and average across GPUs if using DDP
-        if self.ddp:
-            avg_loss = dist.reduce(avg_loss, dst=0, op=dist.ReduceOp.SUM) / dist.get_world_size()
-
-        return avg_loss.item()
+        return avg_loss
 
     def train(self):
         train_loss = self._run_epoch(self.train_loader, self.train_criterion, mode='train')
@@ -90,9 +86,17 @@ class Trainer:
             val_loss = self.validate()
 
             if self.ddp and self.device != 0:
-                continue
+                continue  # if not on main device, don't save losses
 
-            # only save losses for rank 0
+            # only rank 0 can pass this point
+            # accumulate and average across GPUs if using DDP
+            if self.ddp:
+                dist.reduce(train_loss, dst=0, op=dist.ReduceOp.SUM)  # this operation is inplace and returns to rank 0
+                train_loss /= dist.get_world_size()
+
+                dist.reduce(val_loss, dst=0, op=dist.ReduceOp.SUM)
+                val_loss /= dist.get_world_size()
+
             self.train_losses.append(train_loss)
             self.val_losses.append(val_loss)
 
@@ -109,6 +113,11 @@ class Trainer:
             self.model.load_state_dict(self.best_model_params)
         # for test, we must also specify a test_loader
         test_loss = self._run_epoch(test_loader, self.val_criterion, mode='eval')
+
+        if self.ddp and self.device != 0:
+            dist.reduce(test_loss, dst=0, op=dist.ReduceOp.SUM)
+            test_loss /= dist.get_world_size()
+
         return test_loss
 
 

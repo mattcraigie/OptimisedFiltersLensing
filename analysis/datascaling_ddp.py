@@ -114,7 +114,7 @@ def data_scaling(rank, args):
         trainer.train_loop(num_epochs)
 
         # test the best validated model with unseen data
-        test_loss = trainer.test(test_loader, load_best=True)  # test method inherently averages across GPUs
+        test_loss = trainer.test(test_loader, load_best=True)  # reduced across ranks and stored in rank 0's test_loss
 
         # only save results for rank 0
         if rank == 0:
