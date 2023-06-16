@@ -65,6 +65,7 @@ class OptimisableSTRegressor(nn.Module):
         self.st.to(device)
         return self
 
+
 class PreCalcRegressor(nn.Module):
     def __init__(self,
                  input_size,
