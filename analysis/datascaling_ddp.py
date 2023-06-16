@@ -95,7 +95,6 @@ def data_scaling(rank, args):
         train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
         # set up the model
-        print(model_type)
         try:
             model_class = model_map[model_type]
         except KeyError:
