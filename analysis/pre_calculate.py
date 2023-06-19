@@ -34,13 +34,13 @@ def pk(size, num_bins, device):
 
 
 def pre_calc(load_path, save_path, method, kwargs):
-    function_mapping = {'ost': ost, 'mst': mst, 'pk': pk}
+    function_mapping = {'ost': ost, 'mst': mst, 'ps': pk}
     load_and_apply(load_path, save_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', default='configs/precalc_config.yml', type=str)
+    parser.add_argument('-c', '--config', default='configs/ps.yml', type=str)
     args = parser.parse_args()
 
     with open(args.config, 'r') as file:

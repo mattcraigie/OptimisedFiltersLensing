@@ -57,6 +57,7 @@ def data_scaling(rank, args):
     # model params
     model_config = config['model']
     model_type = model_config['model_type']
+    submodel_type = model_config['submodel_type']
     model_args = model_config['model_args']
 
     # training params
@@ -70,7 +71,7 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
 
     # make output folder
-    out_folder = os.path.join('outputs', model_type)
+    out_folder = os.path.join('outputs', 'datascaling', model_type, submodel_type)
     if rank == 0:
         if not os.path.exists(out_folder):
             os.makedirs(out_folder)
