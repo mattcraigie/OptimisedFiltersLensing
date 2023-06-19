@@ -15,7 +15,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         scaling_df = pd.read_csv(scaling_paths[i])
         ax.plot(scaling_df['data_subset'], np.sqrt(scaling_df['test_loss']), linewidth=4, label=labels[i])
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
-    ax.set_ylabel('Best Test RMSE ($\\approx \\sigma$)', fontsize=16)
+    ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
     plt.legend()
 
     if logy and not logx:
@@ -24,6 +24,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         plt.semilogx()
     if logy and logx:
         plt.loglog()
+    if not logy:
+        plt.ylim(bottom=0)
 
     if save_path is not None:
         plt.savefig(save_path)
@@ -119,7 +121,7 @@ class ModelPlotter:
             axes[i, 1].set_xlabel('Target'.format(param_names[i]))
             axes[i, 1].set_ylabel('Prediction'.format(param_names[i]))
             axes[i, 1].set_aspect('equal')
-            axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+            axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
 
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
