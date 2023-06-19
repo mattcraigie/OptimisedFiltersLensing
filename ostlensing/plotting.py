@@ -20,8 +20,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         std = np.std(scaling_df.iloc[:, 1:], axis=1)
         upper = mean + std
         lower = mean - std
-        print(mean)
-        print(std)
+        mean, lower, upper = np.sqrt(mean), np.sqrt(lower), np.sqrt(upper)
 
         x = scaling_df['data_subset']
         ax.plot(x, mean, linewidth=4, label=labels[i], c=colours[i])

@@ -45,6 +45,7 @@ def data_shuffler(*args):
 
 class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
+
     def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2):
         self.load_subset = load_subset
         self.sub_batch_subset = sub_batch_subset
@@ -92,7 +93,6 @@ class DataHandler:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
             self.data, self.targets = data_shuffler(self.data, self.targets)
 
-
     def add_targets(self, path, normalise=True, use_params=('s8',)):
         df = pd.read_csv(path)
         targets = df[list(use_params)].values
@@ -123,19 +123,30 @@ class DataHandler:
         assert self.data is not None and self.targets is not None, \
             'Data and targets must be loaded before getting dataloaders'
 
-        if subset > len(self.data) or subset is None:
-            raise ValueError(
-                "Subset must be smaller than or equal to the loaded data. Load more data or adjust subset.")
+
 
         # make the samplers
-        num_data = len(self.data) if subset is None else subset
-        test_split = int(self.test_ratio * num_data)
-        val_split = int(self.val_ratio * num_data)
+        num_data = len(self.data)
+        test_split = int(self.test_ratio * num_data)  # test set is unaffected by the subsetting
+        num_remaining = num_data - test_split
 
-        train_dataset = GeneralDataset(self.data[test_split + val_split:num_data],
-                                      self.targets[test_split + val_split:num_data])
-        val_dataset = GeneralDataset(self.data[test_split:test_split + val_split],
-                                    self.targets[test_split:test_split + val_split])
+        if subset > num_remaining:
+            raise ValueError(
+                f"Subset must be smaller than or equal to the non-test data (non test data: {num_remaining}). "
+                f"Load more data or adjust subset.")
+        num_remaining = num_remaining if subset is None else subset
+
+        # another layer of randomness to get the bootstrapping working
+        leftover_data = self.data[test_split:num_remaining+test_split]
+        leftover_targets = self.targets[test_split:num_remaining+test_split]
+        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets)
+
+        val_split = int(self.val_ratio * num_remaining)
+
+        train_dataset = GeneralDataset(leftover_data[val_split:],
+                                       leftover_targets[val_split:])
+        val_dataset = GeneralDataset(leftover_data[:val_split],
+                                     leftover_targets[:val_split])
 
         if ddp:
             val_sampler = DistributedSampler(train_dataset)
@@ -195,7 +206,6 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
 # Other functions
 
 def load_and_apply(load_path, save_path, function, device):
-
     all_dirs = os.listdir(os.path.join(load_path))
     all_dirs = np.sort(all_dirs)
 
@@ -207,5 +217,3 @@ def load_and_apply(load_path, save_path, function, device):
     data = np.stack(data)
 
     np.save(save_path, data)
-
-
