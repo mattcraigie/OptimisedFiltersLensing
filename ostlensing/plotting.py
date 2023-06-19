@@ -4,18 +4,18 @@ import os
 import pandas as pd
 
 
-def plot_scaling(scaling_path, save_path=None, semilogy=True, semilogx=True):
+def plot_scaling(scaling_path, save_path=None, logy=True, logx=True):
     scaling_df = pd.read_csv(scaling_path)
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(scaling_df['data_subset'], scaling_df['test_loss'], linewidth=4)
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Best Test Loss', fontsize=16)
 
-    if semilogy and not semilogx:
+    if logy and not logx:
         plt.semilogy()
-    if semilogx and not semilogy:
+    if logx and not logy:
         plt.semilogx()
-    if semilogy and semilogx:
+    if logy and logx:
         plt.loglog()
 
     if save_path is not None:
