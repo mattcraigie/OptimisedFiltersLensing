@@ -131,8 +131,8 @@ class DataHandler:
         test_split = int(self.test_ratio * num_data)
         val_split = int(self.val_ratio * num_data)
 
-        train_dataset = GeneralDataset(self.data[test_split + val_split:],
-                                      self.targets[test_split + val_split:])
+        train_dataset = GeneralDataset(self.data[test_split + val_split:num_data],
+                                      self.targets[test_split + val_split:num_data])
         val_dataset = GeneralDataset(self.data[test_split:test_split + val_split],
                                     self.targets[test_split:test_split + val_split])
 
