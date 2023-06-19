@@ -137,6 +137,7 @@ class Trainer:
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
 
     def save_predictions(self, save_path):
+        self.model.eval()
         with torch.no_grad():
             train_pred = dataloader_apply(self.train_loader, self.model, self.device).cpu().detach().numpy()
             val_pred = dataloader_apply(self.val_loader, self.model, self.device).cpu().detach().numpy()
