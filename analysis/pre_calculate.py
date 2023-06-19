@@ -9,6 +9,8 @@ from scattering_transform.power_spectrum import PowerSpectrum
 from ostlensing.dataloading import load_and_apply
 
 
+
+
 def st_func(filters, reduction, device):
     st = ScatteringTransform2d(filters)
     st.to(device)

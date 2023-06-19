@@ -204,7 +204,7 @@ def load_and_apply(load_path, save_path, function, device):
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
         results = batch_apply(fields, 16, function, device=device)
         data.append(results.cpu().numpy())
-    data = np.stack(data)
+    data = np.concatenate(data, axis=0)
 
     np.save(save_path, data)
 
