@@ -8,9 +8,9 @@ data:
   test_ratio: 0.2                                           # Portion of data to use for testing
 
 model:
-  model_type: 'pre_calc'                                    # Type of model to use, currently 'ost' or 'pre_calc'
+  model_type: 'ost'                                    # Type of model to use, currently 'ost' or 'pre_calc'
   model_args:                                               # Model keywords arguments to be passed to the constructor
-    input_size: 22
+    size: 128
 training:
   num_epochs: 500                                           # Number of training epochs
   batch_size: 128                                           # Batch size
