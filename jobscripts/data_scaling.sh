@@ -20,4 +20,4 @@ conda activate nbody
 export MASTER_ADDR=$(hostname)
 export MASTER_PORT=29500 # default from torch launcher
 
-srun python analysis/datascaling_ddp ${args}
+srun python analysis/datascaling_ddp.py ${args}
