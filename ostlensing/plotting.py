@@ -10,7 +10,7 @@ plt.rc('font', family='serif')
 def plot_scaling(scaling_path, save_path=None):
     scaling_df = pd.read_csv(scaling_path)
     fig, ax = plt.subplots(figsize=(8, 6))
-    ax.plot(scaling_df['data_subset'], scaling_df['test_loss'])
+    ax.plot(scaling_df['data_subset'], scaling_df['test_loss'], linewidth=4)
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Best Test Loss', fontsize=16)
 
@@ -59,10 +59,10 @@ class ModelPlotter:
         if self.losses is None:
             raise ValueError('Losses not set. Call load_folder first.')
         fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(self.losses['train'], label='train')
-        ax.plot(self.losses['val'], label='val')
-        ax.set_xlabel('Epoch')
-        ax.set_ylabel('Loss')
+        ax.plot(self.losses['train'], label='train', linewidth=4)
+        ax.plot(self.losses['val'], label='val', linewidth=4)
+        ax.set_xlabel('Epoch', fontsize=16)
+        ax.set_ylabel('Loss', fontsize=16)
         ax.legend()
         if semilogy:
             plt.semilogy()
