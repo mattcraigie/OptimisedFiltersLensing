@@ -28,7 +28,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         ax.scatter(x, np.sqrt(mean), c=colours[i])
         ax.plot(x, np.sqrt(lower), alpha=0.4, linewidth=1, c=colours[i])
         ax.plot(x, np.sqrt(upper), alpha=0.4, linewidth=1, c=colours[i])
-        ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2, c=colours[i])
+        ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2, color=colours[i])
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
