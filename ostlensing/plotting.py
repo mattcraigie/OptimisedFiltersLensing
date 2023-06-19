@@ -5,10 +5,13 @@ import pandas as pd
 import numpy as np
 
 
-def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None):
+def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
+
+    if colours is None:
+        colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
     fig, ax = plt.subplots(figsize=(8, 6))
     for i in range(len(scaling_paths)):
@@ -17,14 +20,16 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         std = np.std(scaling_df.iloc[:, 1:], axis=1)
         upper = mean + std
         lower = mean - std
+        print(mean)
         print(std)
 
         x = scaling_df['data_subset']
-        ax.plot(x, np.sqrt(mean), linewidth=4, label=labels[i])
-        ax.scatter(x, np.sqrt(mean))
-        ax.plot(x, np.sqrt(lower), alpha=0.4, linewidth=1)
-        ax.plot(x, np.sqrt(upper), alpha=0.4, linewidth=1)
-        ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2)
+        ax.plot(x, np.sqrt(mean), linewidth=4, label=labels[i], c=colours[i])
+        ax.scatter(x, np.sqrt(mean), c=colours[i])
+        ax.plot(x, np.sqrt(lower), alpha=0.4, linewidth=1, c=colours[i])
+        ax.plot(x, np.sqrt(upper), alpha=0.4, linewidth=1, c=colours[i])
+        ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2, c=colours[i])
+
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
     plt.legend()
