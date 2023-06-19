@@ -2,10 +2,9 @@ import numpy as np
 import os
 import pandas as pd
 
-import torch.distributed as dist
+import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from ostlensing.training import mse_and_admissibility, Trainer
@@ -87,6 +86,7 @@ def data_scaling(rank, args):
     test_criterion = mse
 
     model_results = []
+    best_models = []
     for subset in data_subsets:
         if rank == 0:
             print(f"Running analysis for data subset {subset}.")
@@ -122,12 +122,16 @@ def data_scaling(rank, args):
         # only save results for rank 0
         if rank == 0:
             model_results.append(test_loss.cpu().item())
+            best_models.append(model.module.state_dict())
 
     if rank == 0:  # only save the results once!
 
         df = pd.DataFrame({'data_subset': data_subsets, 'test_loss': model_results})
         # df.to_csv(os.path.join('..', 'outputs', 'data_scaling_{}.csv'.format(model_type)), index=False)
         df.to_csv('data_scaling_{}.csv'.format(model_type), index=False)
+
+        # save the best models
+        torch.save(best_models, 'best_models_{}.pt'.format(model_type))
 
     cleanup()
 

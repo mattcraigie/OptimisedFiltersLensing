@@ -2,8 +2,8 @@ data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
   data_subpath: 'mst_precalc.npy'                           # patches or pre_calc
   is_patches: False                                         # True if the data is a set of patches
-  load_subset: 2500                                           # Subset of cosmologies to load (saves memory), -1 for all
-  sub_batch_subset: 192                                      # Subset of patches per cosmology, -1 for all
+  load_subset: 2500                                         # Subset of cosmologies to load (saves memory), 2500 for all
+  sub_batch_subset: 192                                     # Subset of patches per cosmology, 192 for all
   val_ratio: 0.2                                            # Portion of data to use for validation
   test_ratio: 0.2                                           # Portion of data to use for testing
 
@@ -11,7 +11,6 @@ model:
   model_type: 'pre_calc'                                    # Type of model to use, currently 'ost' or 'pre_calc'
   model_args:                                               # Model keywords arguments to be passed to the constructor
     input_size: 22
-    hidden_sizes: (256, 256, 256)
 training:
   num_epochs: 500                                           # Number of training epochs
   batch_size: 128                                           # Batch size
