@@ -67,6 +67,7 @@ class ModelPlotter:
             plt.savefig(save_path)
         else:
             plt.show()
+
     def plot_predictions(self, save_path=None, show_val=True, num_samples=None, param_names=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
@@ -74,10 +75,12 @@ class ModelPlotter:
         num_targets = self.targets['train'].shape[1]
 
         if param_names is None:
-            param_names = range(num_targets)
-
+            param_names = [str(i) for i in range(num_targets)]
 
         fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*4))
+
+        if num_targets == 1:
+            axes = axes.reshape(1, 2)  # Reshape the axes to be 2D to handle the 1 parameter case
 
         for i in range(num_targets):
 
