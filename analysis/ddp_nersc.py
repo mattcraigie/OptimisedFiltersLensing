@@ -43,8 +43,8 @@ def ddp_main(function):
                         type=int, metavar='N')
     parser.add_argument('-g', '--gpus', default=1, type=int,
                         help='number of gpus per node')
-    parser.add_argument('-c', '--config', default='configs/ps.yml', type=str,
-                        help='config file path (default: configs/ps.yml)')
+    parser.add_argument('-c', '--config', default='configs/datascaling/mst.yml', type=str,
+                        help='config file path (default: configs/datascaling/mst.yml)')
     args = parser.parse_args()
 
     # Load the config file
