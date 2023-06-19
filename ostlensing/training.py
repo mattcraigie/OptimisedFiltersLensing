@@ -97,7 +97,6 @@ class Trainer:
             if self.ddp:
                 train_loss = torch.tensor(train_loss).to(self.device)
                 val_loss = torch.tensor(val_loss).to(self.device)
-                print(train_loss, val_loss)
 
                 dist.reduce(train_loss, dst=0, op=dist.ReduceOp.SUM)  # this operation is inplace and returns to rank 0
                 dist.reduce(val_loss, dst=0, op=dist.ReduceOp.SUM)

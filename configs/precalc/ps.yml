@@ -4,7 +4,7 @@ save_path: '//pscratch/sd/m/mcraigie/cosmogrid/ps_precalc.npy'         # must sp
 method: 'ps'
 kwargs:
   size: 128
-  num_bins: 22
+  num_bins: 12
   device: 'cuda:0'
 
 
