@@ -17,10 +17,13 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         std = np.std(scaling_df.iloc[:, 1:], axis=1)
         upper = mean + std
         lower = mean - std
+        print(std)
 
         x = scaling_df['data_subset']
         ax.plot(x, np.sqrt(mean), linewidth=4, label=labels[i])
         ax.scatter(x, np.sqrt(mean))
+        ax.plot(x, np.sqrt(lower), alpha=0.4, linewidth=1)
+        ax.plot(x, np.sqrt(upper), alpha=0.4, linewidth=1)
         ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2)
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
