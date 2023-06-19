@@ -128,9 +128,12 @@ def data_scaling(rank, args):
 
         # only save results for rank 0
         if rank == 0:
-            trainer.save_model(os.path.join(out_folder, f'subset_{subset}', 'model.pt'))
-            trainer.save_losses(os.path.join(out_folder, f'subset_{subset}', 'losses.pt'))
-            trainer.save_predictions(os.path.join(out_folder, f'subset_{subset}', 'predictions.pt'))
+            subset_folder = os.path.join(out_folder, f'subset_{subset}')
+            if not os.path.exists(subset_folder):
+                os.makedirs(subset_folder)
+            trainer.save_model(os.path.join(subset_folder, 'model.pt'))
+            trainer.save_losses(os.path.join(subset_folder, 'losses.pt'))
+            trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))
             model_results.append(test_loss.cpu().item())
 
             # targets only need to be saved for the first run
