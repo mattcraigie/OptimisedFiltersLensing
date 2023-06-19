@@ -25,6 +25,13 @@ class Scaler:
         return data * self.std + self.mean
 
 
+class GeneralDataset(TensorDataset):
+    def __init__(self, data, targets):
+        super().__init__(data, targets)
+        self.data = data
+        self.targets = targets
+
+
 def norm_scale(x, axis=None):
     scaler = Scaler(np.mean(x, axis), np.std(x, axis))
     return scaler.transform(x), scaler
@@ -104,7 +111,7 @@ class DataHandler:
             'Data and targets must be loaded before getting dataloaders'
         num_data = len(self.data)
         test_split = int(self.test_ratio * num_data)
-        test_dataset = TensorDataset(self.data[:test_split], self.targets[:test_split])
+        test_dataset = GeneralDataset(self.data[:test_split], self.targets[:test_split])
         if ddp:
             test_sampler = DistributedSampler(test_dataset)
             return DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler)
@@ -124,9 +131,9 @@ class DataHandler:
         test_split = int(self.test_ratio * num_data)
         val_split = int(self.val_ratio * num_data)
 
-        train_dataset = TensorDataset(self.data[test_split + val_split:],
+        train_dataset = GeneralDataset(self.data[test_split + val_split:],
                                       self.targets[test_split + val_split:])
-        val_dataset = TensorDataset(self.data[test_split:test_split + val_split],
+        val_dataset = GeneralDataset(self.data[test_split:test_split + val_split],
                                     self.targets[test_split:test_split + val_split])
 
         if ddp:

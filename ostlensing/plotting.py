@@ -78,6 +78,7 @@ class ModelPlotter:
         for i in range(num_targets):
             if i == 1:
                 continue
+
             # train (and val)
             axes[i, 0].scatter(self.targets['train'][:num_samples, i],
                                self.predictions['train'][:num_samples, i], c='blue')
