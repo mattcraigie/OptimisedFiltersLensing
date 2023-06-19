@@ -77,7 +77,7 @@ class ModelPlotter:
         if param_names is None:
             param_names = [str(i) for i in range(num_targets)]
 
-        fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*4))
+        fig, axes = plt.subplots(num_targets, 2, figsize=(8, num_targets*8))
 
         if num_targets == 1:
             axes = axes.reshape(1, 2)  # Reshape the axes to be 2D to handle the 1 parameter case
@@ -86,14 +86,15 @@ class ModelPlotter:
 
             # train (and val)
             axes[i, 0].scatter(self.targets['train'][:num_samples, i],
-                               self.predictions['train'][:num_samples, i], c='blue', alpha=0.5)
+                               self.predictions['train'][:num_samples, i], c='cornflowerblue', alpha=0.5, label='train')
             if show_val:
                 axes[i, 0].scatter(self.targets['val'][:num_samples, i],
-                                   self.predictions['val'][:num_samples, i], c='green', marker='x', alpha=0.5)
+                                   self.predictions['val'][:num_samples, i], c='green', marker='x', alpha=0.5, label='validation')
             axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
             axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
             axes[i, 0].set_aspect('equal')
             axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+            axes[i, 0].legend()
 
             # test
             axes[i, 1].scatter(self.targets['test'][:num_samples, i],
