@@ -41,6 +41,9 @@ class ModelPlotter:
     def plot_filters(self, nrows, ncols, save_path=None):
         if self.model is None:
             raise ValueError('Model not set. Call load_folder first.')
+
+        # todo: filters must be saved and loaded directly
+
         try:
             filters = self.model.filters.filter_tensor.cpu().detach().numpy()
         except AttributeError:

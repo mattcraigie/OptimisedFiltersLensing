@@ -9,7 +9,7 @@ data:
 
 model:
   model_type: 'ost'
-  submodel_type: None
+  submodel_type: 'test'
   model_args:                                               # Model keywords arguments to be passed to the constructor
     size: 128
 
