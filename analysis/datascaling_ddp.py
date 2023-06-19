@@ -71,7 +71,11 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
 
     # make output folder
-    out_folder = os.path.join('outputs', 'datascaling', model_type, submodel_type)
+    if submodel_type is not None:
+        out_folder = os.path.join('outputs', 'datascaling', model_type, submodel_type)
+    else:
+        out_folder = os.path.join('outputs', 'datascaling', model_type)
+
     if rank == 0:
         if not os.path.exists(out_folder):
             os.makedirs(out_folder)
