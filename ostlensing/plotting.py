@@ -24,11 +24,11 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         print(std)
 
         x = scaling_df['data_subset']
-        ax.plot(x, np.sqrt(mean), linewidth=4, label=labels[i], c=colours[i])
-        ax.scatter(x, np.sqrt(mean), c=colours[i])
-        ax.plot(x, np.sqrt(lower), alpha=0.4, linewidth=1, c=colours[i])
-        ax.plot(x, np.sqrt(upper), alpha=0.4, linewidth=1, c=colours[i])
-        ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2, color=colours[i])
+        ax.plot(x, mean, linewidth=4, label=labels[i], c=colours[i])
+        ax.scatter(x, mean, c=colours[i])
+        ax.plot(x, lower, alpha=0.4, linewidth=1, c=colours[i])
+        ax.plot(x, upper, alpha=0.4, linewidth=1, c=colours[i])
+        ax.fill_between(x, lower, upper, alpha=0.2, color=colours[i])
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)

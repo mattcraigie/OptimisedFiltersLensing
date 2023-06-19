@@ -38,11 +38,9 @@ class OptimisableSTRegressor(nn.Module):
                  reduction=None,
                  hidden_sizes=(32, 32, 32),
                  output_size=1,
-                 activation=nn.LeakyReLU,
-                 seed=0
+                 activation=nn.LeakyReLU
                  ):
         super(OptimisableSTRegressor, self).__init__()
-        torch.manual_seed(seed)
         self.subnet = SubNet(hidden_sizes=(16, 16, 16), activation=nn.LeakyReLU)
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
         self.st = ScatteringTransform2d(self.filters)
