@@ -12,7 +12,10 @@ class Plotter:
     def plot_filters(self, nrows, ncols, save_path):
         if self.model is None:
             raise ValueError('Model not set. Call load_folder first.')
-        filters = self.model.filters.filter_tensor.cpu().detach().numpy()
+        try:
+            filters = self.model.filters.filter_tensor.cpu().detach().numpy()
+        except AttributeError:
+            raise AttributeError('Model does not have filters.')
 
         fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 2, nrows * 2))
         for i in range(nrows):

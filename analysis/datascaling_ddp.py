@@ -134,12 +134,8 @@ def data_scaling(rank, args):
             trainer.save_model(os.path.join(subset_folder, 'model.pt'))
             trainer.save_losses(os.path.join(subset_folder, 'losses.pt'))
             trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))
+            trainer.save_targets(os.path.join(subset_folder, 'targets.pt'))
             model_results.append(test_loss.cpu().item())
-
-            # targets only need to be saved for the first run
-            target_path = os.path.join(out_folder, 'targets.pt')
-            if not os.path.exists(target_path):
-                trainer.save_targets(target_path)
 
     if rank == 0:  # only save the results once!
         df = pd.DataFrame({'data_subset': data_subsets, 'test_loss': model_results})
