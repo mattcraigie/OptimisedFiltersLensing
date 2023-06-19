@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import torch
 import os
 import pandas as pd
+import numpy as np
 
 
 def plot_scaling(scaling_path, save_path=None, logy=True, logx=True):
     scaling_df = pd.read_csv(scaling_path)
     fig, ax = plt.subplots(figsize=(8, 6))
-    ax.plot(scaling_df['data_subset'], scaling_df['test_loss'].sqrt(), linewidth=4)
+    ax.plot(scaling_df['data_subset'], np.sqrt(scaling_df['test_loss']), linewidth=4)
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Best Test RMSE ($\\approx \\sigma$)', fontsize=16)
 
