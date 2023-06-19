@@ -4,6 +4,8 @@ import torch.nn as nn
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import FourierSubNetFilters, SubNet
 
+from torchvision.models import resnet18, vit_b_16
+
 
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_sizes, output_size, activation=nn.LeakyReLU):
@@ -17,7 +19,7 @@ class MLP(nn.Module):
             if i == 0:
                 self.layers.append(nn.Linear(input_size, hidden_sizes[i]))
             else:
-                self.layers.append(nn.Linear(hidden_sizes[i-1], hidden_sizes[i]))
+                self.layers.append(nn.Linear(hidden_sizes[i - 1], hidden_sizes[i]))
             self.layers.append(activation())
 
         self.layers.append(nn.Linear(hidden_sizes[-1], output_size))
@@ -39,7 +41,6 @@ class OptimisableSTRegressor(nn.Module):
                  activation=nn.LeakyReLU,
                  seed=0
                  ):
-
         super(OptimisableSTRegressor, self).__init__()
         torch.manual_seed(seed)
         self.subnet = SubNet(hidden_sizes=(16, 16, 16), activation=nn.LeakyReLU)
@@ -74,7 +75,6 @@ class PreCalcRegressor(nn.Module):
                  activation=nn.LeakyReLU,
                  seed=0
                  ):
-
         super(PreCalcRegressor, self).__init__()
         torch.manual_seed(seed)
         self.batch_norm = nn.BatchNorm1d(input_size)
@@ -87,3 +87,45 @@ class PreCalcRegressor(nn.Module):
         x = x.mean(1)  # 'channel' mean, i.e. mean across all patches for the same cosmology
         x = self.batch_norm(x)
         return self.regressor(x)
+
+
+class ResNetRegressor(PreCalcRegressor):
+    def __init__(self,
+                 model_output_size=512,
+                 hidden_sizes=(32, 32, 32),
+                 regression_output_size=1,
+                 activation=nn.LeakyReLU,
+                 ):
+        super(ResNetRegressor, self).__init__(model_output_size,
+                                              hidden_sizes=hidden_sizes,
+                                              output_size=regression_output_size,
+                                              activation=activation)
+
+        resnet = resnet18()
+        resnet.fc = nn.Linear(resnet.fc.in_features, model_output_size)
+        self.resnet = resnet
+
+    def forward(self, x):
+        x = self.resnet(x)
+        return super(ResNetRegressor, self).forward(x)
+
+
+class ViTRegressor(PreCalcRegressor):
+    def __init__(self,
+                 model_output_size=512,
+                 hidden_sizes=(32, 32, 32),
+                 regression_output_size=1,
+                 activation=nn.LeakyReLU,
+                 ):
+        super(ViTRegressor, self).__init__(model_output_size,
+                                           hidden_sizes=hidden_sizes,
+                                           output_size=regression_output_size,
+                                           activation=activation)
+
+        vit = vit_b_16()
+        vit.head = nn.Linear(vit.head.in_features, model_output_size)
+        self.vit = vit
+
+    def forward(self, x):
+        x = self.resnet(x)
+        return super(ViTRegressor, self).forward(x)
