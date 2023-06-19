@@ -30,7 +30,7 @@ def batch_apply(data, bs, func, device):
 
 class Trainer:
     # implement gradient averaging
-    def __init__(self, model, optimizer, train_criterion, val_criterion, train_loader, val_loader, device,
+    def __init__(self, model, optimizer, train_criterion, val_criterion, train_loader, val_loader, test_loader, device,
                  ddp=False):
         self.model = model
         self.optimizer = optimizer
@@ -38,6 +38,7 @@ class Trainer:
         self.val_criterion = val_criterion
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.test_loader = test_loader
         self.device = device
         self.best_loss = float('inf')
         self.best_model_params = None
@@ -107,11 +108,11 @@ class Trainer:
         self.model.load_state_dict(self.best_model_params)
         return self.model
 
-    def test(self, test_loader, load_best=True):
+    def test(self, load_best=True):
         if load_best:
             self.model.load_state_dict(self.best_model_params)
         # for test, we must also specify a test_loader
-        test_loss = self._run_epoch(test_loader, self.val_criterion, mode='eval')
+        test_loss = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
 
         if self.ddp:
             test_loss = torch.tensor(test_loss).to(self.device)
@@ -121,66 +122,28 @@ class Trainer:
 
         return test_loss
 
-    def plot_filters(self, nrows, ncols, save_path):
-        filters = self.model.filters.filter_tensor.cpu().detach().numpy()
-
-        fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 2, nrows * 2))
-        for i in range(nrows):
-            for j in range(ncols):
-                try:
-                    axes[i, j].imshow(filters[i * ncols + j, 0, :, :])
-                    axes[i, j].axis('off')
-                except IndexError:
-                    continue
-        plt.savefig(save_path)
-
-    def plot_losses(self, save_path):
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(self.train_losses, label='train')
-        ax.plot(self.val_losses, label='val')
-        ax.set_xlabel('Epoch')
-        ax.set_ylabel('Loss')
-        ax.legend()
-        plt.savefig(save_path)
-
     def save_model(self, save_path):
         torch.save(self.best_model_params, save_path)
+
+    def save_losses(self, save_path):
+        torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
+
+    def save_predictions(self, save_path):
+        train_pred = batch_apply(self.train_loader, 32, self.model, self.device).cpu().detach().numpy()
+        val_pred = batch_apply(self.val_loader, 32, self.model, self.device).cpu().detach().numpy()
+        test_pred = batch_apply(self.test_loader, 32, self.model, self.device).cpu().detach().numpy()
+        torch.save({'train': train_pred, 'val': val_pred, 'test': test_pred}, save_path)
+
+    def save_targets(self, save_path):
+        train_targets = self.train_loader.dataset[1]
+        val_targets = self.val_loader.dataset[1]
+        test_targets = self.test_loader.dataset[1]
+        torch.save({'train': train_targets, 'val': val_targets, 'test': test_targets}, save_path)
 
     def load_model(self, load_path):
         self.model.load_state_dict(torch.load(load_path))
 
-    def plot_predictions(self, test_loader, save_path, num_samples=None):
-        if num_samples is None:
-            num_samples = len(self.train_loader.dataset)
-        num_targets = self.train_loader.dataset.target.shape[1]
 
-        fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*2))
-
-        train_data = self.train_loader.dataset.data[:num_samples]
-        train_target = self.train_loader.dataset.target[:num_samples]
-        train_pred = batch_apply(train_data, 32, self.model, self.device).cpu().detach().numpy()
-
-        test_data = test_loader.dataset.data[:num_samples]
-        test_target = test_loader.dataset.target[:num_samples]
-        test_pred = batch_apply(test_data, 32, self.model, self.device).cpu().detach().numpy()
-
-        for i in range(num_targets):
-            axes[i, 0].scatter(train_target[:, i], train_pred[:, i])
-            axes[i, 1].scatter(test_target[:, i], test_pred[:, i])
-            axes[i, 0].set_xlabel('Target')
-            axes[i, 0].set_ylabel('Prediction')
-            axes[i, 1].set_xlabel('Target')
-            axes[i, 1].set_ylabel('Prediction')
-            axes[i, 0].set_aspect('equal')
-            axes[i, 1].set_aspect('equal')
-            axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='k')
-            axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='k')
-
-        axes[0, 0].set_title('Train')
-        axes[0, 1].set_title('Test')
-        plt.tight_layout()
-
-        plt.savefig(save_path)
 
 
 

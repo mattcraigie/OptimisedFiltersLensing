@@ -70,8 +70,8 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
 
     # make output folder
+    out_folder = os.path.join('outputs', model_type)
     if rank == 0:
-        out_folder = os.path.join('outputs', model_type)
         if not os.path.exists(out_folder):
             os.makedirs(out_folder)
 
@@ -93,7 +93,6 @@ def data_scaling(rank, args):
 
     # make this a proper outputs -- make folder etc.
     model_results = []
-    best_models = []
     for subset in data_subsets:
         if rank == 0:
             print(f"Running analysis for data subset {subset}.")
@@ -120,26 +119,28 @@ def data_scaling(rank, args):
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
         # train the model using Trainer
-        trainer = Trainer(model, optimizer, train_criterion, test_criterion, train_loader, val_loader, rank, ddp=True)
+        trainer = Trainer(model, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
+                          rank, ddp=True)
         trainer.train_loop(num_epochs)
 
         # test the best validated model with unseen data
-        test_loss = trainer.test(test_loader, load_best=True)  # reduced across ranks and stored in rank 0's test_loss
+        test_loss = trainer.test(load_best=True)  # reduced across ranks and stored in rank 0's test_loss
 
         # only save results for rank 0
         if rank == 0:
-            # make thing for thing here
+            trainer.save_model(os.path.join(out_folder, subset, 'model.pt'))
+            trainer.save_losses(os.path.join(out_folder, subset, 'losses.pt'))
+            trainer.save_predictions(os.path.join(out_folder, subset, 'predictions.pt'))
             model_results.append(test_loss.cpu().item())
-            best_models.append(model.module.state_dict())
+
+            # targets only need to be saved for the first run
+            target_path = os.path.join(out_folder, 'targets.pt')
+            if not os.path.exists(target_path):
+                trainer.save_targets(target_path)
 
     if rank == 0:  # only save the results once!
-
         df = pd.DataFrame({'data_subset': data_subsets, 'test_loss': model_results})
-        # df.to_csv(os.path.join('..', 'outputs', 'data_scaling_{}.csv'.format(model_type)), index=False)
-        df.to_csv('data_scaling_{}.csv'.format(model_type), index=False)
-
-        # save the best models
-        torch.save(best_models, 'best_models_{}.pt'.format(model_type))
+        df.to_csv(os.path.join(out_folder, 'data_scaling_{}.csv'.format(model_type)), index=False)
 
     cleanup()
 
