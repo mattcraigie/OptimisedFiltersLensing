@@ -145,7 +145,7 @@ class Trainer:
             torch.save({'train': train_pred, 'val': val_pred, 'test': test_pred}, save_path)
 
     def save_targets(self, save_path):
-        train_targets = self.train_loader.targets
+        train_targets = self.train_loader.dataset.targets
         val_targets = self.val_loader.dataset.targets
         test_targets = self.test_loader.dataset.targets
         torch.save({'train': train_targets, 'val': val_targets, 'test': test_targets}, save_path)
