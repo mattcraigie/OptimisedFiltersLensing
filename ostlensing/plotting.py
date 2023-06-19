@@ -71,7 +71,7 @@ class ModelPlotter:
     def plot_predictions(self, save_path=None, show_val=True, num_samples=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
-        num_targets = self.targets.shape[1]
+        num_targets = 1
 
         fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*2))
 
