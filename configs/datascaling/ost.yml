@@ -15,7 +15,7 @@ model:
 
 training:
   num_epochs: 500                                           # Number of training epochs
-  batch_size: 128                                           # Batch size
+  batch_size: 4                                           # Batch size
   learning_rate: 0.0007                                    # Learning rate
 
 analysis:
