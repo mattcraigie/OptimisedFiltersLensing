@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
-
+import torch
 
 class Plotter:
-    def __init__(self, model, losses, predictions, targets):
-        self.model = model
-        self.losses = losses
-        self.predictions = predictions
-        self.targets = targets
+    def __init__(self):
+        self.model = None
+        self.losses = None
+        self.predictions = None
+        self.targets = None
 
     def plot_filters(self, nrows, ncols, save_path):
         filters = self.model.filters.filter_tensor.cpu().detach().numpy()
@@ -63,3 +63,7 @@ class Plotter:
         plt.tight_layout()
 
         plt.savefig(save_path)
+
+
+    def load_dir(self):
+        torch.load()
