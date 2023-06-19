@@ -70,9 +70,10 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
 
     # make output folder
-    out_folder = os.path.join('outputs', model_type)
-    if not os.path.exists(out_folder):
-        os.makedirs(out_folder)
+    if rank == 0:
+        out_folder = os.path.join('outputs', model_type)
+        if not os.path.exists(out_folder):
+            os.makedirs(out_folder)
 
     # load train+val and test data with DataHandler
     data_handler = DataHandler(load_subset=load_subset,
