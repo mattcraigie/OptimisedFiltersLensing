@@ -71,11 +71,13 @@ class ModelPlotter:
     def plot_predictions(self, save_path=None, show_val=True, num_samples=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
-        num_targets = 1
+        num_targets = 2
 
         fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*2))
 
         for i in range(num_targets):
+            if i == 1:
+                continue
             # train (and val)
             axes[i, 0].scatter(self.targets['train'][:num_samples, i],
                                self.predictions['train'][:num_samples, i], c='blue')
