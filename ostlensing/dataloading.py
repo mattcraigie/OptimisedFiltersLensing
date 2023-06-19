@@ -79,7 +79,7 @@ class DataHandler:
             data = self.load_patches(path)
         else:
             data = self.load_features(path)
-
+        print(data.shape)
         print("logging")
         if log:
             data = np.log(data)
