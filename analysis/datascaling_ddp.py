@@ -69,6 +69,11 @@ def data_scaling(rank, args):
     analysis_config = config['analysis']
     data_subsets = analysis_config['data_subsets']
 
+    # make output folder
+    out_folder = os.path.join('outputs', model_type)
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
+
     # load train+val and test data with DataHandler
     data_handler = DataHandler(load_subset=load_subset,
                                sub_batch_subset=sub_batch_subset,
@@ -85,6 +90,7 @@ def data_scaling(rank, args):
     train_criterion = mse_and_admissibility_ddp if model_type == 'ost' else mse
     test_criterion = mse
 
+    # make this a proper outputs -- make folder etc.
     model_results = []
     best_models = []
     for subset in data_subsets:
@@ -121,6 +127,7 @@ def data_scaling(rank, args):
 
         # only save results for rank 0
         if rank == 0:
+            # make thing for thing here
             model_results.append(test_loss.cpu().item())
             best_models.append(model.module.state_dict())
 

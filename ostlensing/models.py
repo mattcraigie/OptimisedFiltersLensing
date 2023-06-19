@@ -69,7 +69,7 @@ class OptimisableSTRegressor(nn.Module):
 class PreCalcRegressor(nn.Module):
     def __init__(self,
                  input_size,
-                 hidden_sizes=(512, 512, 512),
+                 hidden_sizes=(16, 16, 16),
                  output_size=1,
                  activation=nn.LeakyReLU,
                  seed=0
