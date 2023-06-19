@@ -11,7 +11,7 @@ model:
   model_type: 'pre_calc'                                    # Type of model to use, currently 'ost' or 'pre_calc'
   submodel_type: 'ps'
   model_args:                                               # Model keywords arguments to be passed to the constructor
-    input_size: 22
+    input_size: 12
 
 training:
   num_epochs: 500                                           # Number of training epochs
