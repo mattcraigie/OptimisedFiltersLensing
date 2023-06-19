@@ -85,13 +85,10 @@ def data_scaling(rank, args):
                                sub_batch_subset=sub_batch_subset,
                                val_ratio=val_ratio,
                                test_ratio=test_ratio)
-    print("ddp - adding data")
-    data_handler.add_data(os.path.join(data_path, data_subpath), patches=is_patches, normalise=True, log=True)
 
-    print("ddp - adding targets")
+    data_handler.add_data(os.path.join(data_path, data_subpath), patches=is_patches, normalise=True, log=True)
     data_handler.add_targets(os.path.join(data_path, 'params.csv'), normalise=True)
 
-    print("ddp - making test loader")
     # make test loader outside the loop
     test_loader = data_handler.get_test_loader()
 
