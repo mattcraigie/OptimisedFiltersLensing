@@ -16,6 +16,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         ax.plot(scaling_df['data_subset'], np.sqrt(scaling_df['test_loss']), linewidth=4, label=labels[i])
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Best Test RMSE ($\\approx \\sigma$)', fontsize=16)
+    plt.legend()
 
     if logy and not logx:
         plt.semilogy()
