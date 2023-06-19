@@ -2,12 +2,19 @@ import matplotlib.pyplot as plt
 import torch
 import os
 
+
 class Plotter:
     def __init__(self):
         self.model = None
         self.losses = None
         self.predictions = None
         self.targets = None
+
+    def load_folder(self, folder):
+        self.model = torch.load(os.path.join(folder, 'model.pt'))
+        self.losses = torch.load(os.path.join(folder, 'losses.pt'))
+        self.predictions = torch.load(os.path.join(folder, 'predictions.pt'))
+        self.targets = torch.load(os.path.join(folder, 'targets.pt'))
 
     def plot_filters(self, nrows, ncols, save_path):
         if self.model is None:
@@ -74,8 +81,4 @@ class Plotter:
 
         plt.savefig(save_path)
 
-    def load_folder(self, folder):
-        self.model = torch.load(os.path.join(folder, 'model.pt'))
-        self.losses = torch.load(os.path.join(folder, 'losses.pt'))
-        self.predictions = torch.load(os.path.join(folder, 'predictions.pt'))
-        self.targets = torch.load(os.path.join(folder, 'targets.pt'))
+
