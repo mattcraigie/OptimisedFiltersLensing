@@ -2,7 +2,7 @@ data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
   data_subpath: 'mst_precalc.npy'                           # patches or pre_calc
   is_patches: False                                         # True if the data is a set of patches
-  load_subset: 2500                                         # Subset of cosmologies to load (saves memory), 2500 for all
+  load_subset: 20                                         # Subset of cosmologies to load (saves memory), 2500 for all
   sub_batch_subset: 192                                     # Subset of patches per cosmology, 192 for all
   val_ratio: 0.2                                            # Portion of data to use for validation
   test_ratio: 0.2                                           # Portion of data to use for testing
@@ -19,4 +19,4 @@ training:
   learning_rate: 0.0007                                    # Learning rate
 
 analysis:
-  data_subsets: [25, 50, 100, 200, 400, 800, 1600, 2500]        # Subsets of the data for the scaling analysis
+  data_subsets: [10, 15, 20]        # Subsets of the data for the scaling analysis
