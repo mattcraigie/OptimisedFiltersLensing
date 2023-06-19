@@ -3,13 +3,16 @@ import torch
 import os
 import pandas as pd
 
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
 
 def plot_scaling(scaling_path, save_path=None):
     scaling_df = pd.read_csv(scaling_path)
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(scaling_df['data_subset'], scaling_df['test_loss'])
-    ax.set_xlabel('Number of training cosmologies')
-    ax.set_ylabel('Test loss')
+    ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
+    ax.set_ylabel('Best Test Loss', fontsize=16)
 
     if save_path is not None:
         plt.savefig(save_path)
