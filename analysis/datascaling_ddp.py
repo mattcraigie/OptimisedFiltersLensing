@@ -100,7 +100,7 @@ def data_scaling(rank, args):
     # make this a proper outputs -- make folder etc.
     df = pd.DataFrame({'data_subset': data_subsets})
 
-    for i in repeats:
+    for i in range(repeats):
         print(f"Running repeat {str(i)}.")
         model_results = []
         for subset in data_subsets:
