@@ -1,9 +1,23 @@
 import matplotlib.pyplot as plt
 import torch
 import os
+import pandas as pd
 
 
-class Plotter:
+def plot_scaling(scaling_path, save_path=None):
+    scaling_df = pd.read_csv(scaling_path)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(scaling_df['data_subset'], scaling_df['test_loss'])
+    ax.set_xlabel('Number of training cosmologies')
+    ax.set_ylabel('Test loss')
+
+    if save_path is not None:
+        plt.savefig(save_path)
+    else:
+        plt.show()
+
+
+class ModelPlotter:
     def __init__(self):
         self.model = None
         self.losses = None
@@ -16,7 +30,7 @@ class Plotter:
         self.predictions = torch.load(os.path.join(folder, 'predictions.pt'))
         self.targets = torch.load(os.path.join(folder, 'targets.pt'))
 
-    def plot_filters(self, nrows, ncols, save_path):
+    def plot_filters(self, nrows, ncols, save_path=None):
         if self.model is None:
             raise ValueError('Model not set. Call load_folder first.')
         try:
@@ -32,9 +46,13 @@ class Plotter:
                     axes[i, j].axis('off')
                 except IndexError:
                     continue
-        plt.savefig(save_path)
 
-    def plot_losses(self, save_path=None):
+        if save_path is not None:
+            plt.savefig(save_path)
+        else:
+            plt.show()
+
+    def plot_losses(self, save_path=None, semilogy=True):
         if self.losses is None:
             raise ValueError('Losses not set. Call load_folder first.')
         fig, ax = plt.subplots(figsize=(8, 6))
@@ -43,6 +61,8 @@ class Plotter:
         ax.set_xlabel('Epoch')
         ax.set_ylabel('Loss')
         ax.legend()
+        if semilogy:
+            plt.semilogy()
         if save_path is not None:
             plt.savefig(save_path)
         else:
@@ -78,7 +98,8 @@ class Plotter:
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
         plt.tight_layout()
-
-        plt.savefig(save_path)
-
+        if save_path is not None:
+            plt.savefig(save_path)
+        else:
+            plt.show()
 
