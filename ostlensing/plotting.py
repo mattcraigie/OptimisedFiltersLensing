@@ -5,11 +5,15 @@ import pandas as pd
 import numpy as np
 
 
-def plot_scaling(*scaling_paths, save_path=None, logy=True, logx=True):
+def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None):
+
+    if labels is None:
+        labels = [str(i) for i in range(len(scaling_paths))]
+
     fig, ax = plt.subplots(figsize=(8, 6))
-    for scaling_path in scaling_paths:
-        scaling_df = pd.read_csv(scaling_path)
-        ax.plot(scaling_df['data_subset'], np.sqrt(scaling_df['test_loss']), linewidth=4)
+    for i in range(len(scaling_paths)):
+        scaling_df = pd.read_csv(scaling_paths[i])
+        ax.plot(scaling_df['data_subset'], np.sqrt(scaling_df['test_loss']), linewidth=4, label=labels[i])
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Best Test RMSE ($\\approx \\sigma$)', fontsize=16)
 
