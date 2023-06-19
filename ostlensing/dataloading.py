@@ -74,19 +74,24 @@ class DataHandler:
         return features
 
     def add_data(self, path, patches=False, normalise=True, log=False):
+        print("loading data")
         if patches:
             data = self.load_patches(path)
         else:
             data = self.load_features(path)
 
+        print("logging")
         if log:
             data = np.log(data)
 
+        print("normalising")
         if normalise:
             data, self.data_scaler = norm_scale(data, axis=0)
 
+        print("converting to tensor")
         self.data = torch.from_numpy(data).float()
 
+        print("shuffling")
         if self.targets is not None:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
             self.data, self.targets = data_shuffler(self.data, self.targets)
