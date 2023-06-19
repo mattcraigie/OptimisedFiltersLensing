@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'ps_precalc.npy'                           # patches or pre_calc
+  data_subpath: 'mst_precalc.npy'                           # patches or pre_calc
   is_patches: False                                         # True if the data is a set of patches
   load_subset: 2500                                         # Subset of cosmologies to load (saves memory), 2500 for all
   sub_batch_subset: 192                                     # Subset of patches per cosmology, 192 for all
@@ -12,6 +12,7 @@ model:
   submodel_type: 'ps'
   model_args:                                               # Model keywords arguments to be passed to the constructor
     input_size: 22
+
 training:
   num_epochs: 500                                           # Number of training epochs
   batch_size: 128                                           # Batch size
