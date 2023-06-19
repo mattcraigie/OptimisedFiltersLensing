@@ -69,6 +69,7 @@ def data_scaling(rank, args):
     # analysis params
     analysis_config = config['analysis']
     data_subsets = analysis_config['data_subsets']
+    repeats = analysis_config['repeats']
 
     # make output folder
     if submodel_type is not None:
@@ -97,53 +98,59 @@ def data_scaling(rank, args):
     test_criterion = mse
 
     # make this a proper outputs -- make folder etc.
-    model_results = []
-    for subset in data_subsets:
+    df = pd.DataFrame({'data_subset': data_subsets})
+
+    for i in repeats:
+        print(f"Running repeat {str(i)}.")
+        model_results = []
+        for subset in data_subsets:
+            if rank == 0:
+                print(f"Running analysis for data subset {subset}.")
+
+            # make train and val loaders with the subset of data
+            train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
+
+            # set up the model
+            try:
+                model_class = model_map[model_type]
+            except KeyError:
+                raise ValueError('Model type not recognised.')
+
+            try:
+                model = model_class(**model_args)
+            except ValueError:
+                raise ValueError('Model arguments not recognised.')
+
+            # send to gpu and wrap in DDP
+            model.to(rank)
+            model = DDP(model, device_ids=[rank])
+
+            # set up the optimizer
+            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+            # train the model using Trainer
+            trainer = Trainer(model, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
+                              rank, ddp=True)
+            trainer.train_loop(num_epochs)
+
+            # test the best validated model with unseen data
+            test_loss = trainer.test(load_best=True)  # reduced across ranks and stored in rank 0's test_loss
+
+            # only save results for rank 0
+            if rank == 0:
+                subset_folder = os.path.join(out_folder, f'subset_{subset}')
+                if not os.path.exists(subset_folder):
+                    os.makedirs(subset_folder)
+                trainer.save_model(os.path.join(subset_folder, 'model.pt'))
+                trainer.save_losses(os.path.join(subset_folder, 'losses.pt'))
+                trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))  # could speed this up by sharing across ranks
+                trainer.save_targets(os.path.join(subset_folder, 'targets.pt'))
+                model_results.append(test_loss.cpu().item())
+
         if rank == 0:
-            print(f"Running analysis for data subset {subset}.")
-
-        # make train and val loaders with the subset of data
-        train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
-
-        # set up the model
-        try:
-            model_class = model_map[model_type]
-        except KeyError:
-            raise ValueError('Model type not recognised.')
-
-        try:
-            model = model_class(**model_args)
-        except ValueError:
-            raise ValueError('Model arguments not recognised.')
-
-        # send to gpu and wrap in DDP
-        model.to(rank)
-        model = DDP(model, device_ids=[rank])
-
-        # set up the optimizer
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
-        # train the model using Trainer
-        trainer = Trainer(model, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
-                          rank, ddp=True)
-        trainer.train_loop(num_epochs)
-
-        # test the best validated model with unseen data
-        test_loss = trainer.test(load_best=True)  # reduced across ranks and stored in rank 0's test_loss
-
-        # only save results for rank 0
-        if rank == 0:
-            subset_folder = os.path.join(out_folder, f'subset_{subset}')
-            if not os.path.exists(subset_folder):
-                os.makedirs(subset_folder)
-            trainer.save_model(os.path.join(subset_folder, 'model.pt'))
-            trainer.save_losses(os.path.join(subset_folder, 'losses.pt'))
-            trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))  # could speed this up by sharing across ranks
-            trainer.save_targets(os.path.join(subset_folder, 'targets.pt'))
-            model_results.append(test_loss.cpu().item())
+            df[f'run_{str(i)}'] = model_results
 
     if rank == 0:  # only save the results once!
-        df = pd.DataFrame({'data_subset': data_subsets, 'test_loss': model_results})
         df.to_csv(os.path.join(out_folder, 'data_scaling_{}.csv'.format(model_type)), index=False)
 
     cleanup()

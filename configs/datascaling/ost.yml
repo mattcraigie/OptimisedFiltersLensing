@@ -20,3 +20,4 @@ training:
 
 analysis:
   data_subsets: [10, 20, 25]        # Subsets of the data for the scaling analysis
+  repeats: 1

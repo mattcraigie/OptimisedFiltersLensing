@@ -72,11 +72,9 @@ class PreCalcRegressor(nn.Module):
                  input_size,
                  hidden_sizes=(32, 32, 32),
                  output_size=1,
-                 activation=nn.LeakyReLU,
-                 seed=0
+                 activation=nn.LeakyReLU
                  ):
         super(PreCalcRegressor, self).__init__()
-        torch.manual_seed(seed)
         self.batch_norm = nn.BatchNorm1d(input_size)
         self.regressor = MLP(input_size=input_size,
                              hidden_sizes=hidden_sizes,
