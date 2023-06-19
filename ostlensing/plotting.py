@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import torch
+import os
 
 class Plotter:
     def __init__(self):
@@ -9,6 +10,8 @@ class Plotter:
         self.targets = None
 
     def plot_filters(self, nrows, ncols, save_path):
+        if self.model is None:
+            raise ValueError('Model not set. Call load_folder first.')
         filters = self.model.filters.filter_tensor.cpu().detach().numpy()
 
         fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 2, nrows * 2))
@@ -22,6 +25,8 @@ class Plotter:
         plt.savefig(save_path)
 
     def plot_losses(self, save_path=None):
+        if self.losses is None:
+            raise ValueError('Losses not set. Call load_folder first.')
         fig, ax = plt.subplots(figsize=(8, 6))
         ax.plot(self.losses['train'], label='train')
         ax.plot(self.losses['val'], label='val')
@@ -34,6 +39,8 @@ class Plotter:
             plt.show()
 
     def plot_predictions(self, save_path=None, show_val=True, num_samples=None):
+        if self.predictions is None or self.targets is None:
+            raise ValueError('Predictions or targets not set. Call load_folder first.')
         num_targets = self.targets.shape[1]
 
         fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*2))
@@ -64,6 +71,8 @@ class Plotter:
 
         plt.savefig(save_path)
 
-
-    def load_dir(self):
-        torch.load()
+    def load_folder(self, folder):
+        self.model = torch.load(os.path.join(folder, 'model.pt'))
+        self.losses = torch.load(os.path.join(folder, 'losses.pt'))
+        self.predictions = torch.load(os.path.join(folder, 'predictions.pt'))
+        self.targets = torch.load(os.path.join(folder, 'targets.pt'))
