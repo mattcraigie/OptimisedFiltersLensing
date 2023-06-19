@@ -67,34 +67,36 @@ class ModelPlotter:
             plt.savefig(save_path)
         else:
             plt.show()
-
-    def plot_predictions(self, save_path=None, show_val=True, num_samples=None):
+    def plot_predictions(self, save_path=None, show_val=True, num_samples=None, param_names=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
-        num_targets = 2
 
-        fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*2))
+        num_targets = self.targets['train'].shape[1]
+
+        if param_names is None:
+            param_names = range(num_targets)
+
+
+        fig, axes = plt.subplots(num_targets, 2, figsize=(4, num_targets*4))
 
         for i in range(num_targets):
-            if i == 1:
-                continue
 
             # train (and val)
             axes[i, 0].scatter(self.targets['train'][:num_samples, i],
-                               self.predictions['train'][:num_samples, i], c='blue')
+                               self.predictions['train'][:num_samples, i], c='blue', alpha=0.5)
             if show_val:
                 axes[i, 0].scatter(self.targets['val'][:num_samples, i],
-                                   self.predictions['val'][:num_samples, i], c='green')
-            axes[i, 0].set_xlabel('Target')
-            axes[i, 0].set_ylabel('Prediction')
+                                   self.predictions['val'][:num_samples, i], c='green', marker='x', alpha=0.5)
+            axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
+            axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
             axes[i, 0].set_aspect('equal')
             axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
 
             # test
             axes[i, 1].scatter(self.targets['test'][:num_samples, i],
-                               self.predictions['test'][:num_samples, i], c='pink')
-            axes[i, 1].set_xlabel('Target')
-            axes[i, 1].set_ylabel('Prediction')
+                               self.predictions['test'][:num_samples, i], c='deeppink', alpha=0.5)
+            axes[i, 1].set_xlabel('Target'.format(param_names[i]))
+            axes[i, 1].set_ylabel('Prediction'.format(param_names[i]))
             axes[i, 1].set_aspect('equal')
             axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
 
