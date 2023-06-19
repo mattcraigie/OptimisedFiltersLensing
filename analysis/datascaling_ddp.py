@@ -133,7 +133,7 @@ def data_scaling(rank, args):
                 os.makedirs(subset_folder)
             trainer.save_model(os.path.join(subset_folder, 'model.pt'))
             trainer.save_losses(os.path.join(subset_folder, 'losses.pt'))
-            trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))
+            trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))  # could speed this up by sharing across ranks
             trainer.save_targets(os.path.join(subset_folder, 'targets.pt'))
             model_results.append(test_loss.cpu().item())
 

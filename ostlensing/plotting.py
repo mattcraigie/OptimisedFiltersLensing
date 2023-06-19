@@ -3,9 +3,6 @@ import torch
 import os
 import pandas as pd
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-
 
 def plot_scaling(scaling_path, save_path=None):
     scaling_df = pd.read_csv(scaling_path)
