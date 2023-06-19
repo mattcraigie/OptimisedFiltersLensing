@@ -101,7 +101,8 @@ def data_scaling(rank, args):
     df = pd.DataFrame({'data_subset': data_subsets})
 
     for i in range(repeats):
-        print(f"Running repeat {str(i)}.")
+        if rank == 0:
+            print(f"Running repeat {str(i)}.")
         model_results = []
         for subset in data_subsets:
             if rank == 0:

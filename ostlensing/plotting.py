@@ -13,7 +13,15 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     fig, ax = plt.subplots(figsize=(8, 6))
     for i in range(len(scaling_paths)):
         scaling_df = pd.read_csv(scaling_paths[i])
-        ax.plot(scaling_df['data_subset'], np.sqrt(scaling_df['test_loss']), linewidth=4, label=labels[i])
+        mean = np.mean(scaling_df.iloc[:, 1:], axis=1)
+        std = np.std(scaling_df.iloc[:, 1:], axis=1)
+        upper = mean + std
+        lower = mean - std
+
+        x = scaling_df['data_subset']
+        ax.plot(x, np.sqrt(mean), linewidth=4, label=labels[i])
+        ax.scatter(x, np.sqrt(mean))
+        ax.fill_between(x, np.sqrt(lower), np.sqrt(upper), alpha=0.2)
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
     plt.legend()
