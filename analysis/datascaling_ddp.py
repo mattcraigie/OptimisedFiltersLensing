@@ -88,7 +88,7 @@ def data_scaling(rank, args):
                                test_ratio=test_ratio)
 
     data_handler.add_data(os.path.join(data_path, data_subpath), patches=is_patches, normalise=False, log=False)
-    data_handler.add_targets(os.path.join(data_path, 'params.csv'), normalise=True)
+    data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
 
     # make test loader outside the loop
     test_loader = data_handler.get_test_loader()

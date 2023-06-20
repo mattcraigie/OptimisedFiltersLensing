@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None):
+def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform=None, param=None):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -16,8 +16,14 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     fig, ax = plt.subplots(figsize=(8, 6))
     for i in range(len(scaling_paths)):
         scaling_df = pd.read_csv(scaling_paths[i])
-        mean = np.mean(scaling_df.iloc[:, 1:], axis=1)
-        std = np.std(scaling_df.iloc[:, 1:], axis=1)
+        data = scaling_df.iloc[:, 1:]
+
+        # rescale all values to data units if transform is provided
+        if transform is not None:
+            data = (data * transform[1]) + transform[0]
+
+        mean = np.mean(data, axis=1)
+        std = np.std(data, axis=1)
         upper = mean + std
         lower = mean - std
         mean, lower, upper = np.sqrt(mean), np.sqrt(lower), np.sqrt(upper)

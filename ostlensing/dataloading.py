@@ -93,8 +93,12 @@ class DataHandler:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
             self.data, self.targets = data_shuffler(self.data, self.targets)
 
-    def add_targets(self, path, normalise=True, use_params=('s8',)):
+    def add_targets(self, path, normalise=False, use_params=None):
         df = pd.read_csv(path)
+
+        if use_params is None:
+            use_params = df.columns[1:]
+
         targets = df[list(use_params)].values
         targets = targets[:self.load_subset]
 
