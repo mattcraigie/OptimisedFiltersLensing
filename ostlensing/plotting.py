@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform=None, param=None):
+def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_sigma=None):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -19,8 +19,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         data = scaling_df.iloc[:, 1:]
 
         # rescale all values to data units if transform is provided
-        if transform is not None:
-            data = (data * transform[1]) + transform[0]
+        if transform_sigma is not None:
+            data = data * transform_sigma
 
         mean = np.mean(data, axis=1)
         std = np.std(data, axis=1)
