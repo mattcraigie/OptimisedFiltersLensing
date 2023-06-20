@@ -2,6 +2,8 @@
 #SBATCH -A desi_g
 #SBATCH -C gpu
 #SBATCH -q regular
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node 1
 #SBATCH --cpus-per-task 1
 #SBATCH --gpus-per-node 4
 #SBATCH --time=0:10:00
