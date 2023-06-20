@@ -19,13 +19,14 @@ def main():
     data = torch.stack(data)
 
     # first calculate log
-    data_log = batch_apply(data, 8, torch.log, device=torch.device('cuda'))
+    data_log = batch_apply(data, 1, torch.log, device=torch.device('cuda'))
+    torch.cuda.empty_cache()
 
     # then calculate scaling values and apply
     logged_mean = torch.mean(data_log)
     logged_std = torch.std(data_log)
     scaler = Scaler(logged_mean, logged_std)
-    result = batch_apply(data, 8, scaler.transform, device=torch.device('cuda'))
+    result = batch_apply(data, 1, scaler.transform, device=torch.device('cuda'))
 
     # save the result as the dirs
     for i, dir_ in enumerate(all_dirs):
