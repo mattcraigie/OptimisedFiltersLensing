@@ -16,8 +16,8 @@ model:
 #    sub_batch: 32
 
 training:
-  num_epochs: 500                                          # Number of training epochs
-  batch_size: 8                                            # Batch size
+  num_epochs: 2000                                          # Number of training epochs
+  batch_size: 16                                            # Batch size
   learning_rate: 0.0001                                    # Learning rate
 
 analysis:

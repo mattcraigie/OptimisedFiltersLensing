@@ -154,10 +154,9 @@ class Trainer:
         self.model.load_state_dict(torch.load(load_path))
 
     def save_filters(self, save_path):
-        self.model.eval()
-        with torch.no_grad():
-            filters = self.model.filter_tensor.cpu().detach()
-            torch.save(filters, save_path)
+        model = self.model.module if self.ddp else self.model
+        filters = model.filter_tensor.cpu().detach()
+        torch.save(filters, save_path)
 
 
 
