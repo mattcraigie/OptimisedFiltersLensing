@@ -2,8 +2,8 @@ data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
   data_subpath: 'patches'                           # patches or pre_calc
   is_patches: True                                         # True if the data is a set of patches
-  load_subset: 25                                         # Subset of cosmologies to load (saves memory), 2500 for all
-  sub_batch_subset: 192                                     # Subset of patches per cosmology, 192 for all
+  load_subset: 2500                                         # Subset of cosmologies to load (saves memory), 2000 for all
+  sub_batch_subset: 32                                     # Subset of patches per cosmology, 192 for all
   val_ratio: 0.2                                            # Portion of data to use for validation
   test_ratio: 0.2                                           # Portion of data to use for testing
 
@@ -12,12 +12,13 @@ model:
   submodel_type: 'test'
   model_args:                                               # Model keywords arguments to be passed to the constructor
     size: 128
+    reduction: 'rot_avg'
 
 training:
   num_epochs: 500                                           # Number of training epochs
-  batch_size: 4                                           # Batch size
-  learning_rate: 0.0007                                    # Learning rate
+  batch_size: 32                                           # Batch size
+  learning_rate: 0.0005                                    # Learning rate
 
 analysis:
-  data_subsets: [10, 20, 25]        # Subsets of the data for the scaling analysis
+  data_subsets: [25, 2000]        # Subsets of the data for the scaling analysis
   repeats: 1

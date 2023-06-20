@@ -205,7 +205,7 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
 
 # Other functions
 
-def load_and_apply(load_path, save_path, function, device):
+def load_and_apply(load_path, function, device, save_path=None, save=True):
     all_dirs = os.listdir(os.path.join(load_path))
     all_dirs = np.sort(all_dirs)
 
@@ -214,6 +214,13 @@ def load_and_apply(load_path, save_path, function, device):
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
         results = batch_apply(fields, 16, function, device=device)
         data.append(results.cpu().numpy())
+
     data = np.stack(data)
 
-    np.save(save_path, data)
+    if save:
+        assert save_path is not None, 'Must provide save path if saving'
+        np.save(save_path, data)
+    else:
+        return data
+
+

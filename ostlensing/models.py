@@ -33,8 +33,8 @@ class MLP(nn.Module):
 class OptimisableSTRegressor(nn.Module):
     def __init__(self,
                  size,
-                 num_scales=6,
-                 num_angles=6,
+                 num_scales=4,
+                 num_angles=4,
                  reduction=None,
                  hidden_sizes=(32, 32, 32),
                  output_size=1,
@@ -80,7 +80,7 @@ class PreCalcRegressor(nn.Module):
                              activation=activation)
 
     def forward(self, x):
-        x = x.mean(1)  # 'channel' mean, i.e. mean across all patches for the same cosmology
+        x = x.mean(1)  # todo: I should just put this in the precalc script!
         x = self.batch_norm(x)
         return self.regressor(x)
 
