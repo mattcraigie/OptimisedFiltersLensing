@@ -3,7 +3,7 @@ data:
   data_subpath: 'patches_log_std'                          # patches or pre_calc
   is_patches: True                                         # True if the data is a set of patches
   load_subset: 2500                                        # Subset of cosmologies to load (saves memory), 2000 for all
-  sub_batch_subset: 32                                      # Subset of patches per cosmology, 192 for all
+  sub_batch_subset: 16                                      # Subset of patches per cosmology, 192 for all
   val_ratio: 0.2                                           # Portion of data to use for validation
   test_ratio: 0.2                                          # Portion of data to use for testing
 
@@ -17,7 +17,7 @@ model:
 
 training:
   num_epochs: 2000                                          # Number of training epochs
-  batch_size: 8                                            # Batch size
+  batch_size: 4                                            # Batch size
   learning_rate: 0.0001                                    # Learning rate
 
 analysis:
