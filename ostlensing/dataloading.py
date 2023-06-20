@@ -74,7 +74,7 @@ class DataHandler:
 
         return features
 
-    def add_data(self, path, patches=False, normalise=True, log=False):
+    def add_data(self, path, patches=False, normalise=False, log=False):
         if patches:
             data = self.load_patches(path)
         else:
