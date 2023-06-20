@@ -104,11 +104,8 @@ def make_params():
     transform_df = transform_df.transpose()
     transform_df.columns = clean_df.columns
 
-    # add an index saying 'mean' and 'std'
-    transform_df['index'] = ['mean', 'std']
-    transform_df = transform_df.set_index('index')
-    print(transform_df.columns)
-
+    # make the index column for the transform_df 'mean' and 'std'
+    transform_df.index = ['mean', 'std']
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_clean.csv'
     clean_df.to_csv(save_path, index=False)
