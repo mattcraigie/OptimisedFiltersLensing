@@ -18,7 +18,7 @@ def batch_apply(data, bs, func, operate_device, end_device=None):
 
 def main():
 
-    use_log = True
+    use_log = False
 
     op_dev = torch.device('cuda')
     end_dev = torch.device('cpu')
