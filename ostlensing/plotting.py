@@ -60,6 +60,7 @@ class ModelPlotter:
         self.losses = None
         self.predictions = None
         self.targets = None
+        self.filters = None
 
     def load_folder(self, folder):
         self.model = torch.load(os.path.join(folder, 'model.pt'))
@@ -67,16 +68,17 @@ class ModelPlotter:
         self.predictions = torch.load(os.path.join(folder, 'predictions.pt'))
         self.targets = torch.load(os.path.join(folder, 'targets.pt'))
 
-    def plot_filters(self, nrows, ncols, save_path=None):
-        if self.model is None:
-            raise ValueError('Model not set. Call load_folder first.')
-
-        # todo: filters must be saved and loaded directly
-
         try:
-            filters = self.model.filters.filter_tensor.cpu().detach().numpy()
-        except AttributeError:
+            self.filters = torch.load(os.path.join(folder, 'filters.pt'))
+        except FileNotFoundError:
+            pass
+
+    def plot_filters(self, nrows, ncols, save_path=None):
+
+        if self.filters is None:
             raise AttributeError('Model does not have filters.')
+
+        filters = self.filters.numpy()
 
         fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 2, nrows * 2))
         for i in range(nrows):

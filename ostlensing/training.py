@@ -155,8 +155,13 @@ class Trainer:
 
     def save_filters(self, save_path):
         model = self.model.module if self.ddp else self.model
-        filters = model.filter_tensor.cpu().detach()
-        torch.save(filters, save_path)
+        try:
+            filters = model.filter_tensor.cpu().detach()
+            torch.save(filters, save_path)
+        except AttributeError:
+            # model doesn't have filters, so don't save anything
+            pass
+
 
 
 
