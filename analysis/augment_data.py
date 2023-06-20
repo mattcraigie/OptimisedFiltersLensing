@@ -108,13 +108,13 @@ def make_params():
     transform_df.index = ['mean', 'std']
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_clean.csv'
-    clean_df.to_csv(save_path, index=False)
+    clean_df.to_csv(save_path)
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_std.csv'
-    standardised_df.to_csv(save_path, index=False)
+    standardised_df.to_csv(save_path)
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_transvals.csv'
-    transform_df.to_csv(save_path, index=False)
+    transform_df.to_csv(save_path)
 
 if __name__ == '__main__':
     make_params()
