@@ -45,6 +45,9 @@ def main():
     scaler = Scaler(logged_mean, logged_std)
     result = batch_apply(data, 1, scaler.transform, operate_device=op_dev, end_device=end_dev)
 
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     # save the result as the dirs
     for i, dir_ in enumerate(all_dirs):
         np.save(os.path.join(save_path, dir_), result[i].cpu().numpy())
