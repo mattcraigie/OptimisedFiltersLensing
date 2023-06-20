@@ -13,11 +13,11 @@ model:
   model_args:                                              # Model keywords arguments to be passed to the constructor
     size: 128
     reduction: 'rot_avg'
-    sub_batch: 32
+#    sub_batch: 32
 
 training:
   num_epochs: 500                                          # Number of training epochs
-  batch_size: 32                                            # Batch size
+  batch_size: 4                                            # Batch size
   learning_rate: 0.0001                                    # Learning rate
 
 analysis:
