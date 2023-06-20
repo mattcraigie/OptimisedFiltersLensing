@@ -101,6 +101,9 @@ def make_params():
 
     # save the means and stds in their own df
     transform_df = pd.concat([means, stds], axis=1)
+    transform_df.columns = ['mean', 'std']
+    transform_df.transpose()
+    transform_df.columns = param_names
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_clean.csv'
     clean_df.to_csv(save_path, index=False)
