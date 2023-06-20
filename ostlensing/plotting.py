@@ -120,7 +120,7 @@ class ModelPlotter:
         def transform(x, i):
             if param_transforms is None:
                 return x
-            return (x * param_transforms[i][1]) / param_transforms[i][0]
+            return (x * param_transforms[i][1]) + param_transforms[i][0]
 
         fig, axes = plt.subplots(num_targets, 2, figsize=(8, num_targets*8))
 
