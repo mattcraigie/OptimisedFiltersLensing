@@ -81,9 +81,9 @@ def augment_data():
 def make_params():
 
     load_path = '//pscratch/sd/m/mcraigie/cosmogrid/params.csv'
-    df = pd.read_csv(load_path, index_col=False)
+    df = pd.read_csv(load_path)
 
-    param_names = df.columns.values[14]
+    param_names = df.columns[1:14]
 
     print(param_names)
     param_values = df[param_names].values
