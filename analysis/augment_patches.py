@@ -9,10 +9,10 @@ def batch_apply(data, bs, func, device):
     num_batches = num_batches if data.shape[0] % bs == 0 else num_batches + 1
     for i in range(num_batches):
         x = data[bs*i:bs*(i+1)]
-        print(x.shape)
         x = x.to(device)
         results.append(func(x))
-
+        torch.cuda.empty_cache()
+        print(torch.cuda.memory_allocated(device))
     return torch.cat(results, dim=0)
 
 
