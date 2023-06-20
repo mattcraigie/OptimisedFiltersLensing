@@ -36,21 +36,22 @@ def main():
     print(data.shape)
 
     # first calculate log
-    data_log = batch_apply(data, 1, torch.log, operate_device=op_dev, end_device=end_dev)
+    data_log = batch_apply(data, 4, torch.log, operate_device=op_dev, end_device=end_dev)
 
 
     # then calculate scaling values and apply
     logged_mean = torch.mean(data_log)
     logged_std = torch.std(data_log)
     scaler = Scaler(logged_mean, logged_std)
-    result = batch_apply(data, 1, scaler.transform, operate_device=op_dev, end_device=end_dev)
+    result = batch_apply(data, 4, scaler.transform, operate_device=op_dev, end_device=end_dev)
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
     # save the result as the dirs
     for i, dir_ in enumerate(all_dirs):
-        np.save(os.path.join(save_path, dir_), result[i].cpu().numpy())
+        data_half = result[i].cpu().numpy().astype(np.half)  # save as half precision for space
+        np.save(os.path.join(save_path, dir_), data_half)
 
 
 if __name__ == '__main__':
