@@ -108,7 +108,7 @@ class ModelPlotter:
         else:
             plt.show()
 
-    def plot_predictions(self, save_path=None, show_val=True, num_samples=None, param_names=None):
+    def plot_predictions(self, save_path=None, show_val=True, num_samples=None, param_names=None, param_transforms=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
@@ -116,6 +116,9 @@ class ModelPlotter:
 
         if param_names is None:
             param_names = [str(i) for i in range(num_targets)]
+
+        if param_transforms is None:
+            param_transforms = [1 for i in range(num_targets)]
 
         fig, axes = plt.subplots(num_targets, 2, figsize=(8, num_targets*8))
 
@@ -125,11 +128,13 @@ class ModelPlotter:
         for i in range(num_targets):
 
             # train (and val)
-            axes[i, 0].scatter(self.targets['train'][:num_samples, i],
-                               self.predictions['train'][:num_samples, i], c='cornflowerblue', alpha=0.5, label='train')
+            axes[i, 0].scatter(self.targets['train'][:num_samples, i] * param_transforms[i],
+                               self.predictions['train'][:num_samples, i] * param_transforms[i],
+                               c='cornflowerblue', alpha=0.5, label='train')
             if show_val:
-                axes[i, 0].scatter(self.targets['val'][:num_samples, i],
-                                   self.predictions['val'][:num_samples, i], c='green', marker='x', alpha=0.5, label='validation')
+                axes[i, 0].scatter(self.targets['val'][:num_samples, i] * param_transforms[i],
+                                   self.predictions['val'][:num_samples, i] * param_transforms[i],
+                                   c='green', marker='x', alpha=0.5, label='validation')
             axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
             axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
             axes[i, 0].set_aspect('equal')
@@ -137,8 +142,9 @@ class ModelPlotter:
             axes[i, 0].legend()
 
             # test
-            axes[i, 1].scatter(self.targets['test'][:num_samples, i],
-                               self.predictions['test'][:num_samples, i], c='deeppink', alpha=0.5)
+            axes[i, 1].scatter(self.targets['test'][:num_samples, i] * param_transforms[i],
+                               self.predictions['test'][:num_samples, i] * param_transforms[i],
+                               c='deeppink', alpha=0.5)
             axes[i, 1].set_xlabel('Target'.format(param_names[i]))
             axes[i, 1].set_ylabel('Prediction'.format(param_names[i]))
             axes[i, 1].set_aspect('equal')
