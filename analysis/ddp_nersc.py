@@ -38,6 +38,7 @@ def function(gpu, args):
 
 
 def ddp_main(function):
+    print("about to parse")
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--nodes', default=1,
                         type=int, metavar='N')
@@ -46,6 +47,7 @@ def ddp_main(function):
     parser.add_argument('-c', '--config', default='configs/datascaling/mst.yml', type=str,
                         help='config file path (default: configs/datascaling/mst.yml)')
     args = parser.parse_args()
+    print("parsed. About to config")
 
     # Load the config file
     with open(args.config, 'r') as file:
@@ -53,6 +55,7 @@ def ddp_main(function):
     args.config = config
 
     args.world_size = args.gpus * args.nodes
+    print("Config done. About to spawn")
     mp.spawn(function, nprocs=args.gpus, args=(args,))
 
 
