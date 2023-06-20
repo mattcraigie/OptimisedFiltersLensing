@@ -2,6 +2,7 @@ from ostlensing.dataloading import Scaler
 import numpy as np
 import torch
 import os
+import pandas as pd
 
 def batch_apply(data, bs, func, operate_device, end_device=None):
     if end_device is None:
@@ -77,8 +78,38 @@ def augment_data():
     np.save(save_path, result)
 
 
+def make_params():
+
+    load_path = '//pscratch/sd/m/mcraigie/cosmogrid/params.csv'
+    df = pd.read_csv(load_path)
+
+    param_names = df.columns.values[:14]
+    print(param_names)
+    param_values = df[param_names].values
+
+    # cleaned df that drops irrelevant columns
+    clean_df = pd.DataFrame(columns=param_names, data=param_values)
+
+    # standardised df
+    means = param_values.mean(axis=0)
+    stds = param_values.std(axis=0)
+    scaled = (param_values - means) / stds
+    standardised_df = pd.DataFrame(columns=param_names, data=scaled)
+
+    transform_vals = {'means': means, 'stds': stds}
+    transform_df = pd.DataFrame(columns=param_names, data=transform_vals)
+
+    save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_clean.csv'
+    clean_df.to_csv(save_path, index=False)
+
+    save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_std.csv'
+    standardised_df.to_csv(save_path, index=False)
+
+    save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_transvals.csv'
+    transform_df.to_csv(save_path, index=False)
+
 if __name__ == '__main__':
-    augment_data()
+    make_params()
 
 
 
