@@ -18,6 +18,6 @@ conda activate nbody
 
 # Use the head node of the job as the main communicator
 export MASTER_ADDR=$(hostname)
-export MASTER_PORT=29500 # default from torch launcher
+export MASTER_PORT=49552
 
 srun python analysis/datascaling_ddp.py ${args}

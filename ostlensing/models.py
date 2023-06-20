@@ -3,6 +3,7 @@ import torch.nn as nn
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import FourierSubNetFilters, SubNet
+from .training import batch_apply
 
 from torchvision.models import resnet18, vit_b_16
 
@@ -50,6 +51,7 @@ class OptimisableSTRegressor(nn.Module):
                              hidden_sizes=hidden_sizes,
                              output_size=output_size,
                              activation=activation)
+        self.device = None
 
     def forward(self, x):
         self.filters.update_filters()
@@ -59,9 +61,17 @@ class OptimisableSTRegressor(nn.Module):
         x = self.batch_norm(x)
         return self.regressor(x)
 
+    def subbatch_apply(self, x, func, bs=4):
+        #        x = self.subbatch_apply(x, lambda y: self.reducer(self.st(y)), bs=4)
+        # This is here to avoid memory issues when applying the ost to a large dataset. We don't want to change how
+        # often we compute gradients (e.g. we want to do that over a batch of e.g. 32) but we can't apply the ost
+        # to a batch of 32 cosmologies * 192 patches * 128x128 size. Idk if gradients will be too much though?
+        return batch_apply(x, bs=bs, func=func, device=self.device)
+
     def to(self, device):
         super(OptimisableSTRegressor, self).to(device)
         self.st.to(device)
+        self.device = device
         return self
 
 
