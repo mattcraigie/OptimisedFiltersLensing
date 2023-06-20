@@ -70,7 +70,7 @@ class OptimisableSTRegressor(nn.Module):
         # This is here to avoid memory issues when applying the ost to a large dataset. We don't want to change how
         # often we compute gradients (e.g. we want to do that over a batch of e.g. 32) but we can't apply the ost
         # to a batch of 32 cosmologies * 192 patches * 128x128 size. Idk if gradients will be too much though?
-        assert self.device is not None, "Please set the device before using sub_batch_apply"
+        assert self.device is not None, "Must set the device before using sub_batch_apply"
         return batch_apply(x, bs=bs, func=func, device=self.device)
 
     def to(self, device):
