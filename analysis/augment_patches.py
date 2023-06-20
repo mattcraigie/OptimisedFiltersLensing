@@ -1,7 +1,19 @@
-from ostlensing.dataloading import Scaler, batch_apply
+from ostlensing.dataloading import Scaler
 import numpy as np
 import torch
 import os
+
+def batch_apply(data, bs, func, device):
+    results = []
+    num_batches = data.shape[0] // bs
+    num_batches = num_batches if data.shape[0] % bs == 0 else num_batches + 1
+    for i in range(num_batches):
+        x = data[bs*i:bs*(i+1)]
+        print(x.shape)
+        x = x.to(device)
+        results.append(func(x))
+
+    return torch.cat(results, dim=0)
 
 
 def main():
@@ -17,10 +29,11 @@ def main():
         data.append(fields)
 
     data = torch.stack(data)
+    print(data.shape)
 
     # first calculate log
     data_log = batch_apply(data, 1, torch.log, device=torch.device('cuda'))
-    torch.cuda.empty_cache()
+
 
     # then calculate scaling values and apply
     logged_mean = torch.mean(data_log)
