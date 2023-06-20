@@ -97,10 +97,10 @@ def make_params():
     # standardised df
     means = clean_df.mean()
     stds = clean_df.std()
-    standardised_df = (df - means) / stds
+    standardised_df = (clean_df - means) / stds
 
     # save the means and stds in their own df
-    transform_df = pd.DataFrame(columns=param_names, data=[means, stds], index=['means', 'stds'])
+    transform_df = pd.concat([means, stds], axis=1)
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_clean.csv'
     clean_df.to_csv(save_path, index=False)
