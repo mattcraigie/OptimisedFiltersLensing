@@ -16,7 +16,7 @@ def batch_apply(data, bs, func, operate_device, end_device=None):
     return torch.cat(results, dim=0)
 
 
-def main():
+def augment_patches():
 
     use_log = False
 
@@ -55,8 +55,30 @@ def main():
         np.save(os.path.join(save_path, dir_), data_half)
 
 
+def augment_data():
+
+    name = 'ps_precalc'
+    load_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}.npy'
+
+
+    # without log
+    save_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}_std.npy'
+    data = np.load(load_path)
+    scaler = Scaler(np.mean(data), np.std(data))
+    result = scaler.transform(data)
+    np.save(save_path, result)
+
+    # with log
+    save_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}_log_std.npy'
+    data = np.load(load_path)
+    data = np.log(data)
+    scaler = Scaler(np.mean(data), np.std(data))
+    result = scaler.transform(data)
+    np.save(save_path, result)
+
+
 if __name__ == '__main__':
-    main()
+    augment_data()
 
 
 
