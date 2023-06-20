@@ -2,8 +2,7 @@
 #SBATCH -A desi_g
 #SBATCH -C gpu
 #SBATCH -q regular
-#SBATCH --ntasks-per-node 4
-#SBATCH --cpus-per-task 32
+#SBATCH --cpus-per-task 1
 #SBATCH --gpus-per-node 4
 #SBATCH --time=0:10:00
 #SBATCH -J datascaling
