@@ -81,23 +81,26 @@ def augment_data():
 def make_params():
 
     load_path = '//pscratch/sd/m/mcraigie/cosmogrid/params.csv'
-    df = pd.read_csv(load_path)
+    df = pd.read_csv(load_path, index_col=False)
 
-    param_names = df.columns.values[:14]
+    param_names = df.columns.values[14]
+
     print(param_names)
     param_values = df[param_names].values
 
     # cleaned df that drops irrelevant columns
     clean_df = pd.DataFrame(columns=param_names, data=param_values)
 
-    # standardised df
-    means = param_values.mean(axis=0)
-    stds = param_values.std(axis=0)
-    scaled = (param_values - means) / stds
-    standardised_df = pd.DataFrame(columns=param_names, data=scaled)
+    # drop columns 'Ol' and 'm_nu' since they don't vary
+    clean_df = clean_df.drop(columns=['Ol', 'm_nu'])
 
-    transform_vals = {'means': means, 'stds': stds}
-    transform_df = pd.DataFrame(columns=param_names, data=transform_vals)
+    # standardised df
+    means = clean_df.mean()
+    stds = clean_df.stds()
+    standardised_df = (df - means) / stds
+
+    # save the means and stds in their own df
+    transform_df = pd.DataFrame(columns=param_names, data=[means, stds], index=['means', 'stds'])
 
     save_path = '//pscratch/sd/m/mcraigie/cosmogrid/params_clean.csv'
     clean_df.to_csv(save_path, index=False)
