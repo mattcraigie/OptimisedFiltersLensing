@@ -96,7 +96,7 @@ def make_params():
 
     # standardised df
     means = clean_df.mean()
-    stds = clean_df.stds()
+    stds = clean_df.std()
     standardised_df = (df - means) / stds
 
     # save the means and stds in their own df
