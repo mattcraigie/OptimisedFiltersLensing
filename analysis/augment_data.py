@@ -57,7 +57,7 @@ def augment_patches():
 
 def augment_data():
 
-    name = 'ps_precalc'
+    name = 'mst_precalc'
     load_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}.npy'
 
 
