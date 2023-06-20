@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'patches'                           # patches or pre_calc
+  data_subpath: 'patches_log_std'                           # patches or pre_calc
   is_patches: True                                         # True if the data is a set of patches
   load_subset: 2500                                         # Subset of cosmologies to load (saves memory), 2000 for all
   sub_batch_subset: 32                                     # Subset of patches per cosmology, 192 for all
