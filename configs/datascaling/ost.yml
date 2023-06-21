@@ -9,16 +9,16 @@ data:
 
 model:
   model_type: 'ost'
-  submodel_type: 'test'
+  submodel_type: 'test_lr0.001'
   model_args:                                              # Model keywords arguments to be passed to the constructor
     size: 128
     reduction: 'rot_avg'
 #    sub_batch: 32
 
 training:
-  num_epochs: 2000                                          # Number of training epochs
+  num_epochs: 100                                          # Number of training epochs
   batch_size: 4                                            # Batch size
-  learning_rate: 0.0001                                    # Learning rate
+  learning_rate: 0.001                                    # Learning rate
 
 analysis:
   data_subsets: [25, 100, 500, 2000]                 # Subsets of the data for the scaling analysis
