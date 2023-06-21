@@ -82,7 +82,7 @@ class ModelPlotter:
 
         ncols = 3
         nrows = filters.shape[0]
-        fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(nrows * 3, ncols * 3))
+        fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols * 3, nrows * 3))
         for j in range(filters.shape[0]):
             k = filters[j, 0, :, :]
             x = torch.fft.fft2(k)
