@@ -39,11 +39,11 @@ class OptimisableSTRegressor(nn.Module):
                  reduction=None,
                  hidden_sizes=(32, 32, 32),
                  output_size=1,
-                 activation=nn.LeakyReLU,
+                 activation=nn.Tanh,
                  sub_batch=None
                  ):
         super(OptimisableSTRegressor, self).__init__()
-        self.subnet = SubNet(hidden_sizes=(16, 16, 16), activation=nn.LeakyReLU)
+        self.subnet = SubNet(hidden_sizes=(4, 4), activation=activation)
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
         self.st = ScatteringTransform2d(self.filters)
         self.reducer = Reducer(self.filters, reduction)
@@ -51,7 +51,7 @@ class OptimisableSTRegressor(nn.Module):
         self.regressor = MLP(input_size=self.reducer.num_outputs,
                              hidden_sizes=hidden_sizes,
                              output_size=output_size,
-                             activation=activation)
+                             activation=nn.LeakyReLU)
         self.device = None
         self.sub_batch = sub_batch
 
