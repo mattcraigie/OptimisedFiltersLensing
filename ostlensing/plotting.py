@@ -73,21 +73,25 @@ class ModelPlotter:
         except FileNotFoundError:
             pass
 
-    def plot_filters(self, nrows, ncols, save_path=None):
+    def plot_filters(self, save_path=None):
 
         if self.filters is None:
             raise AttributeError('Model does not have filters.')
 
         filters = self.filters.numpy()
 
-        fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 2, nrows * 2))
-        for i in range(nrows):
-            for j in range(ncols):
-                try:
-                    axes[i, j].imshow(filters[i * ncols + j, 0, :, :])
-                    axes[i, j].axis('off')
-                except IndexError:
-                    continue
+        fig, axes = plt.subplots(nrows=3, ncols=filters.shape[0], figsize=(8, filters.shape[0] * 2))
+        for j in range(filters.shape[0]):
+            k = filters[j, 0, :, :]
+            x = torch.fft.fft2(k)
+            axes[0, j].imshow(torch.fft.fftshift(k))
+            axes[0, j].axis('off')
+
+            axes[1, j].imshow(torch.fft.fftshift(x.real))
+            axes[1, j].axis('off')
+
+            axes[2, j].imshow(torch.fft.fftshift(x.imag))
+            axes[2, j].axis('off')
 
         if save_path is not None:
             plt.savefig(save_path)

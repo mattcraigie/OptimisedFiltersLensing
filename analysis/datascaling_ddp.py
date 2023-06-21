@@ -13,8 +13,6 @@ from ostlensing.models import OptimisableSTRegressor, PreCalcRegressor, ResNetRe
 
 from ddp_nersc import ddp_main, setup, cleanup
 
-# help options: berkeley group desi -  nersc channel desi anthony kremin,
-
 model_map = {'ost': OptimisableSTRegressor,
              'pre_calc': PreCalcRegressor,
              'resnet': ResNetRegressor,
