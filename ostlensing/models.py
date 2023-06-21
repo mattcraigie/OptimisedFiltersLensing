@@ -146,7 +146,7 @@ class ViTRegressor(PreCalcRegressor):
         vit = vit_b_16()
 
         # change the first layer to input a single channel
-        vit.patch_embed.proj = nn.Conv2d(1, vit.patch_embed.proj.out_channels, kernel_size=7, stride=4, padding=3)
+
 
         # change the last layer to output the correct size
         vit.head = nn.Linear(vit.head.in_features, model_output_size)
