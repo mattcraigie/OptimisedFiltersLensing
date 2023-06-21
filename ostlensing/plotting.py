@@ -155,8 +155,8 @@ class ModelPlotter:
             axes[i, 1].scatter(transform(self.targets['test'][:num_samples, i], i),
                                transform(self.predictions['test'][:num_samples, i], i),
                                c='deeppink', alpha=0.5)
-            axes[i, 1].set_xlabel('Target'.format(param_names[i]))
-            axes[i, 1].set_ylabel('Prediction'.format(param_names[i]))
+            axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
+            axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             axes[i, 1].set_aspect('equal')
             axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
 
