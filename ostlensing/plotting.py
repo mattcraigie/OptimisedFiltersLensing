@@ -94,7 +94,7 @@ class ModelPlotter:
 
             axes[j, 2].imshow(torch.fft.fftshift(x.imag))
             axes[j, 2].axis('off')
-
+        plt.tight_layout()
         if save_path is not None:
             plt.savefig(save_path)
         else:
