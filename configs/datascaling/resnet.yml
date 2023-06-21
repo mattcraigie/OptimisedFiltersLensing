@@ -10,10 +10,8 @@ data:
 model:
   model_type: 'resnet'
   submodel_type: 'test'
-#  model_args:                                              # Model keywords arguments to be passed to the constructor
-#    size: 128
-#    reduction: 'rot_avg'
-#    sub_batch: 32
+  model_args:                                              # Model keywords arguments to be passed to the constructor
+     model_output_size: 512
 
 training:
   num_epochs: 1000                                          # Number of training epochs
