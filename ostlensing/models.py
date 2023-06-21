@@ -125,7 +125,7 @@ class ResNetRegressor(PreCalcRegressor):
         batch_dim = x.shape[0]
         patch_dim = x.shape[1]
         size = x.shape[2]
-        x = x.reshape(batch_dim * patch_dim, size, size)
+        x = x.reshape(batch_dim * patch_dim, 1, size, size)
         x = self.resnet(x)
         x = x.reshape(batch_dim, patch_dim, -1)
         return super(ResNetRegressor, self).forward(x)
@@ -156,7 +156,7 @@ class ViTRegressor(PreCalcRegressor):
         batch_dim = x.shape[0]
         patch_dim = x.shape[1]
         size = x.shape[2]
-        x = x.reshape(batch_dim * patch_dim, size, size)
+        x = x.reshape(batch_dim * patch_dim, 1, size, size)
         x = self.vit(x)
         x = x.reshape(batch_dim, patch_dim, -1)
         return super(ViTRegressor, self).forward(x)
