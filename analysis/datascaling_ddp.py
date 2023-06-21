@@ -9,13 +9,16 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from ostlensing.training import mse_and_admissibility, Trainer
 from ostlensing.dataloading import DataHandler
-from ostlensing.models import OptimisableSTRegressor, PreCalcRegressor
+from ostlensing.models import OptimisableSTRegressor, PreCalcRegressor, ResNetRegressor, ViTRegressor
 
 from ddp_nersc import ddp_main, setup, cleanup
 
 # help options: berkeley group desi -  nersc channel desi anthony kremin,
 
-model_map = {'ost': OptimisableSTRegressor, 'pre_calc': PreCalcRegressor}
+model_map = {'ost': OptimisableSTRegressor,
+             'pre_calc': PreCalcRegressor,
+             'resnet': ResNetRegressor,
+             'vit': ViTRegressor}
 
 
 # Adjusted loss functions
