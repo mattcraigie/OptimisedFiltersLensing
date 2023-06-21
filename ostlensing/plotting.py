@@ -78,7 +78,7 @@ class ModelPlotter:
         if self.filters is None:
             raise AttributeError('Model does not have filters.')
 
-        filters = self.filters.numpy()
+        filters = self.filters
 
         fig, axes = plt.subplots(nrows=3, ncols=filters.shape[0], figsize=(8, filters.shape[0] * 2))
         for j in range(filters.shape[0]):
