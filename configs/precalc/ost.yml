@@ -1,0 +1,9 @@
+load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches'                 # the folder to load from
+save_path: '//pscratch/sd/m/mcraigie/cosmogrid/pk_precalc.npy'         # must specify the .npy file for output
+
+method: 'ost'
+kwargs:
+  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/ost/test_smallnet/subset_500/filters.pt'
+  reduction: 'rot_avg'
+  device: 'cuda:0'
+
