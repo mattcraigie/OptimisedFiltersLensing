@@ -92,7 +92,7 @@ class ModelPlotter:
             keep_size = 128 // 2**j
             half = keep_size // 2
             k = k[64 - half:64 + half, 64 - half:64 + half]
-            k = torch.fft.fftshift
+            k = torch.fft.fftshift(k)
 
             x = torch.fft.fft2(k)
             axes[j, 0].imshow(torch.fft.fftshift(k))
