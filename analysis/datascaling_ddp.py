@@ -21,6 +21,13 @@ model_map = {'ost': OptimisableSTRegressor,
              'vit': ViTRegressor}
 
 
+# Create a custom filter to suppress specific log messages
+class SuppressFilter(logging.Filter):
+    def filter(self, record):
+        # Suppress log messages from pytorch (because they cram my logging!)
+        return "Reducer buckets have been rebuilt" not in record.getMessage()
+
+
 # Adjusted loss functions
 
 def mse_and_admissibility_ddp(output, target, model, weighting=1.0):
@@ -76,6 +83,8 @@ def data_scaling(rank, args):
 
     logging.basicConfig(filename=os.path.join('outputs', 'logs', f'datascaling_{model_type}'), level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")
+    logger = logging.getLogger()
+    logger.addFilter(SuppressFilter())  # suppress log messages from pytorch
 
     # make output folder
     if submodel_type is not None:
@@ -162,13 +171,13 @@ def data_scaling(rank, args):
                 model_results.append(test_loss.cpu().item())
 
                 subset_end_time = time.time()
-                logging.info(f"Subset {subset} took {subset_end_time - subset_start_time} seconds.")
+                logging.info("Subset {} took {:.2f} seconds.".format(subset, subset_end_time - subset_start_time))
 
         if rank == 0:
             df[f'run_{str(i)}'] = model_results
 
             repeat_end_time = time.time()
-            logging.info(f"Repeat {i} took {repeat_end_time - repeat_start_time} seconds.")
+            logging.info("Repeat {} took {:.2f} seconds.".format(i, repeat_end_time - repeat_start_time))
 
     if rank == 0:  # only save the results once!
         df.to_csv(os.path.join(out_folder, 'data_scaling_{}.csv'.format(model_type)), index=False)
@@ -177,7 +186,7 @@ def data_scaling(rank, args):
 
     if rank == 0:
         end_time = time.time()
-        logging.info(f"Full data scaling analysis took {end_time - start_time} seconds.")
+        logging.info("Data scaling analysis took {:.2f} seconds.".format(end_time - start_time))
 
 
 if __name__ == '__main__':
