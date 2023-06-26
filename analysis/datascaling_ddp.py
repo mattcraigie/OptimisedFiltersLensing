@@ -82,8 +82,12 @@ def data_scaling(rank, args):
     repeats = analysis_config['repeats']
 
     # set up logging
-    log_filename = os.path.join('outputs', 'logs', f'datascaling_{model_type}')
+    logging_path = os.path.join('outputs', 'logs', 'datascaling', model_type)
+    log_filename = os.path.join(logging_path, f'{submodel_type}.log')
     if rank == 0:
+        if not os.path.exists(logging_path):
+            os.mkdir(logging_path)
+
         if os.path.exists(log_filename):
             os.remove(log_filename)
 
@@ -110,7 +114,7 @@ def data_scaling(rank, args):
                                sub_batch_subset=sub_batch_subset,
                                val_ratio=val_ratio,
                                test_ratio=test_ratio,
-                               seed=42)  # must use a seed for fair comparison at low sample size
+                               seed=42)
 
     data_handler.add_data(os.path.join(data_path, data_subpath), patches=is_patches, normalise=False, log=False)
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
@@ -131,6 +135,9 @@ def data_scaling(rank, args):
             repeat_start_time = time.time()
             logging.info(f"Running repeat {i}.")
 
+        # set the seed for the train and val split. This should be consistent amongst the subsets for the same repeat
+        data_handler.seed = i
+
         model_results = []
 
         # iterate over the train/val data subsets
@@ -138,6 +145,8 @@ def data_scaling(rank, args):
             if rank == 0:
                 subset_start_time = time.time()
                 logging.info(f"Running subset {subset}.")
+
+
 
             # make train and val loaders with the subset of data
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)

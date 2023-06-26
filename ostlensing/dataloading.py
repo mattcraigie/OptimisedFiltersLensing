@@ -130,8 +130,6 @@ class DataHandler:
         assert self.data is not None and self.targets is not None, \
             'Data and targets must be loaded before getting dataloaders'
 
-
-
         # make the samplers
         num_data = len(self.data)
         test_split = int(self.test_ratio * num_data)  # test set is unaffected by the subsetting
