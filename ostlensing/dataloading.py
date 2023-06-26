@@ -37,7 +37,7 @@ def norm_scale(x, axis=None):
     return scaler.transform(x), scaler
 
 
-def data_shuffler(self, *args, seed=None):  # a class method so we can access the DataHandler seed
+def data_shuffler(*args, seed=None):  # a class method so we can access the DataHandler seed
     if seed is not None:
         torch.manual_seed(seed)
     size = args[0].shape[0]
