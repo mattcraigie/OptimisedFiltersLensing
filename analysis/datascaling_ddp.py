@@ -82,7 +82,7 @@ def data_scaling(rank, args):
     repeats = analysis_config['repeats']
 
     # set up logging
-    logging_filename = os.path.join('outputs', 'logs', model_type, f'{submodel_type}.log')
+    logging_filename = os.path.join('outputs', 'logs', f'{model_type}_{submodel_type}.log')
 
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")
