@@ -1,5 +1,5 @@
 load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches'                 # the folder to load from
-save_path: '//pscratch/sd/m/mcraigie/cosmogrid/ost_precalc.npy'         # must specify the .npy file for output
+save_path: '//pscratch/sd/m/mcraigie/cosmogrid/'         # must specify the .npy file for output
 save_name: 'ost_precalc_test'
 
 method: 'ost'
