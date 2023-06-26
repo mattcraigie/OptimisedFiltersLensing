@@ -83,6 +83,8 @@ def data_scaling(rank, args):
 
     # set up logging
     logging_filename = os.path.join('outputs', 'logs', f'{model_type}_{submodel_type}.log')
+    if rank == 0 and os.path.exists(logging_filename):
+        os.remove(logging_filename)
 
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")
