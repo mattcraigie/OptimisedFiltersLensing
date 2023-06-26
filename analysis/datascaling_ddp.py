@@ -1,6 +1,8 @@
 import numpy as np
 import os
 import pandas as pd
+import logging
+import time
 
 import torch
 import torch.nn as nn
@@ -39,7 +41,7 @@ def data_scaling(rank, args):
         args (argparse.Namespace): The command line arguments. This function only uses args.config.
     """
 
-    print(f"Running data scaling analysis on rank {rank}.")
+    # look at path and
     setup(rank, args)
 
     # Load configuration settings
@@ -72,6 +74,9 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
     repeats = analysis_config['repeats']
 
+    logging.basicConfig(filename=os.path.join('outputs', 'logs', f'datascaling_{model_type}'), level=logging.INFO)
+    logging.info(f"Running data scaling analysis on rank {rank}.")
+
     # make output folder
     if submodel_type is not None:
         out_folder = os.path.join('outputs', 'datascaling', model_type, submodel_type)
@@ -81,6 +86,9 @@ def data_scaling(rank, args):
     if rank == 0:
         if not os.path.exists(out_folder):
             os.makedirs(out_folder)
+
+        start_time = time.time()
+        logging.info('Loading and initialising.')
 
     # load train+val and test data with DataHandler
     data_handler = DataHandler(load_subset=load_subset,
@@ -103,11 +111,14 @@ def data_scaling(rank, args):
 
     for i in range(repeats):
         if rank == 0:
-            print(f"Running repeat {str(i)}.")
+            repeat_start_time = time.time()
+            logging.info(f"Running repeat {i}.")
+
         model_results = []
         for subset in data_subsets:
             if rank == 0:
-                print(f"Running analysis for data subset {subset}.")
+                subset_start_time = time.time()
+                logging.info(f"Running subset {subset}.")
 
             # make train and val loaders with the subset of data
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
@@ -150,16 +161,24 @@ def data_scaling(rank, args):
                 trainer.save_targets(os.path.join(subset_folder, 'targets.pt'))
                 model_results.append(test_loss.cpu().item())
 
+                subset_end_time = time.time()
+                logging.info(f"Subset {subset} took {subset_end_time - subset_start_time} seconds.")
+
         if rank == 0:
             df[f'run_{str(i)}'] = model_results
+
+            repeat_end_time = time.time()
+            logging.info(f"Repeat {i} took {repeat_end_time - repeat_start_time} seconds.")
 
     if rank == 0:  # only save the results once!
         df.to_csv(os.path.join(out_folder, 'data_scaling_{}.csv'.format(model_type)), index=False)
 
     cleanup()
 
+    if rank == 0:
+        end_time = time.time()
+        logging.info(f"Full data scaling analysis took {end_time - start_time} seconds.")
+
 
 if __name__ == '__main__':
-    print("starting...")
     ddp_main(data_scaling)
-    print("finished!")

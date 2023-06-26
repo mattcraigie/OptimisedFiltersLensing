@@ -61,15 +61,14 @@ def augment_data():
     name = 'mst_precalc'
     load_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}.npy'
 
-
-    # without log
+    # with wtd
     save_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}_std.npy'
     data = np.load(load_path)
     scaler = Scaler(np.mean(data), np.std(data))
     result = scaler.transform(data)
     np.save(save_path, result)
 
-    # with log
+    # with log and std
     save_path = f'//pscratch/sd/m/mcraigie/cosmogrid/{name}_log_std.npy'
     data = np.load(load_path)
     data = np.log(data)
