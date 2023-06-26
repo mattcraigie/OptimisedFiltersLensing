@@ -79,12 +79,19 @@ class ModelPlotter:
             raise AttributeError('Model does not have filters.')
 
         filters = self.filters
+        filter_size = filters.shape[-1]
 
         ncols = 3
         nrows = filters.shape[0]
         fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols * 3, nrows * 3))
         for j in range(filters.shape[0]):
             k = filters[j, 0, :, :]
+
+            # crop out the central 2**(j - 4) pixels
+            keep_size = 128 // 2**j
+            half = keep_size // 2
+            k = k[64 - half:64 + half, 64 - half:64 + half]
+
             x = torch.fft.fft2(k)
             axes[j, 0].imshow(torch.fft.fftshift(k))
             axes[j, 0].axis('off')
