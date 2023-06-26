@@ -82,16 +82,9 @@ def data_scaling(rank, args):
     repeats = analysis_config['repeats']
 
     # set up logging
-    logging_path = os.path.join('outputs', 'logs', 'datascaling', model_type)
-    log_filename = os.path.join(logging_path, f'{submodel_type}.log')
-    if rank == 0:
-        if not os.path.exists(logging_path):
-            os.mkdir(logging_path)
+    logging_filename = os.path.join('outputs', 'logs', model_type, f'{submodel_type}.log')
 
-        if os.path.exists(log_filename):
-            os.remove(log_filename)
-
-    logging.basicConfig(filename=log_filename, level=logging.INFO)
+    logging.basicConfig(filename=logging_filename, level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")
     logger = logging.getLogger()
     logger.addFilter(SuppressFilter())  # suppress log messages from pytorch
