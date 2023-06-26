@@ -48,7 +48,7 @@ def data_shuffler(self, *args, seed=None):  # a class method so we can access th
 class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
 
-    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2, seed=42):
+    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2, seed=None):
         self.load_subset = load_subset
         self.sub_batch_subset = sub_batch_subset
         self.val_ratio = val_ratio

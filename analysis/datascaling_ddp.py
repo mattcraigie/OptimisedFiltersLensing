@@ -81,6 +81,7 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
     repeats = analysis_config['repeats']
 
+    # set up logging
     logging.basicConfig(filename=os.path.join('outputs', 'logs', f'datascaling_{model_type}'), level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")
     logger = logging.getLogger()
@@ -103,27 +104,31 @@ def data_scaling(rank, args):
     data_handler = DataHandler(load_subset=load_subset,
                                sub_batch_subset=sub_batch_subset,
                                val_ratio=val_ratio,
-                               test_ratio=test_ratio)
+                               test_ratio=test_ratio,
+                               seed=42)  # must use a seed for fair comparison at low sample size
 
     data_handler.add_data(os.path.join(data_path, data_subpath), patches=is_patches, normalise=False, log=False)
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
 
-    # make test loader outside the loop
+    # make test loader outside the loop for consistent test data
     test_loader = data_handler.get_test_loader()
 
     # setup train and test losses
     train_criterion = mse_and_admissibility_ddp if model_type == 'ost' else mse
     test_criterion = mse
 
-    # make this a proper outputs -- make folder etc.
+    # set up the results dataframe
     df = pd.DataFrame({'data_subset': data_subsets})
 
+    # iterate of repeat number i
     for i in range(repeats):
         if rank == 0:
             repeat_start_time = time.time()
             logging.info(f"Running repeat {i}.")
 
         model_results = []
+
+        # iterate over the train/val data subsets
         for subset in data_subsets:
             if rank == 0:
                 subset_start_time = time.time()
