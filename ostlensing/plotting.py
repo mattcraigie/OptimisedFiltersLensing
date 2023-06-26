@@ -88,9 +88,11 @@ class ModelPlotter:
             k = filters[j, 0, :, :]
 
             # keep the corners of the filters
+            k = torch.fft.fftshift(k)
             keep_size = 128 // 2**j
             half = keep_size // 2
             k = k[64 - half:64 + half, 64 - half:64 + half]
+            k = torch.fft.fftshift
 
             x = torch.fft.fft2(k)
             axes[j, 0].imshow(torch.fft.fftshift(k))
