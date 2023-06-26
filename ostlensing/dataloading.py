@@ -37,7 +37,9 @@ def norm_scale(x, axis=None):
     return scaler.transform(x), scaler
 
 
-def data_shuffler(*args):
+def data_shuffler(self, *args, seed=None):  # a class method so we can access the DataHandler seed
+    if seed is not None:
+        torch.manual_seed(seed)
     size = args[0].shape[0]
     perm = torch.randperm(size)
     return tuple([arg[perm] for arg in args])
@@ -46,11 +48,12 @@ def data_shuffler(*args):
 class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
 
-    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2):
+    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2, seed=42):
         self.load_subset = load_subset
         self.sub_batch_subset = sub_batch_subset
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
+        self.seed = seed
 
         self.data = None
         self.targets = None
@@ -91,7 +94,7 @@ class DataHandler:
 
         if self.targets is not None:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
-            self.data, self.targets = data_shuffler(self.data, self.targets)
+            self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
 
     def add_targets(self, path, normalise=False, use_params=None):
         df = pd.read_csv(path)
@@ -109,7 +112,7 @@ class DataHandler:
 
         if self.data is not None:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
-            self.data, self.targets = data_shuffler(self.data, self.targets)
+            self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
 
     def get_test_loader(self, batch_size=128, ddp=False):
         assert self.data is not None and self.targets is not None, \
@@ -143,7 +146,7 @@ class DataHandler:
         # another layer of randomness to get the bootstrapping working
         leftover_data = self.data[test_split:num_remaining+test_split]
         leftover_targets = self.targets[test_split:num_remaining+test_split]
-        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets)
+        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets, seed=self.seed)
 
         val_split = int(self.val_ratio * num_remaining)
 
@@ -162,6 +165,8 @@ class DataHandler:
             train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
         return train_loader, val_loader
+
+
 
 
 # Patch making functions
