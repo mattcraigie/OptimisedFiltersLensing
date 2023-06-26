@@ -209,7 +209,7 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
 
 # Other functions
 
-def load_and_apply(load_path, function, device, save_path=None, save=True):
+def load_and_apply(load_path, function, device, save_path=None):
     all_dirs = os.listdir(os.path.join(load_path))
     all_dirs = np.sort(all_dirs)
 
@@ -221,10 +221,11 @@ def load_and_apply(load_path, function, device, save_path=None, save=True):
 
     data = np.stack(data)
 
-    if save:
-        assert save_path is not None, 'Must provide save path if saving'
-        np.save(save_path, data)
-    else:
+    if save_path is None:
         return data
+    else:
+        np.save(save_path, data)
+
+
 
 
