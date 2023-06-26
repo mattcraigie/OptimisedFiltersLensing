@@ -86,18 +86,18 @@ class ModelPlotter:
         fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols * 3, nrows * 3))
         for j in range(filters.shape[0]):
             k = filters[j, 0, :, :]
+            k_full = k.clone()
 
             # keep the corners of the filters
             k = torch.fft.fftshift(k)
             keep_size = 128 // 2**j
             half = keep_size // 2
             k = k[64 - half:64 + half, 64 - half:64 + half]
-            k = torch.fft.fftshift(k)
 
-            x = torch.fft.fft2(k)
-            axes[j, 0].imshow(torch.fft.fftshift(k))
+            axes[j, 0].imshow(k)
             axes[j, 0].axis('off')
 
+            x = torch.fft.fft2(k_full)
             axes[j, 1].imshow(torch.fft.fftshift(x.real))
             axes[j, 1].axis('off')
 
