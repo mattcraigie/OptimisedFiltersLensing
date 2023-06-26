@@ -87,7 +87,7 @@ class ModelPlotter:
         for j in range(filters.shape[0]):
             k = filters[j, 0, :, :]
 
-            # crop out the central 2**(j - 4) pixels
+            # keep the corners of the filters
             keep_size = 128 // 2**j
             half = keep_size // 2
             k = k[64 - half:64 + half, 64 - half:64 + half]
