@@ -1,4 +1,4 @@
-load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches'                 # the folder to load from
+load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches_log_std'                 # the folder to load from
 save_path: '//pscratch/sd/m/mcraigie/cosmogrid/'
 save_name: 'ps_precalc'
 

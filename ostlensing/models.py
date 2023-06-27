@@ -39,9 +39,9 @@ class OptimisableSTRegressor(nn.Module):
                  reduction=None,
                  hidden_sizes=(32, 32, 32),
                  output_size=1,
-                 activation=nn.LeakyReLU,
-                 sub_batch=None
+                 activation=nn.Tanh
                  ):
+
         super(OptimisableSTRegressor, self).__init__()
         self.subnet = SubNet(hidden_sizes=(16, 16, 16), activation=activation)
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
@@ -53,25 +53,14 @@ class OptimisableSTRegressor(nn.Module):
                              output_size=output_size,
                              activation=nn.LeakyReLU)
         self.device = None
-        self.sub_batch = sub_batch
 
     def forward(self, x):
         self.filters.update_filters()
         self.st.clip_filters()
-        if self.sub_batch is None:
-            x = self.reducer(self.st(x))
-        else:
-            x = self.sub_batch_apply(x, lambda y: self.reducer(self.st(y)), bs=self.sub_batch)
+        x = self.reducer(self.st(x))
         x = x.mean(1)  # 'channel' mean, i.e. mean across all patches for the same cosmology
         x = self.batch_norm(x)
         return self.regressor(x)
-
-    def sub_batch_apply(self, x, func, bs=4):
-        # This is here to avoid memory issues when applying the ost to a large dataset. We don't want to change how
-        # often we compute gradients (e.g. we want to do that over a batch of e.g. 32) but we can't apply the ost
-        # to a batch of 32 cosmologies * 192 patches * 128x128 size. Idk if gradients will be too much though?
-        assert self.device is not None, "Must set the device before using sub_batch_apply"
-        return batch_apply(x, bs=bs, func=func, device=self.device)
 
     def to(self, device):
         super(OptimisableSTRegressor, self).to(device)
