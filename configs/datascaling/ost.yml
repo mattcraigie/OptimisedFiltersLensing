@@ -9,10 +9,10 @@ data:
 
 model:
   model_type: 'ost'
-  submodel_type: 'rot_avg'
+  submodel_type: 'ang_avg'
   model_args:                                              # Model keywords arguments to be passed to the constructor
     size: 128
-    reduction: 'rot_avg'
+    reduction: 'ang_avg'
 #    sub_batch: 32
 
 training:

@@ -4,7 +4,7 @@ save_name: 'ost_precalc_rotavg'
 
 method: 'ost'
 kwargs:
-  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/ost/rot_avg/subset_500/filters.pt'
+  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/ost/rot_avg/subset_2000/filters.pt'
   reduction: 'rot_avg'
   device: 'cuda:0'
 
