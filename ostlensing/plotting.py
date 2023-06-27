@@ -135,6 +135,8 @@ class ModelPlotter:
             param_names = [str(i) for i in range(num_targets)]
 
         def transform(x, i):
+            if type(x) == torch.Tensor:
+                x = x.from_numpy()
             if param_transforms is None:
                 return x
             return (x * param_transforms[i][1]) + param_transforms[i][0]
