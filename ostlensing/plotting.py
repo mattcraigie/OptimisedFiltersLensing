@@ -125,7 +125,7 @@ class ModelPlotter:
         else:
             plt.show()
 
-    def plot_predictions(self, save_path=None, show_val=True, num_samples=None, param_names=None, param_transforms=None):
+    def plot_predictions(self, flat_plot=False, save_path=None, show_val=True, num_samples=None, param_names=None, param_transforms=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
@@ -147,27 +147,49 @@ class ModelPlotter:
         for i in range(num_targets):
 
             # train (and val)
-            axes[i, 0].scatter(transform(self.targets['train'][:num_samples, i], i),
-                               transform(self.predictions['train'][:num_samples, i], i),
-                               c='cornflowerblue', alpha=0.5, label='train')
+
+            x_train = transform(self.targets['train'][:num_samples, i], i)
+            y_train = transform(self.predictions['train'][:num_samples, i], i)
+            if not flat_plot:
+                axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
+            else:
+                axes[i, 0].scatter(x_train - y_train, y_train - y_train, c='cornflowerblue', alpha=0.5, label='train')
+
             if show_val:
-                axes[i, 0].scatter(transform(self.targets['val'][:num_samples, i], i),
-                                   transform(self.predictions['val'][:num_samples, i], i),
-                                   c='green', marker='x', alpha=0.5, label='validation')
+                x_val = transform(self.targets['val'][:num_samples, i], i)
+                y_val = transform(self.predictions['val'][:num_samples, i], i)
+
+                if not flat_plot:
+                    axes[i, 0].scatter(x_val, y_val, c='green', marker='x', alpha=0.5, label='validation')
+                else:
+                    axes[i, 0].scatter(x_val - y_val, y_val - y_val, c='green', marker='x', alpha=0.5, label='validation')
+
             axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
             axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
             axes[i, 0].set_aspect('equal')
-            axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+            if not flat_plot:
+                axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+            else:
+                axes[i, 0].plot([0, 1], [0, 0], transform=axes[i, 0].transAxes, c='black')
+
             axes[i, 0].legend()
 
             # test
-            axes[i, 1].scatter(transform(self.targets['test'][:num_samples, i], i),
-                               transform(self.predictions['test'][:num_samples, i], i),
-                               c='deeppink', alpha=0.5)
+
+            x_test = transform(self.targets['test'][:num_samples, i], i)
+            y_test = transform(self.predictions['test'][:num_samples, i], i)
+            if not flat_plot:
+                axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
+            else:
+                axes[i, 1].scatter(x_test - y_test, y_test - y_test, c='deeppink', alpha=0.5)
+
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
             axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             axes[i, 1].set_aspect('equal')
-            axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
+            if not flat_plot:
+                axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+            else:
+                axes[i, 0].plot([0, 1], [0, 0], transform=axes[i, 0].transAxes, c='black')
 
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
