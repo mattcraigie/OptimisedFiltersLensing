@@ -128,7 +128,7 @@ def data_scaling(rank, args):
     for i in range(repeats):
         if rank == 0:
             repeat_start_time = time.time()
-            logging.info(f"Running repeat {i}.")
+            logging.info(f"\nRunning repeat {i}.")
 
         # set the seed for the train and val split. This should be consistent amongst the subsets for the same repeat
         data_handler.seed = i

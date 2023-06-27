@@ -1,10 +1,10 @@
 load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches_log_std'                 # the folder to load from
 save_path: '//pscratch/sd/m/mcraigie/cosmogrid/'         # must specify the .npy file for output
-save_name: 'ost_precalc_rotavg'
+save_name: 'ost_precalc_angavg'
 
 method: 'ost'
 kwargs:
   filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/ost/rot_avg/subset_2000/filters.pt'
-  reduction: 'rot_avg'
+  reduction: 'ang_avg'
   device: 'cuda:0'
 
