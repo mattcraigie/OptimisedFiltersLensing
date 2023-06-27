@@ -136,12 +136,18 @@ class ModelPlotter:
 
         def transform(x, i):
             if type(x) == torch.Tensor:
-                x = x.from_numpy()
+                x = x.numpy()
             if param_transforms is None:
                 return x
             return (x * param_transforms[i][1]) + param_transforms[i][0]
 
-        fig, axes = plt.subplots(num_targets, 2, figsize=(8, num_targets*8))
+        if not flat_plot:
+            figsize = (8, num_targets*8)
+        else:
+            figsize = (8, num_targets*4)
+
+        fig, axes = plt.subplots(num_targets, 2, figsize=figsize)
+
 
         if num_targets == 1:
             axes = axes.reshape(1, 2)  # Reshape the axes to be 2D to handle the 1 parameter case
