@@ -165,12 +165,13 @@ class ModelPlotter:
                     axes[i, 0].scatter(x_val - y_val, y_val - y_val, c='green', marker='x', alpha=0.5, label='validation')
 
             axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
-            axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
-            axes[i, 0].set_aspect('equal')
             if not flat_plot:
                 axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].set_aspect('equal')
+                axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
                 axes[i, 0].plot([0, 1], [0, 0], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
 
             axes[i, 0].legend()
 
@@ -184,12 +185,14 @@ class ModelPlotter:
                 axes[i, 1].scatter(x_test - y_test, y_test - y_test, c='deeppink', alpha=0.5)
 
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
-            axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
-            axes[i, 1].set_aspect('equal')
+
             if not flat_plot:
                 axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].set_aspect('equal')
+                axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
                 axes[i, 0].plot([0, 1], [0, 0], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
 
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
