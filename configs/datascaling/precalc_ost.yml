@@ -9,7 +9,7 @@ data:
 
 model:
   model_type: 'pre_calc'                                    # Type of model to use, currently 'ost' or 'pre_calc'
-  submodel_type: 'ost_sb16'
+  submodel_type: 'ost_rot_sb16'
   model_args:                                               # Model keywords arguments to be passed to the constructor
     input_size: 11
 
