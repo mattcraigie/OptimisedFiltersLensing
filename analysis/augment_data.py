@@ -41,8 +41,9 @@ def augment_patches():
     for dir_ in all_dirs:
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
         fm = fields.mean()
-        print(fm)
         fields /= fm  # should become mean 1. Already strictly positive so no shift needed before logging
+        if use_log:
+            fields -= 1
         data.append(fields)
 
     data = torch.stack(data)

@@ -14,9 +14,9 @@ model:
      model_output_size: 512
 
 training:
-  num_epochs: 5000                                          # Number of training epochs
+  num_epochs: 300                                          # Number of training epochs
   batch_size: 64                                            # Batch size
-  learning_rate: 0.00001                                    # Learning rate
+  learning_rate: 0.00005                                    # Learning rate
 
 analysis:
   data_subsets: [25, 100, 500, 2000]                 # Subsets of the data for the scaling analysis
