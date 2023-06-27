@@ -98,10 +98,16 @@ class ModelPlotter:
             axes[j, 0].axis('off')
 
             x = torch.fft.fft2(k_full)
-            axes[j, 1].imshow(torch.fft.fftshift(x.real))
+            x = torch.fft.fftshift(x)
+            # keep the middle of the filters
+            keep_size = 2**(j+1)
+            half = keep_size // 2
+            x = x[64 - half:64 + half, 64 - half:64 + half]
+
+            axes[j, 1].imshow(x.real)
             axes[j, 1].axis('off')
 
-            axes[j, 2].imshow(torch.fft.fftshift(x.imag))
+            axes[j, 2].imshow(x.image)
             axes[j, 2].axis('off')
         plt.tight_layout()
         if save_path is not None:
