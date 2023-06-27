@@ -18,6 +18,10 @@ def batch_apply(data, bs, func, operate_device, end_device=None):
 
 
 def augment_patches():
+    # augment the data with the mean of each cosmology separately
+    # we want this because the mean is independent of the filters, since we (ideally) destroy it in the first filter
+    # pass (since the admissibility requires the mean-field component of the filter to be zero)
+    # std (which still holds power spectrum-y, scattering transform-y information) is the same for all cosmologies
 
     use_log = False
 
@@ -36,16 +40,17 @@ def augment_patches():
     data = []
     for dir_ in all_dirs:
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
+        fields /= fields.mean()  # should become mean 1. Already strictly positive so no shift needed before logging
         data.append(fields)
 
     data = torch.stack(data)
 
     if use_log:
         data = batch_apply(data, 16, torch.log, operate_device=op_dev, end_device=end_dev)
+        # should become a mean 1, approx gaussian 1 pt pdf
 
-    #  calculate scaling values and apply
-    scaler = Scaler(torch.mean(data), torch.std(data))
-    result = batch_apply(data, 16, scaler.transform, operate_device=op_dev, end_device=end_dev)
+    #  global std
+    result = data / data.std()
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -117,7 +122,7 @@ def make_params():
 
 
 if __name__ == '__main__':
-    make_params()
+    augment_patches()
 
 
 
