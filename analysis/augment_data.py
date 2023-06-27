@@ -23,7 +23,7 @@ def augment_patches():
     # pass (since the admissibility requires the mean-field component of the filter to be zero)
     # std (which still holds power spectrum-y, scattering transform-y information) is the same for all cosmologies
 
-    use_log = False
+    use_log = True
 
     op_dev = torch.device('cuda')
     end_dev = torch.device('cpu')
@@ -40,7 +40,9 @@ def augment_patches():
     data = []
     for dir_ in all_dirs:
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
-        fields /= fields.mean()  # should become mean 1. Already strictly positive so no shift needed before logging
+        fm = fields.mean()
+        print(fm)
+        fields /= fm  # should become mean 1. Already strictly positive so no shift needed before logging
         data.append(fields)
 
     data = torch.stack(data)
