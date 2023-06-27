@@ -202,9 +202,9 @@ class ModelPlotter:
                 axes[i, 1].set_aspect('equal')
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
-                axes[i, 1].plot([0, 1], [0, 0], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].plot([0, 1], [0, 0], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
-                axes[i, 0].set_ylim(-ylims, ylims)
+                axes[i, 1].set_ylim(-ylims, ylims)
 
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
