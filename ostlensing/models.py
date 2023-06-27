@@ -37,7 +37,7 @@ class OptimisableSTRegressor(nn.Module):
                  num_scales=4,
                  num_angles=4,
                  reduction=None,
-                 hidden_sizes=(128, 128, 128),
+                 hidden_sizes=(32, 32, 32),
                  output_size=1,
                  activation=nn.Tanh
                  ):
@@ -72,7 +72,7 @@ class OptimisableSTRegressor(nn.Module):
 class PreCalcRegressor(nn.Module):
     def __init__(self,
                  input_size,
-                 hidden_sizes=(128, 128, 128),
+                 hidden_sizes=(32, 32, 32),
                  output_size=1,
                  activation=nn.LeakyReLU
                  ):
@@ -92,7 +92,7 @@ class PreCalcRegressor(nn.Module):
 class ResNetRegressor(PreCalcRegressor):
     def __init__(self,
                  model_output_size=512,
-                 hidden_sizes=(128, 128, 128),
+                 hidden_sizes=(32, 32, 32),
                  regression_output_size=1,
                  activation=nn.LeakyReLU,
                  ):
@@ -123,7 +123,7 @@ class ResNetRegressor(PreCalcRegressor):
 class ViTRegressor(PreCalcRegressor):
     def __init__(self,
                  model_output_size=512,
-                 hidden_sizes=(128, 128, 128),
+                 hidden_sizes=(32, 32, 32),
                  regression_output_size=1,
                  activation=nn.LeakyReLU,
                  ):
