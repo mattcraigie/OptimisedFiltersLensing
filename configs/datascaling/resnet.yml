@@ -14,7 +14,7 @@ model:
      pretrained: True
 
 training:
-  num_epochs: 500                                          # Number of training epochs
+  num_epochs: 300                                          # Number of training epochs
   batch_size: 64                                            # Batch size
   learning_rate: 0.00001                                    # Learning rate
 
