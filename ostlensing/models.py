@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
 
+from transformers import ResNetModel, ResNetConfig
+
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import FourierSubNetFilters, SubNet
 from .training import batch_apply
-
-from torchvision.models import resnet18, vit_b_16
-
 
 
 class MLP(nn.Module):
@@ -42,7 +41,6 @@ class OptimisableSTRegressor(nn.Module):
                  output_size=1,
                  activation=nn.GELU
                  ):
-
         super(OptimisableSTRegressor, self).__init__()
         self.subnet = SubNet(hidden_sizes=(32, 32, 32), activation=activation)
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
@@ -91,62 +89,33 @@ class PreCalcRegressor(nn.Module):
 
 
 class ResNetRegressor(PreCalcRegressor):
-    def __init__(self,
-                 model_output_size=512,
-                 hidden_sizes=(512, 256, 128),
-                 regression_output_size=1,
-                 activation=nn.LeakyReLU,
-                 ):
-        super(ResNetRegressor, self).__init__(model_output_size,
-                                              hidden_sizes=hidden_sizes,
-                                              output_size=regression_output_size,
-                                              activation=activation)
+    def __init__(
+            self,
+            pretrained=True,
+            regressor_hiddens=(2048, 512, 512),
+            regressor_outputs=1,
+            regressor_activations=nn.LeakyReLU,
+    ):
+        super(ResNetRegressor, self).__init__(
+            2048,
+            hidden_sizes=regressor_hiddens,
+            output_size=regressor_outputs,
+            activation=regressor_activations
+        )
 
-        resnet = resnet18()
-
-        # change the first layer to input a single channel
-        resnet.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
-
-        # change the last layer to output the correct size
-        resnet.fc = nn.Linear(resnet.fc.in_features, model_output_size)
-        self.resnet = resnet
+        self.channel_upsample = nn.Conv2d(1, 3, kernel_size=1, stride=1, padding=0, bias=False)
+        if pretrained:
+            self.resnet = ResNetModel.from_pretrained('microsoft/resnet-50')
+        else:
+            config = ResNetConfig()
+            self.resnet = ResNetModel(config)
 
     def forward(self, x):
         batch_dim = x.shape[0]
         patch_dim = x.shape[1]
         size = x.shape[2]
         x = x.reshape(batch_dim * patch_dim, 1, size, size)
-        x = self.resnet(x)
+        x = self.channel_upsample(x)
+        x = self.resnet(x).pooler_output
         x = x.reshape(batch_dim, patch_dim, -1)
         return super(ResNetRegressor, self).forward(x)
-
-
-class ViTRegressor(PreCalcRegressor):
-    def __init__(self,
-                 model_output_size=512,
-                 hidden_sizes=(32, 32, 32),
-                 regression_output_size=1,
-                 activation=nn.LeakyReLU,
-                 ):
-        super(ViTRegressor, self).__init__(model_output_size,
-                                           hidden_sizes=hidden_sizes,
-                                           output_size=regression_output_size,
-                                           activation=activation)
-
-        vit = vit_b_16()
-
-        # change the first layer to input a single channel
-
-
-        # change the last layer to output the correct size
-        vit.head = nn.Linear(vit.head.in_features, model_output_size)
-        self.vit = vit
-
-    def forward(self, x):
-        batch_dim = x.shape[0]
-        patch_dim = x.shape[1]
-        size = x.shape[2]
-        x = x.reshape(batch_dim * patch_dim, 1, size, size)
-        x = self.vit(x)
-        x = x.reshape(batch_dim, patch_dim, -1)
-        return super(ViTRegressor, self).forward(x)
