@@ -105,7 +105,7 @@ class ResNetRegressor(PreCalcRegressor):
 
         self.channel_upsample = nn.Conv2d(1, 3, kernel_size=1, stride=1, padding=0, bias=False)
         if pretrained:
-            self.resnet = ResNetModel.from_pretrained('microsoft/resnet-50')
+            self.resnet = ResNetModel.from_pretrained('microsoft/resnet-18')
         else:
             config = ResNetConfig()
             self.resnet = ResNetModel(config)
