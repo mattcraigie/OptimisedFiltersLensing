@@ -119,3 +119,8 @@ class ResNetRegressor(PreCalcRegressor):
         x = self.resnet(x).pooler_output
         x = x.reshape(batch_dim, patch_dim, -1)
         return super(ResNetRegressor, self).forward(x)
+
+
+class ViTRegressor:
+    pass
+
