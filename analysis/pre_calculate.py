@@ -4,11 +4,14 @@ import yaml
 import os
 import numpy as np
 
+
+
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import Morlet, FixedFilterBank
 from scattering_transform.power_spectrum import PowerSpectrum
 
 from ostlensing.dataloading import load_and_apply, Scaler
+from ostlensing.models import ResNetWrapper
 
 
 def st_func(filters, reduction, device):
@@ -29,6 +32,13 @@ def ost(filter_path, reduction, device):
     return st_func(filter_bank, reduction, device)
 
 
+def resnet(model_state_dict_path, pretrained_model, device):
+    model = ResNetWrapper(pretrained_model=pretrained_model)
+    model = model.load_state_dict(model_state_dict_path)
+    model.to(device)
+    return model
+
+
 def pk(size, num_bins, device):
     ps = PowerSpectrum(size, num_bins)
     ps.to(device)
@@ -36,8 +46,9 @@ def pk(size, num_bins, device):
 
 
 def pre_calc(load_path, save_path, save_name, method, kwargs):
-    function_mapping = {'ost': ost, 'mst': mst, 'ps': pk}
+    function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet}
     raw_data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
+    raw_data = raw_data.mean(axis=1)  # average over the patch axis
 
     # without altering data
     np.save(os.path.join(save_path, f'{save_name}.npy'), raw_data)

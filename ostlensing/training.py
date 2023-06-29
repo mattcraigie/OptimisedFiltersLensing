@@ -131,7 +131,7 @@ class Trainer:
         return test_loss
 
     def save_model(self, save_path):
-        torch.save(self.best_model_params, save_path)
+        self.model.save(save_path)
 
     def save_losses(self, save_path):
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)

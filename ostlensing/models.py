@@ -5,11 +5,12 @@ from transformers import ResNetModel, ResNetConfig
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
 from scattering_transform.filters import FourierSubNetFilters, SubNet
-from .training import batch_apply
 
+
+# ~~~ General Models ~~~ #
 
 class MLP(nn.Module):
-    def __init__(self, input_size, hidden_sizes, output_size, activation=nn.LeakyReLU):
+    def __init__(self, input_size, hidden_sizes, output_size, activation):
         super(MLP, self).__init__()
         self.input_size = input_size
         self.hidden_sizes = hidden_sizes
@@ -31,96 +32,116 @@ class MLP(nn.Module):
         return self.model(x)
 
 
-class OptimisableSTRegressor(nn.Module):
+# ~~~ Model Wrappers ~~~ #
+
+# The forward methods input a flattened batch/patch tensor with an input shape of (batch * patch, 1, size, size).
+# The forward methods output a vector of summary statistics of shape (batch * patch, num_outputs)
+
+class ResNetWrapper(nn.Module):
+    def __init(self, pretrained_model=None):
+        super(ResNetWrapper, self).__init__()
+
+        # pretrained model is in form from huggingface e.g. 'microsoft/resnet-18'
+        self.channel_upsample = nn.Conv2d(1, 3, kernel_size=1, stride=1, padding=0, bias=False)
+        if pretrained_model is None:
+            config = ResNetConfig()  # these are resnet-50 defaults
+            self.resnet = ResNetModel(config)
+        else:
+            self.resnet = ResNetModel.from_pretrained(pretrained_model)
+
+        # get number of outputs by running a dummy pass
+        with torch.no_grad():
+            # pooler output shape is (batch, outputs, 1, 1)
+            self.num_outputs = self.resnet(torch.zeros(1, 3, 128, 128)).pooler_output.shape[1]
+
+    def forward(self, x):
+        batch, patch, size, _ = x.shape
+        x = x.reshape(batch * patch, 1, size, size)
+        x = self.channel_upsample(x)
+        x = self.resnet(x).pooler_output
+        return x.reshape(batch, patch, self.num_outputs)
+
+    def save(self, path):
+        torch.save(self.state_dict(), path)
+
+
+class OSTWrapper(nn.Module):
     def __init__(self,
-                 size,
+                 size=128,
                  num_scales=4,
                  num_angles=4,
                  reduction=None,
-                 hidden_sizes=(32, 32, 32),
-                 output_size=1,
-                 activation=nn.GELU
+                 subnet_hiddens=(32, 32, 32),
+                 subnet_activations=nn.GELU,
                  ):
-        super(OptimisableSTRegressor, self).__init__()
-        self.subnet = SubNet(hidden_sizes=(32, 32, 32), activation=activation)
+        super(OSTWrapper, self).__init__()
+        self.subnet = SubNet(hidden_sizes=subnet_hiddens, activation=subnet_activations)
         self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
         self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
         self.reducer = Reducer(self.filters, reduction)
-        self.batch_norm = nn.BatchNorm1d(self.reducer.num_outputs)
-        self.regressor = MLP(input_size=self.reducer.num_outputs,
-                             hidden_sizes=hidden_sizes,
-                             output_size=output_size,
-                             activation=nn.LeakyReLU)
-        self.device = None
+        self.num_outputs = self.reducer.num_outputs
 
     def forward(self, x):
         self.filters.update_filters()
         self.st.clip_filters()
-        x = self.reducer(self.st(x))
-        x = x.mean(1)  # 'channel' mean, i.e. mean across all patches for the same cosmology
-        x = self.batch_norm(x)
-        return self.regressor(x)
+        return self.reducer(self.st(x))
 
     def to(self, device):
-        super(OptimisableSTRegressor, self).to(device)
-        self.st.to(device)
+        super(OSTWrapper, self).to(device)
+        self.subnet.to(device)
+        self.filters.to(device)
+        self.reducer.to(device)
         self.device = device
         return self
 
+    def save(self, path):
+        torch.save(self.state_dict(), path)
 
-class PreCalcRegressor(nn.Module):
+
+# ~~~ Regression Models ~~~ #
+
+
+class Regressor(nn.Module):
+    # This is for pre-computed features
+    def __init__(self, input_size, hidden_sizes, output_size, activation):
+        super(Regressor, self).__init__()
+        self.input_size = input_size
+        self.hidden_sizes = hidden_sizes
+        self.output_size = output_size
+
+        self.model = MLP(input_size, hidden_sizes, output_size, activation)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
+
+
+class ModelRegressor(nn.Module):
+    # This is for models that output features
     def __init__(self,
-                 input_size,
-                 hidden_sizes=(32, 32, 32),
-                 output_size=1,
-                 activation=nn.LeakyReLU
+                 model_type,
+                 model_kwargs,
+                 regressor_hiddens=(32, 32, 32),
+                 regressor_outputs=1,
+                 regressor_activations=nn.ReLU,
                  ):
-        super(PreCalcRegressor, self).__init__()
-        self.batch_norm = nn.BatchNorm1d(input_size)
-        self.regressor = MLP(input_size=input_size,
-                             hidden_sizes=hidden_sizes,
-                             output_size=output_size,
-                             activation=activation)
+        super(ModelRegressor, self).__init__()
+        self.model = model_dict[model_type](**model_kwargs)
+        self.regressor = Regressor(self.model.num_outputs, regressor_hiddens, regressor_outputs, regressor_activations)
+
+    def to(self, device):
+        super(ModelRegressor, self).to(device)
+        self.model.to(device)
+        self.device = device
+        return self
 
     def forward(self, x):
-        x = x.mean(1)  # todo: I should just put this in the precalc script!
-        x = self.batch_norm(x)
-        return self.regressor(x)
+        x = self.model(x)
+        x = x.mean(1)  # average over all patches that have the same cosmology
+        x = self.regressor(x)
+        return x  # final output should have shape (batch, regressor_outputs)
 
-
-class ResNetRegressor(PreCalcRegressor):
-    def __init__(
-            self,
-            pretrained=True,
-            regressor_hiddens=(2048, 512, 512),
-            regressor_outputs=1,
-            regressor_activations=nn.LeakyReLU,
-    ):
-        super(ResNetRegressor, self).__init__(
-            2048,
-            hidden_sizes=regressor_hiddens,
-            output_size=regressor_outputs,
-            activation=regressor_activations
-        )
-
-        self.channel_upsample = nn.Conv2d(1, 3, kernel_size=1, stride=1, padding=0, bias=False)
-        if pretrained:
-            self.resnet = ResNetModel.from_pretrained('microsoft/resnet-18')
-        else:
-            config = ResNetConfig()
-            self.resnet = ResNetModel(config)
-
-    def forward(self, x):
-        batch_dim = x.shape[0]
-        patch_dim = x.shape[1]
-        size = x.shape[2]
-        x = x.reshape(batch_dim * patch_dim, 1, size, size)
-        x = self.channel_upsample(x)
-        x = self.resnet(x).pooler_output
-        x = x.reshape(batch_dim, patch_dim, -1)
-        return super(ResNetRegressor, self).forward(x)
-
-
-class ViTRegressor:
-    pass
-
+    def save(self, path):
+        self.model.save(path)
