@@ -49,6 +49,8 @@ def data_scaling(rank, args):
     # Load configuration settings
     config = args.config
 
+    print(config)
+
     # data params
     data_config = config['data']
     data_path = data_config['data_path']
