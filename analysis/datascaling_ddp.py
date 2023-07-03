@@ -71,7 +71,7 @@ def data_scaling(rank, args):
     analysis_config = config['analysis']
     data_subsets = analysis_config['data_subsets']
     repeats = analysis_config['repeats']
-    analysis_name = analysis_config['name']
+    analysis_name = analysis_config['analysis_name']
 
     # set up logging
     logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}.log')
