@@ -1,18 +1,22 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
   data_subpath: 'patches_log_std'                       # file name or folder (e.g. 'patches')
-  is_patches: True                                        # True if the data is a set of patches
-  load_subset: 2500                                         # Subset of cosmologies to load (saves memory), 2500 for all
-  sub_batch_subset: 16                                      # Subset of patches per cosmology, 192 for all
-  val_ratio: 0.2                                            # Portion of data to use for validation
-  test_ratio: 0.2                                           # Portion of data to use for testing
+  data_type: 'patches'                                      # patches or precalc
+  datahandler_kwargs:
+    load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
+    sub_batch_subset: 16                                    # Subset of patches per cosmology, 192 for all
+    val_ratio: 0.2                                          # Portion of data to use for validation
+    test_ratio: 0.2                                         # Portion of data to use for testing
+    seed: 0                                                 # Random seed for data splitting
+    pre_average: False
 
 regressor:
-  regressor_type: 'patch'                                 # patch or precalc
   regressor_kwargs:
+    regressor_type: 'patch'
     model_type: 'ost'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs:
       reduction: 'rot_avg'
+    regressor_inputs: 11                                    # Number of features
     regressor_hiddens: null
 
 training:
@@ -21,5 +25,6 @@ training:
   learning_rate: 0.001                                      # Learning rate
 
 analysis:
+  analysis_name: 'ost_rot_16'
   data_subsets: [25, 100, 500, 2000]   # Subsets of the data for the scaling analysis
-  repeats: 10
+  repeats: 1
