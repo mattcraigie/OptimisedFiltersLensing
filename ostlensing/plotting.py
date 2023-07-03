@@ -63,7 +63,10 @@ class ModelPlotter:
         self.filters = None
 
     def load_folder(self, folder):
-        self.model = torch.load(os.path.join(folder, 'model.pt'))
+        try:
+            self.model = torch.load(os.path.join(folder, 'model.pt'))
+        except FileNotFoundError:
+            pass  # it's precalc - no model
         self.losses = torch.load(os.path.join(folder, 'losses.pt'))
         self.predictions = torch.load(os.path.join(folder, 'predictions.pt'))
         self.targets = torch.load(os.path.join(folder, 'targets.pt'))
