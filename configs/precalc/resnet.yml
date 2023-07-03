@@ -1,0 +1,9 @@
+load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches_log_std'                 # the folder to load from
+save_path: '//pscratch/sd/m/mcraigie/cosmogrid/'
+save_name:  'mst_precalc'
+
+method: 'resnet'
+kwargs:
+  model_state_dict_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/resnet/test/subset_2000/model.pt'
+  pretrained_model: 'microsoft/resnet-18'
+

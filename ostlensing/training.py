@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.distributed as dist
 import matplotlib.pyplot as plt
+import os
 
 # ~~~ Loss Functions ~~~ #
 
@@ -162,6 +163,12 @@ class Trainer:
             # model doesn't have filters, so don't save anything
             pass
 
+    def save_all(self, save_path):
+        self.save_model(os.path.join(save_path, 'model.pt'))
+        self.save_losses(os.path.join(save_path, 'losses.pt'))
+        self.save_filters(os.path.join(save_path, 'filters.pt'))
+        self.save_predictions(os.path.join(save_path, 'predictions.pt'))
+        self.save_targets(os.path.join(save_path, 'targets.pt'))
 
 
 

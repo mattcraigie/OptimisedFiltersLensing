@@ -11,14 +11,9 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from ostlensing.training import mse_and_admissibility, Trainer
 from ostlensing.dataloading import DataHandler
-from ostlensing.models import OptimisableSTRegressor, PreCalcRegressor, ResNetRegressor, ViTRegressor
+from ostlensing.models import Regressor, ModelRegressor, model_dict, regressor_dict
 
 from ddp_nersc import ddp_main, setup, cleanup
-
-model_map = {'ost': OptimisableSTRegressor,
-             'pre_calc': PreCalcRegressor,
-             'resnet': ResNetRegressor,
-             'vit': ViTRegressor}
 
 
 # Create a custom filter to suppress specific log messages
@@ -57,18 +52,17 @@ def data_scaling(rank, args):
     # data params
     data_config = config['data']
     data_path = data_config['data_path']
-    data_subpath = data_config['data_subpath']  # i.e. patches or pre_calc
-    is_patches = data_config['is_patches']
+    data_type = data_config['data_type']  # patches of precalc
     load_subset = data_config['load_subset']
     sub_batch_subset = data_config['sub_batch_subset']
     val_ratio = data_config['val_ratio']
     test_ratio = data_config['test_ratio']
 
-    # model params
-    model_config = config['model']
-    model_type = model_config['model_type']
-    submodel_type = model_config['submodel_type']
-    model_args = model_config['model_args']
+    # regressor params
+    regressor_config = config['regressor']
+    model_type = regressor_config['model_type']
+    regressor_type = regressor_config['regressor_type']
+    regressor_kwargs = regressor_config['regressor_kwargs']
 
     # training params
     train_config = config['training']
@@ -82,7 +76,7 @@ def data_scaling(rank, args):
     repeats = analysis_config['repeats']
 
     # set up logging
-    logging_filename = os.path.join('outputs', 'logs', f'{model_type}_{submodel_type}.log')
+    logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}.log')
     if rank == 0 and os.path.exists(logging_filename):
         os.remove(logging_filename)
 
@@ -92,10 +86,7 @@ def data_scaling(rank, args):
     logger.addFilter(SuppressFilter())  # suppress log messages from pytorch
 
     # make output folder
-    if submodel_type is not None:
-        out_folder = os.path.join('outputs', 'datascaling', model_type, submodel_type)
-    else:
-        out_folder = os.path.join('outputs', 'datascaling', model_type)
+    out_folder = os.path.join('outputs', 'datascaling', data_type, model_type)
 
     if rank == 0:
         if not os.path.exists(out_folder):
@@ -111,7 +102,8 @@ def data_scaling(rank, args):
                                test_ratio=test_ratio,
                                seed=42)
 
-    data_handler.add_data(os.path.join(data_path, data_subpath), patches=is_patches, normalise=False, log=False)
+    data_handler.add_data(os.path.join(data_path, data_type), patches=data_type == 'patches', normalise=False,
+                          log=False)
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
 
     # make test loader outside the loop for consistent test data
@@ -141,31 +133,21 @@ def data_scaling(rank, args):
                 subset_start_time = time.time()
                 logging.info(f"Running subset {subset}.")
 
-
-
             # make train and val loaders with the subset of data
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
             # set up the model
-            try:
-                model_class = model_map[model_type]
-            except KeyError:
-                raise ValueError('Model type not recognised.')
-
-            try:
-                model = model_class(**model_args)
-            except ValueError:
-                raise ValueError('Model arguments not recognised.')
+            regressor = regressor_dict[regressor_type](**regressor_kwargs)
 
             # send to gpu and wrap in DDP
-            model.to(rank)
-            model = DDP(model, device_ids=[rank])
+            regressor.to(rank)
+            regressor = DDP(regressor, device_ids=[rank])
 
             # set up the optimizer
-            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+            optimizer = optim.Adam(regressor.parameters(), lr=learning_rate)
 
             # train the model using Trainer
-            trainer = Trainer(model, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
+            trainer = Trainer(regressor, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
                               rank, ddp=True)
             trainer.train_loop(num_epochs)
 
@@ -177,11 +159,7 @@ def data_scaling(rank, args):
                 subset_folder = os.path.join(out_folder, f'subset_{subset}')
                 if not os.path.exists(subset_folder):
                     os.makedirs(subset_folder)
-                trainer.save_model(os.path.join(subset_folder, 'model.pt'))
-                trainer.save_losses(os.path.join(subset_folder, 'losses.pt'))
-                trainer.save_filters(os.path.join(subset_folder, 'filters.pt'))
-                trainer.save_predictions(os.path.join(subset_folder, 'predictions.pt'))  # could speed this up by sharing across ranks
-                trainer.save_targets(os.path.join(subset_folder, 'targets.pt'))
+                trainer.save_all(subset_folder)
                 model_results.append(test_loss.cpu().item())
 
                 subset_end_time = time.time()

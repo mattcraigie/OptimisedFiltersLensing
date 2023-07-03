@@ -16,17 +16,22 @@ class MLP(nn.Module):
         self.hidden_sizes = hidden_sizes
         self.output_size = output_size
 
-        self.layers = []
-        for i in range(len(hidden_sizes)):
-            if i == 0:
-                self.layers.append(nn.Linear(input_size, hidden_sizes[i]))
-            else:
-                self.layers.append(nn.Linear(hidden_sizes[i - 1], hidden_sizes[i]))
-            self.layers.append(activation())
+        if hidden_sizes is None:
+            self.model = nn.Sequential(
+                nn.Linear(input_size, output_size)
+            )
+        else:
+            self.layers = []
+            for i in range(len(hidden_sizes)):
+                if i == 0:
+                    self.layers.append(nn.Linear(input_size, hidden_sizes[i]))
+                else:
+                    self.layers.append(nn.Linear(hidden_sizes[i - 1], hidden_sizes[i]))
+                self.layers.append(activation())
 
-        self.layers.append(nn.Linear(hidden_sizes[-1], output_size))
+            self.layers.append(nn.Linear(hidden_sizes[-1], output_size))
 
-        self.model = nn.Sequential(*self.layers)
+            self.model = nn.Sequential(*self.layers)
 
     def forward(self, x):
         return self.model(x)
@@ -103,7 +108,7 @@ class OSTWrapper(nn.Module):
 
 class Regressor(nn.Module):
     # This is for pre-computed features
-    def __init__(self, input_size, hidden_sizes, output_size, activation):
+    def __init__(self, input_size, hidden_sizes=None, output_size=1, activation=nn.ReLU):
         super(Regressor, self).__init__()
         self.input_size = input_size
         self.hidden_sizes = hidden_sizes
@@ -115,15 +120,12 @@ class Regressor(nn.Module):
         return self.model(x)
 
 
-model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
-
-
 class ModelRegressor(nn.Module):
     # This is for models that output features
     def __init__(self,
-                 model_type,
-                 model_kwargs,
-                 regressor_hiddens=(32, 32, 32),
+                 model_type=None,
+                 model_kwargs=None,
+                 regressor_hiddens=None,
                  regressor_outputs=1,
                  regressor_activations=nn.ReLU,
                  ):
@@ -145,3 +147,8 @@ class ModelRegressor(nn.Module):
 
     def save(self, path):
         self.model.save(path)
+
+
+# ~~~ Model Dicts ~~~ #
+model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
+regressor_dict = {'patch': ModelRegressor, 'precalc': Regressor}
