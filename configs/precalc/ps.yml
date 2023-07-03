@@ -8,5 +8,5 @@ kwargs:
   num_bins: 12
   device: 'cuda:0'
 
-already_run: True
+already_run: False
 subsets: [16,]

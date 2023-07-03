@@ -7,5 +7,5 @@ kwargs:
   model_state_dict_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/resnet/test/subset_2000/model.pt'
   pretrained_model: 'microsoft/resnet-18'
 
-already_run: True
+already_run: False
 subsets: [16,]
