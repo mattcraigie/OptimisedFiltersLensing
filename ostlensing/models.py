@@ -103,6 +103,9 @@ class OSTWrapper(nn.Module):
         torch.save(self.state_dict(), path)
 
 
+# ~~~ Model Dict ~~~ #
+model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
+
 # ~~~ Regression Model ~~~ #
 
 class ModelRegressor(nn.Module):
@@ -144,6 +147,3 @@ class ModelRegressor(nn.Module):
     def save(self, path):
         self.model.save(path)
 
-
-# ~~~ Model Dicts ~~~ #
-model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}

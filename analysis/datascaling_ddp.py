@@ -11,7 +11,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from ostlensing.training import mse_and_admissibility, Trainer
 from ostlensing.dataloading import DataHandler
-from ostlensing.models import Regressor, ModelRegressor, model_dict, regressor_dict
+from ostlensing.models import ModelRegressor
 
 from ddp_nersc import ddp_main, setup, cleanup
 
