@@ -69,7 +69,7 @@ class Trainer:
                 data, target = data.to(self.device), target.to(self.device)
                 self.optimizer.zero_grad()
                 output = self.regressor(data)
-                loss = criterion(output, target, self.regressor.module.model)
+                loss = criterion(output, target, self.regressor)
 
                 if mode == 'train':
                     loss.backward()

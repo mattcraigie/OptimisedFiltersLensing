@@ -25,12 +25,8 @@ class SuppressFilter(logging.Filter):
 
 # Adjusted loss functions
 
-def mse_and_admissibility_ddp(output, target, model, weighting=1.0):
-    return mse_and_admissibility(output, target, model.module, weighting)
-
-
-def mse(output, target, model):
-    return nn.functional.mse_loss(output, target)
+def mse_and_admissibility_ddp(output, target, regressor, weighting=1.0):
+    return mse_and_admissibility(output, target, regressor.model.module, weighting)
 
 
 # main analysis function
