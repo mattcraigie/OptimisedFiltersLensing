@@ -95,6 +95,7 @@ class OSTWrapper(nn.Module):
         super(OSTWrapper, self).to(device)
         self.subnet.to(device)
         self.filters.to(device)
+        self.st.to(device)
         self.reducer.to(device)
         self.device = device
         return self
