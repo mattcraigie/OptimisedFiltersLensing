@@ -10,14 +10,12 @@ data:
     seed: 0                                                 # Random seed for data splitting
 
 regressor:
-  regressor_type: 'precalc'                                 # patch or precalc
   regressor_kwargs:
+    regressor_type: 'precalc'
     model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: None
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: null
-
-
 
 training:
   num_epochs: 1000                                          # Number of training epochs
@@ -25,5 +23,6 @@ training:
   learning_rate: 0.001                                      # Learning rate
 
 analysis:
+  analysis_name: 'mst_rot'
   data_subsets: [25, 50, 100, 250, 500, 1000, 1500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10

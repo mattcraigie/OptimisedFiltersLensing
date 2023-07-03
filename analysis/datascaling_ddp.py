@@ -52,12 +52,12 @@ def data_scaling(rank, args):
     # data params
     data_config = config['data']
     data_path = data_config['data_path']
+    data_subpath = data_config['data_subpath']
     data_type = data_config['data_type']
     datahandler_kwargs = data_config['datahandler_kwargs']
 
     # regressor params
     regressor_config = config['regressor']
-    regressor_type = regressor_config['regressor_type']
     regressor_kwargs = regressor_config['regressor_kwargs']
     model_type = regressor_kwargs['model_type']
 
@@ -71,6 +71,7 @@ def data_scaling(rank, args):
     analysis_config = config['analysis']
     data_subsets = analysis_config['data_subsets']
     repeats = analysis_config['repeats']
+    analysis_name = analysis_config['name']
 
     # set up logging
     logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}.log')
@@ -83,7 +84,7 @@ def data_scaling(rank, args):
     logger.addFilter(SuppressFilter())  # suppress log messages from pytorch
 
     # make output folder
-    out_folder = os.path.join('outputs', 'datascaling', data_type, model_type)
+    out_folder = os.path.join('outputs', 'datascaling', data_type, model_type, analysis_name)
 
     if rank == 0:
         if not os.path.exists(out_folder):
@@ -95,7 +96,7 @@ def data_scaling(rank, args):
     # load train+val and test data with DataHandler
     data_handler = DataHandler(**datahandler_kwargs)
 
-    data_handler.add_data(os.path.join(data_path, data_type), patches=data_type == 'patches', normalise=False,
+    data_handler.add_data(os.path.join(data_path, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
 
