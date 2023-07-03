@@ -56,7 +56,7 @@ def subset_average_standardise(save_path, file_name, subsets):
 
     for subset in subsets:
         if subset is not None:
-            subset_data = data[:subset].mean(axis=1)
+            subset_data = data[:, :subset].mean(axis=1)
 
             main_path = os.path.join(save_path, f'{file_name}_{str(subset)}')
 
