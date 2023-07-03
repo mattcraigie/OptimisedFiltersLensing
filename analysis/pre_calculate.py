@@ -45,33 +45,34 @@ def pk(size, num_bins, device):
     return ps
 
 
-def pre_calc(load_path, save_path, save_name, method, kwargs, subset=None):
+def pre_calc(load_path, save_path, file_name, method, kwargs):
     function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet}
-    raw_data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
+    load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'),
+                   save_path=os.path.join(save_path, file_name + '_full.npy'))
 
-    if subset is not None:
-        raw_data = raw_data[:subset]
 
-    raw_data = raw_data.mean(axis=1)  # average over the patch axis
+def subset_average_standardise(save_path, file_name, subsets):
+    data = np.load(os.path.join(save_path, file_name + '_full.npy'))
 
-    if subset is None:
-        subset = 'full'
+    for subset in subsets:
+        if subset is not None:
+            subset_data = data[:subset].mean(axis=1)
 
-    main_path = os.path.join(save_path, f'{save_name}_{subset}')
+            main_path = os.path.join(save_path, f'{file_name}_{str(subset)}')
 
-    # without altering data
-    np.save(main_path + '.npy', raw_data)
+            # without altering data
+            np.save(main_path + '.npy', subset_data)
 
-    # with std
-    scaler = Scaler(np.mean(raw_data), np.std(raw_data))
-    std_data = scaler.transform(raw_data)
-    np.save(main_path + '_std.npy', std_data)
+            # with std
+            scaler = Scaler(np.mean(subset_data), np.std(subset_data))
+            std_data = scaler.transform(subset_data)
+            np.save(main_path + '_std.npy', std_data)
 
-    # with std and log
-    log_data = np.log(raw_data)
-    scaler = Scaler(np.mean(log_data), np.std(log_data))
-    log_std_data = scaler.transform(log_data)
-    np.save(main_path + '_log_std.npy', log_std_data)
+            # with std and log
+            log_data = np.log(subset_data)
+            scaler = Scaler(np.mean(log_data), np.std(log_data))
+            log_std_data = scaler.transform(log_data)
+            np.save(main_path + '_log_std.npy', log_std_data)
 
 
 def main():
@@ -84,11 +85,16 @@ def main():
 
     load_path = config['load_path']
     save_path = config['save_path']
-    save_name = config['save_name']
+    file_name = config['file_name']
     method = config['method']
     kwargs = config['kwargs']
 
-    pre_calc(load_path, save_path, save_name, method, kwargs)
+    already_run = config['already_run']
+    subsets = config['subsets']
+
+    if not already_run:
+        pre_calc(load_path, save_path, file_name, method, kwargs)
+    subset_average_standardise(save_path, file_name, subsets)
 
 if __name__ == '__main__':
     main()

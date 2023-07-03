@@ -10,3 +10,5 @@ kwargs:
   reduction: 'rot_avg'
   device: 'cuda:0'
 
+already_run: True
+subsets: [16,]
