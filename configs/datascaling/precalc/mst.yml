@@ -8,6 +8,7 @@ data:
     val_ratio: 0.2                                          # Portion of data to use for validation
     test_ratio: 0.2                                         # Portion of data to use for testing
     seed: 0                                                 # Random seed for data splitting
+    pre_average: True
 
 regressor:
   regressor_kwargs:

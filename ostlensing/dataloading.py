@@ -54,7 +54,7 @@ class DataHandler:
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.seed = seed
-        self.pre_average = pre_average
+        self.pre_average = pre_average  # pre average over the patch dimension
 
         self.data = None
         self.targets = None
