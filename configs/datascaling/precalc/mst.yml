@@ -14,7 +14,6 @@ regressor:
   regressor_kwargs:
     model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: None
-    apply_patch_mean: False
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: null
 

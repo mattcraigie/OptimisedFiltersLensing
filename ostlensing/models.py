@@ -111,18 +111,18 @@ model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
 class ModelRegressor(nn.Module):
     # This is for models that output features
     def __init__(self,
+                 regressor_type='precalc',
                  model_type=None,
                  model_kwargs=None,
-                 apply_patch_mean=False,
                  regressor_inputs=None,
                  regressor_hiddens=None,
                  regressor_outputs=1,
                  regressor_activations=nn.ReLU,
                  ):
         super(ModelRegressor, self).__init__()
-        self.apply_patch_mean = apply_patch_mean
+        self.patch = True if regressor_type == 'patch' else False
 
-        if model_type is not None:
+        if self.patch:
             self.model = model_dict[model_type](**model_kwargs)
             regressor_inputs = self.model.num_outputs
         else:
