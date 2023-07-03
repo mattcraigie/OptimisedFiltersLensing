@@ -120,14 +120,15 @@ class ModelRegressor(nn.Module):
                  regressor_activations=nn.ReLU,
                  ):
         super(ModelRegressor, self).__init__()
-        self.patch = True if regressor_type == 'patch' else False
 
-        if self.patch:
+        if regressor_type == 'patch':
             self.model = model_dict[model_type](**model_kwargs)
             regressor_inputs = self.model.num_outputs
+            self.patch = True
         else:
             assert regressor_inputs is not None, 'Must specify regressor_inputs for precalc'
             self.model = nn.Identity()
+            self.patch = False
 
         self.regressor = MLP(regressor_inputs, regressor_hiddens, regressor_outputs, regressor_activations)
 
@@ -139,7 +140,7 @@ class ModelRegressor(nn.Module):
 
     def forward(self, x):
         x = self.model(x)
-        if self.apply_patch_mean:
+        if self.patch:
             x = x.mean(1)  # average over all patches that have the same cosmology
         x = self.regressor(x)
         return x  # final output should have shape (batch, regressor_outputs)
