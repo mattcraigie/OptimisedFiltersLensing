@@ -49,8 +49,6 @@ def data_scaling(rank, args):
     # Load configuration settings
     config = args.config
 
-    print(config)
-
     # data params
     data_config = config['data']
     data_path = data_config['data_path']
@@ -132,7 +130,7 @@ def data_scaling(rank, args):
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
             # set up the model
-            regressor = regressor_dict[regressor_type](**regressor_kwargs)
+            regressor = ModelRegressor(**regressor_kwargs)
 
             # send to gpu and wrap in DDP
             regressor.to(rank)

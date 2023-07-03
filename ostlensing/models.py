@@ -103,35 +103,30 @@ class OSTWrapper(nn.Module):
         torch.save(self.state_dict(), path)
 
 
-# ~~~ Regression Models ~~~ #
-
-
-class Regressor(nn.Module):
-    # This is for pre-computed features
-    def __init__(self, input_size, hidden_sizes=None, output_size=1, activation=nn.ReLU):
-        super(Regressor, self).__init__()
-        self.input_size = input_size
-        self.hidden_sizes = hidden_sizes
-        self.output_size = output_size
-
-        self.model = MLP(input_size, hidden_sizes, output_size, activation)
-
-    def forward(self, x):
-        return self.model(x)
-
+# ~~~ Regression Model ~~~ #
 
 class ModelRegressor(nn.Module):
     # This is for models that output features
     def __init__(self,
                  model_type=None,
                  model_kwargs=None,
+                 apply_patch_mean=False,
+                 regressor_inputs=None,
                  regressor_hiddens=None,
                  regressor_outputs=1,
                  regressor_activations=nn.ReLU,
                  ):
         super(ModelRegressor, self).__init__()
-        self.model = model_dict[model_type](**model_kwargs)
-        self.regressor = Regressor(self.model.num_outputs, regressor_hiddens, regressor_outputs, regressor_activations)
+        self.apply_patch_mean = apply_patch_mean
+
+        if model_type is not None:
+            self.model = model_dict[model_type](**model_kwargs)
+            regressor_inputs = self.model.num_outputs
+        else:
+            assert regressor_inputs is not None, 'Must specify regressor_inputs for precalc'
+            self.model = nn.Identity()
+
+        self.regressor = MLP(regressor_inputs, regressor_hiddens, regressor_outputs, regressor_activations)
 
     def to(self, device):
         super(ModelRegressor, self).to(device)
@@ -141,7 +136,8 @@ class ModelRegressor(nn.Module):
 
     def forward(self, x):
         x = self.model(x)
-        x = x.mean(1)  # average over all patches that have the same cosmology
+        if self.apply_patch_mean:
+            x = x.mean(1)  # average over all patches that have the same cosmology
         x = self.regressor(x)
         return x  # final output should have shape (batch, regressor_outputs)
 
@@ -151,4 +147,3 @@ class ModelRegressor(nn.Module):
 
 # ~~~ Model Dicts ~~~ #
 model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
-regressor_dict = {'patch': ModelRegressor, 'precalc': Regressor}
