@@ -59,9 +59,9 @@ def data_scaling(rank, args):
 
     # regressor params
     regressor_config = config['regressor']
-    model_type = regressor_config['model_type']
     regressor_type = regressor_config['regressor_type']
     regressor_kwargs = regressor_config['regressor_kwargs']
+    model_type = regressor_kwargs['model_type']
 
     # training params
     train_config = config['training']
