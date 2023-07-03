@@ -38,7 +38,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         if show_repeats:
             for j in range(data.shape[0]):
-                ax.scatter([x[j] for _ in range(data.shape[1])], data.iloc[j], c=colours[i], alpha=0.4, marker='x')
+                ax.scatter([x[j] for _ in range(data.shape[1])], np.sqrt(data.iloc[j]), c=colours[i], alpha=0.4, marker='x')
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
