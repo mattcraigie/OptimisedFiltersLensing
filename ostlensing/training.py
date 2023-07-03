@@ -39,9 +39,9 @@ def dataloader_apply(dataloader, func, device):
 
 class Trainer:
     # implement gradient averaging
-    def __init__(self, model, optimizer, train_criterion, val_criterion, train_loader, val_loader, test_loader, device,
+    def __init__(self, regressor, optimizer, train_criterion, val_criterion, train_loader, val_loader, test_loader, device,
                  ddp=False):
-        self.model = model
+        self.regressor = regressor
         self.optimizer = optimizer
         self.train_criterion = train_criterion
         self.val_criterion = val_criterion
@@ -50,16 +50,16 @@ class Trainer:
         self.test_loader = test_loader
         self.device = device
         self.best_loss = float('inf')
-        self.best_model_params = None
+        self.best_regressor_params = None
         self.train_losses = []
         self.val_losses = []
         self.ddp = ddp  # distributed data parallel
 
     def _run_epoch(self, loader, criterion, mode='train'):
         if mode == 'train':
-            self.model.train()
+            self.regressor.train()
         else:
-            self.model.eval()
+            self.regressor.eval()
 
         total_loss = 0
         num_samples = len(loader.dataset)
@@ -68,8 +68,8 @@ class Trainer:
             for batch_idx, (data, target) in enumerate(loader):
                 data, target = data.to(self.device), target.to(self.device)
                 self.optimizer.zero_grad()
-                output = self.model(data)
-                loss = criterion(output, target, self.model)
+                output = self.regressor(data)
+                loss = criterion(output, target, self.regressor.model)
 
                 if mode == 'train':
                     loss.backward()
@@ -111,15 +111,15 @@ class Trainer:
 
             if val_loss < self.best_loss:
                 self.best_loss = val_loss
-                self.best_model_params = self.model.state_dict()
+                self.best_regressor_params = self.regressor.state_dict()
 
     def get_best_model(self):
-        self.model.load_state_dict(self.best_model_params)
-        return self.model
+        self.regressor.load_state_dict(self.best_regressor_params)
+        return self.regressor
 
     def test(self, load_best=True):
         if load_best:
-            self.model.load_state_dict(self.best_model_params)
+            self.regressor.load_state_dict(self.best_regressor_params)
         # for test, we must also specify a test_loader
         test_loss = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
 
@@ -132,9 +132,9 @@ class Trainer:
         return test_loss
 
     def save_model(self, save_path):
-        model = self.model.module if self.ddp else self.model
+        regressor = self.regressor.module if self.ddp else self.regressor
         try:
-            model.save(save_path)
+            regressor.save(save_path)
         except AttributeError:
             pass  # model does not have a save method, no worries
 
@@ -142,11 +142,11 @@ class Trainer:
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
 
     def save_predictions(self, save_path):
-        self.model.eval()
+        self.regressor.eval()
         with torch.no_grad():
-            train_pred = dataloader_apply(self.train_loader, self.model, self.device).cpu().detach().numpy()
-            val_pred = dataloader_apply(self.val_loader, self.model, self.device).cpu().detach().numpy()
-            test_pred = dataloader_apply(self.test_loader, self.model, self.device).cpu().detach().numpy()
+            train_pred = dataloader_apply(self.train_loader, self.regressor, self.device).cpu().detach().numpy()
+            val_pred = dataloader_apply(self.val_loader, self.regressor, self.device).cpu().detach().numpy()
+            test_pred = dataloader_apply(self.test_loader, self.regressor, self.device).cpu().detach().numpy()
             torch.save({'train': train_pred, 'val': val_pred, 'test': test_pred}, save_path)
 
     def save_targets(self, save_path):
@@ -156,12 +156,12 @@ class Trainer:
         torch.save({'train': train_targets, 'val': val_targets, 'test': test_targets}, save_path)
 
     def load_model(self, load_path):
-        self.model.load_state_dict(torch.load(load_path))
+        self.regressor.load_state_dict(torch.load(load_path))
 
     def save_filters(self, save_path):
-        model = self.model.module if self.ddp else self.model
+        regressor = self.regressor.module if self.ddp else self.regressor
         try:
-            filters = model.filters.filter_tensor.cpu().detach()
+            filters = regressor.model.filters.filter_tensor.cpu().detach()
             torch.save(filters, save_path)
         except AttributeError:
             # model doesn't have filters, so don't save anything
