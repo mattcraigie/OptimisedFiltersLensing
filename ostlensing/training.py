@@ -133,7 +133,10 @@ class Trainer:
 
     def save_model(self, save_path):
         model = self.model.module if self.ddp else self.model
-        model.save(save_path)
+        try:
+            model.save(save_path)
+        except AttributeError:
+            pass  # model does not have a save method, no worries
 
     def save_losses(self, save_path):
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
