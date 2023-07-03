@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 
 
-def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_sigma=None):
+def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_sigma=None,
+                 show_repeats=False):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -34,6 +35,10 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         ax.plot(x, lower, alpha=0.4, linewidth=1, c=colours[i])
         ax.plot(x, upper, alpha=0.4, linewidth=1, c=colours[i])
         ax.fill_between(x, lower, upper, alpha=0.2, color=colours[i])
+
+        if show_repeats:
+            for j in range(data.shape[0]):
+                ax.scatter([x[j] for _ in range(len(data.shape[1]))], data[j, :], c=colours[i], alpha=0.4, marker='x')
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
