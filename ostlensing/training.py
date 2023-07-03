@@ -69,6 +69,9 @@ class Trainer:
                 data, target = data.to(self.device), target.to(self.device)
                 self.optimizer.zero_grad()
                 output = self.model(data)
+
+                print(output[0], target[0])
+
                 loss = criterion(output, target, self.model)
 
                 if mode == 'train':

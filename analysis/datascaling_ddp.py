@@ -104,7 +104,7 @@ def data_scaling(rank, args):
     test_loader = data_handler.get_test_loader()
 
     # setup train and test losses
-    train_criterion = mse_and_admissibility_ddp if model_type == 'ost' else mse
+    train_criterion = mse_and_admissibility_ddp if model_type == 'ost' and data_type == 'patches' else mse
     test_criterion = mse
 
     # set up the results dataframe
