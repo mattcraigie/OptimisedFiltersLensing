@@ -48,12 +48,13 @@ def data_shuffler(*args, seed=None):  # a class method so we can access the Data
 class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
 
-    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2, seed=None):
+    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2, seed=None, pre_average=False):
         self.load_subset = load_subset
         self.sub_batch_subset = sub_batch_subset
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.seed = seed
+        self.pre_average = pre_average
 
         self.data = None
         self.targets = None
@@ -74,6 +75,9 @@ class DataHandler:
     def load_features(self, path):
         features = np.load(path)
         features = features[:self.load_subset, :self.sub_batch_subset]
+
+        if self.pre_average:
+            features = features.mean(axis=1)
 
         return features
 

@@ -47,32 +47,23 @@ def pk(size, num_bins, device):
 
 def pre_calc(load_path, save_path, file_name, method, kwargs):
     function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet}
-    load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'),
-                   save_path=os.path.join(save_path, file_name + '_full.npy'))
+    data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
 
+    main_path = os.path.join(save_path, file_name)
 
-def subset_average_standardise(save_path, file_name, subsets):
-    data = np.load(os.path.join(save_path, file_name + '_full.npy'))
+    # without altering data
+    np.save(main_path + '.npy', data)
 
-    for subset in subsets:
-        if subset is not None:
-            subset_data = data[:, :subset].mean(axis=1)
+    # with std
+    scaler = Scaler(np.mean(data), np.std(data))
+    std_data = scaler.transform(data)
+    np.save(main_path + '_std.npy', std_data)
 
-            main_path = os.path.join(save_path, f'{file_name}_{str(subset)}')
-
-            # without altering data
-            np.save(main_path + '.npy', subset_data)
-
-            # with std
-            scaler = Scaler(np.mean(subset_data), np.std(subset_data))
-            std_data = scaler.transform(subset_data)
-            np.save(main_path + '_std.npy', std_data)
-
-            # with std and log
-            log_data = np.log(subset_data)
-            scaler = Scaler(np.mean(log_data), np.std(log_data))
-            log_std_data = scaler.transform(log_data)
-            np.save(main_path + '_log_std.npy', log_std_data)
+    # with std and log
+    log_data = np.log(data)
+    scaler = Scaler(np.mean(log_data), np.std(log_data))
+    log_std_data = scaler.transform(log_data)
+    np.save(main_path + '_log_std.npy', log_std_data)
 
 
 def main():
@@ -89,12 +80,8 @@ def main():
     method = config['method']
     kwargs = config['kwargs']
 
-    already_run = config['already_run']
-    subsets = config['subsets']
+    pre_calc(load_path, save_path, file_name, method, kwargs)
 
-    if not already_run:
-        pre_calc(load_path, save_path, file_name, method, kwargs)
-    subset_average_standardise(save_path, file_name, subsets)
 
 if __name__ == '__main__':
     main()
