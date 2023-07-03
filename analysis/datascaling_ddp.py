@@ -96,7 +96,7 @@ def data_scaling(rank, args):
     # load train+val and test data with DataHandler
     data_handler = DataHandler(**datahandler_kwargs)
 
-    data_handler.add_data(os.path.join(data_path, data_subpath), patches=data_type == 'patches', normalise=False,
+    data_handler.add_data(os.path.join(data_path, data_type, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
 
