@@ -54,11 +54,8 @@ def data_scaling(rank, args):
     # data params
     data_config = config['data']
     data_path = data_config['data_path']
-    data_type = data_config['data_type']  # patches of precalc
-    load_subset = data_config['load_subset']
-    sub_batch_subset = data_config['sub_batch_subset']
-    val_ratio = data_config['val_ratio']
-    test_ratio = data_config['test_ratio']
+    data_type = data_config['data_type']
+    datahandler_kwargs = data_config['datahandler_kwargs']
 
     # regressor params
     regressor_config = config['regressor']
@@ -98,11 +95,7 @@ def data_scaling(rank, args):
         logging.info('Loading and initialising.')
 
     # load train+val and test data with DataHandler
-    data_handler = DataHandler(load_subset=load_subset,
-                               sub_batch_subset=sub_batch_subset,
-                               val_ratio=val_ratio,
-                               test_ratio=test_ratio,
-                               seed=42)
+    data_handler = DataHandler(**datahandler_kwargs)
 
     data_handler.add_data(os.path.join(data_path, data_type), patches=data_type == 'patches', normalise=False,
                           log=False)
