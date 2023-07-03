@@ -69,9 +69,6 @@ class Trainer:
                 data, target = data.to(self.device), target.to(self.device)
                 self.optimizer.zero_grad()
                 output = self.model(data)
-
-                print(output[0], target[0])
-
                 loss = criterion(output, target, self.model)
 
                 if mode == 'train':
@@ -135,7 +132,8 @@ class Trainer:
         return test_loss
 
     def save_model(self, save_path):
-        self.model.save(save_path)
+        model = self.model.module if self.ddp else self.model
+        model.save(save_path)
 
     def save_losses(self, save_path):
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
