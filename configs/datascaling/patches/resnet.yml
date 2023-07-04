@@ -16,7 +16,7 @@ regressor:
     model_type: 'resnet'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs:
       pretrained_model: '//pscratch/sd/m/mcraigie/huggingface_models/resnet18'
-    regressor_inputs: 500                                    # Number of features
+    regressor_inputs: 512                                    # Number of features
     regressor_hiddens: null
 
 training:
