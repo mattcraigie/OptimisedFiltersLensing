@@ -121,9 +121,7 @@ class ModelRegressor(nn.Module):
                  regressor_activations=nn.ReLU,
                  ):
         super(ModelRegressor, self).__init__()
-        print(model_type)
-        print(model_dict[model_type])
-        print(model_kwargs)
+
         if regressor_type == 'patch':
             self.model = model_dict[model_type](**model_kwargs)
             regressor_inputs = self.model.num_outputs

@@ -74,7 +74,7 @@ def data_scaling(rank, args):
     if rank == 0 and os.path.exists(logging_filename):
         os.remove(logging_filename)
 
-    logging.basicConfig(filename=logging_filename, level=logging.INFO)
+    logging.basicConfig(filename=logging_filename, level=logging.DEBUG)
     logging.info(f"Running data scaling analysis on rank {rank}.")
     logger = logging.getLogger()
     logger.addFilter(SuppressFilter())  # suppress log messages from pytorch
@@ -123,27 +123,34 @@ def data_scaling(rank, args):
                 subset_start_time = time.time()
                 logging.info(f"Running subset {subset}.")
 
+            logging.debug("getting train and val loaders.", rank)
             # make train and val loaders with the subset of data
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
+            logging.debug("Setting up the regressor.", rank)
             # set up the model
             regressor = ModelRegressor(**regressor_kwargs)
 
+            logging.debug("Setting up the regressor.", rank)
             # send to gpu and wrap in DDP
             regressor.to(rank)
             regressor = DDP(regressor, device_ids=[rank])
 
+            logging.debug("Setting up the optimizer.", rank)
             # set up the optimizer
             optimizer = optim.Adam(regressor.parameters(), lr=learning_rate)
 
+            logging.debug("Setting up the trainer.", rank)
             # train the model using Trainer
             trainer = Trainer(regressor, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
                               rank, ddp=True)
             trainer.train_loop(num_epochs)
 
+            logging.debug("Testing the model.", rank)
             # test the best validated model with unseen data
             test_loss = trainer.test(load_best=True)  # reduced across ranks and stored in rank 0's test_loss
 
+            logging.debug("Saving the results.", rank)
             # only save results for rank 0
             if rank == 0:
                 subset_folder = os.path.join(out_folder, f'subset_{subset}')
