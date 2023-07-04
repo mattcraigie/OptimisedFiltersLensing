@@ -26,7 +26,7 @@ training:
 
 analysis:
   analysis_name: 'resnet18_16'
-  data_subsets: [25, 100, 500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 1
 
 
