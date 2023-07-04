@@ -107,6 +107,7 @@ class OSTWrapper(nn.Module):
 # ~~~ Model Dict ~~~ #
 model_dict = {'resnet': ResNetWrapper, 'ost': OSTWrapper}
 
+
 # ~~~ Regression Model ~~~ #
 
 class ModelRegressor(nn.Module):
