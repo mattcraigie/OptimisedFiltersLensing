@@ -20,11 +20,11 @@ regressor:
     regressor_hiddens: null
 
 training:
-  num_epochs: 1000                                          # Number of training epochs
+  num_epochs: 2000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: 0.01                                      # Learning rate
+  learning_rate: 0.001                                      # Learning rate
 
 analysis:
   analysis_name: 'ost_rot_16'
-  data_subsets: [25, 100, 500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [2000]   # Subsets of the data for the scaling analysis
   repeats: 1
