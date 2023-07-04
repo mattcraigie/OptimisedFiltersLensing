@@ -37,7 +37,7 @@ def resnet(model_state_dict_path, pretrained_model, device):
     model.load_state_dict(torch.load(model_state_dict_path))
     print(model)
     model.to(device)
-    return lambda x: model(x.unsqueeze(0))
+    return lambda x: model(x.unsqueeze(0)).squeeze(0)
 
 
 def pk(size, num_bins, device):

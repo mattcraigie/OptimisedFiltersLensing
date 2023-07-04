@@ -4,6 +4,6 @@ file_name:  'resnet18'
 
 method: 'resnet'
 kwargs:
-  model_state_dict_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/resnet/resnet18_16/subset_500/model.pt'
+  model_state_dict_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/resnet/resnet18_16/subset_2000/model.pt'
   pretrained_model: '//pscratch/sd/m/mcraigie/huggingface_models/resnet18'
   device: 'cuda:0'
