@@ -14,8 +14,7 @@ regressor:
   regressor_kwargs:
     regressor_type: 'precalc'
     model_type: 'ost'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
-    model_kwargs:
-      reduction: 'rot_avg'
+    model_kwargs: null
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: null
 
@@ -26,5 +25,5 @@ training:
 
 analysis:
   analysis_name: 'ost_rot_16'
-  data_subsets: [25, 50, 100, 250, 500, 1000, 1500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10

@@ -35,7 +35,6 @@ def ost(filter_path, reduction, device):
 def resnet(model_state_dict_path, pretrained_model, device):
     model = ResNetWrapper(pretrained_model=pretrained_model)
     model.load_state_dict(torch.load(model_state_dict_path))
-    print(model)
     model.to(device)
     return lambda x: model(x.unsqueeze(0)).squeeze(0)
 
