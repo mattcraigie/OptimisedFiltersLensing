@@ -223,6 +223,7 @@ def load_and_apply(load_path, function, device, save_path=None):
     data = []
     for dir_ in all_dirs:
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
+        print(fields.shape)
         results = batch_apply(fields, 16, function, device=device)
         data.append(results.cpu().numpy())
 
