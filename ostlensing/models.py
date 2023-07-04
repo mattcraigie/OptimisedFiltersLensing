@@ -43,7 +43,7 @@ class MLP(nn.Module):
 # The forward methods output a vector of summary statistics of shape (batch * patch, num_outputs)
 
 class ResNetWrapper(nn.Module):
-    def __init(self, pretrained_model=None):
+    def __init__(self, pretrained_model=None):
         super(ResNetWrapper, self).__init__()
 
         # pretrained model is in form from huggingface e.g. 'microsoft/resnet-18'
