@@ -48,7 +48,8 @@ def pk(size, num_bins, device):
 
 def pre_calc(load_path, save_path, file_name, method, kwargs):
     function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet}
-    data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
+    with torch.no_grad():
+        data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
 
     main_path = os.path.join(save_path, file_name)
 
