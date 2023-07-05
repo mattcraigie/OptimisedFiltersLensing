@@ -212,7 +212,7 @@ class ModelPlotter:
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
 
             if not flat_plot:
-                axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_aspect('equal')
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
