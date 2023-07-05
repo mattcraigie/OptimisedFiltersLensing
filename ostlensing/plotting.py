@@ -216,6 +216,7 @@ class ModelPlotter:
                 axes[i, 1].set_ylim(-ylims, ylims)
 
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
+
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
         plt.tight_layout()
