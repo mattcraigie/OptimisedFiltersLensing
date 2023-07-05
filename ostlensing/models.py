@@ -98,7 +98,6 @@ class OSTWrapper(nn.Module):
 
     def to(self, device):
         super(OSTWrapper, self).to(device)
-        self.subnet.to(device)
         self.filters.to(device)
         self.st.to(device)
         self.reducer.to(device)
