@@ -167,11 +167,10 @@ class ModelPlotter:
             axes = axes.reshape(1, 2)  # Reshape the axes to be 2D to handle the 1 parameter case
 
         for i in range(num_targets):
-
             # train (and val)
-
             x_train = transform(self.targets['train'][:num_samples, i], i)
             y_train = transform(self.predictions['train'][:num_samples, i], i)
+
             if not flat_plot:
                 axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
             else:
@@ -187,6 +186,7 @@ class ModelPlotter:
                     axes[i, 0].scatter(x_val, y_val - x_val, c='green', marker='x', alpha=0.5, label='validation')
 
             axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
+
             if not flat_plot:
                 axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
                 axes[i, 0].set_aspect('equal')
@@ -199,27 +199,23 @@ class ModelPlotter:
 
             axes[i, 0].legend()
 
-
             # test
-
             x_test = transform(self.targets['test'][:num_samples, i], i)
             y_test = transform(self.predictions['test'][:num_samples, i], i)
+
             if not flat_plot:
                 axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
-            else:
-                axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)
-
-            axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
-
-            if not flat_plot:
                 axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_aspect('equal')
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
+                axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)
                 axes[i, 1].plot([0, 1], [0.5, 0.5], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
+                ylims = np.abs(np.max(x_train) - np.min(x_train)) * 0.5
                 axes[i, 1].set_ylim(-ylims, ylims)
 
+            axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
         axes[0, 0].set_title('Train')
         axes[0, 1].set_title('Test')
         plt.tight_layout()
