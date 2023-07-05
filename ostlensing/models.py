@@ -4,7 +4,7 @@ import torch.nn as nn
 from transformers import ResNetModel, ResNetConfig
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import FourierSubNetFilters, SubNet
+from scattering_transform.filters import FourierSubNetFilters, SubNet, FourierDirectFilters
 
 
 # ~~~ General Models ~~~ #
@@ -76,12 +76,17 @@ class OSTWrapper(nn.Module):
                  num_scales=4,
                  num_angles=4,
                  reduction=None,
+                 use_subnet=True,
                  subnet_hiddens=(32, 32, 32),
                  subnet_activations=nn.GELU,
                  ):
         super(OSTWrapper, self).__init__()
-        self.subnet = SubNet(hidden_sizes=subnet_hiddens, activation=subnet_activations)
-        self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
+        if use_subnet:
+            self.subnet = SubNet(hidden_sizes=subnet_hiddens, activation=subnet_activations)
+            self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
+        else:
+            self.filters = FourierDirectFilters(size, num_scales, num_angles)
+
         self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
         self.reducer = Reducer(self.filters, reduction)
         self.num_outputs = self.reducer.num_outputs
