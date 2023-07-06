@@ -83,7 +83,8 @@ class OSTWrapper(nn.Module):
                  ):
         super(OSTWrapper, self).__init__()
         if use_subnet:
-            self.subnet = SubNet(hidden_sizes=subnet_hiddens, activation=subnet_activations)
+            subnet_inputs = 2 if scale_invariant else 3
+            self.subnet = SubNet(subnet_inputs, hidden_sizes=subnet_hiddens, activation=subnet_activations)
             self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet, scale_invariant=scale_invariant)
         else:
             self.filters = FourierDirectFilters(size, num_scales, num_angles)
