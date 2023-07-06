@@ -20,7 +20,7 @@ regressor:
     regressor_hiddens: null
 
 training:
-  num_epochs: 3000                                          # Number of training epochs
+  num_epochs: 2000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.005                                      # Learning rate
 

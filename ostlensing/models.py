@@ -78,12 +78,13 @@ class OSTWrapper(nn.Module):
                  reduction=None,
                  use_subnet=True,
                  subnet_hiddens=(32, 32, 32),
-                 subnet_activations=nn.GELU,
+                 subnet_activations=nn.LeakyReLU,
+                 scale_invariant=False
                  ):
         super(OSTWrapper, self).__init__()
         if use_subnet:
             self.subnet = SubNet(hidden_sizes=subnet_hiddens, activation=subnet_activations)
-            self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet)
+            self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet, scale_invariant=scale_invariant)
         else:
             self.filters = FourierDirectFilters(size, num_scales, num_angles)
 
