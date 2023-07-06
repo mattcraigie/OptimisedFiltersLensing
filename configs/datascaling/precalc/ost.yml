@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'ost_rot_std.npy'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'ost_rot.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
@@ -19,9 +19,9 @@ regressor:
     regressor_hiddens: null
 
 training:
-  num_epochs: 500                                          # Number of training epochs
+  num_epochs: 1000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: 0.01                                     # Learning rate
+  learning_rate: 0.005                                     # Learning rate
 
 analysis:
   analysis_name: 'ost_rot_16'
