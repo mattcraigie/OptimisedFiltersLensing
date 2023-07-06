@@ -77,7 +77,7 @@ class OSTWrapper(nn.Module):
                  num_angles=4,
                  reduction=None,
                  use_subnet=True,
-                 subnet_hiddens=(128, 128, 128),
+                 subnet_hiddens=(32, 32, 32),
                  subnet_activations=nn.LeakyReLU,
                  scale_invariant=False
                  ):
