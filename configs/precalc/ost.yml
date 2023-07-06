@@ -4,6 +4,6 @@ file_name: 'ost_rot'
 
 method: 'ost'
 kwargs:
-  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/ost/rot_avg/subset_2000/filters.pt'
+  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/ost/ost_rot_16//subset_125/filters.pt'
   reduction: 'rot_avg'
   device: 'cuda:0'
