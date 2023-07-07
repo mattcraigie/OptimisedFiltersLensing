@@ -68,23 +68,23 @@ class DataHandler:
         all_dirs = os.listdir(path)
         all_dirs = np.sort(all_dirs)
 
-        num_patches = None
         patches = []
         for dir_ in all_dirs[:self.load_subset]:
             loaded_patches = np.load(os.path.join(path, dir_))
-            if num_patches is None:
-                num_patches = loaded_patches.shape[0]
-                self.patch_perm = np.random.permutation(num_patches)[:self.patch_subset]
-            patches.append(loaded_patches[self.patch_perm])
+            num_patches = loaded_patches.shape[0]
+            patches.append(loaded_patches[np.random.permutation(num_patches)][:self.patch_subset])
 
         return np.stack(patches)
 
     def load_features(self, path):
         features = np.load(path)
         features = features[:self.load_subset]
-        num_patches = features.shape[1]
-        self.patch_perm = np.random.permutation(num_patches)[:self.patch_subset]
-        features = features[:, self.patch_perm]
+        num_cosmo, num_patches, vector_size = features.shape
+
+        # Generate random indices for selecting the subsets
+        random_indices = np.random.choice(num_patches, (num_cosmo, self.patch_subset), replace=False)
+        batch_indices = np.arange(num_cosmo)[:, np.newaxis]
+        features = features[batch_indices, random_indices]
 
         if self.pre_average:
             features = features.mean(axis=1)
@@ -111,7 +111,6 @@ class DataHandler:
             self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
 
     def add_targets(self, path, normalise=False, use_params=None):
-        assert self.data is not None, 'Data must be loaded before targets'
 
         df = pd.read_csv(path)
 
@@ -119,14 +118,15 @@ class DataHandler:
             use_params = df.columns[1:]
 
         targets = df[list(use_params)].values
-        targets = targets[self.patch_perm]
+        targets = targets[:self.load_subset]
 
         if normalise:
             targets, self.targets_scaler = norm_scale(targets, axis=0)
 
         self.targets = torch.from_numpy(targets).float()
-        assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
-        self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
+        if self.data is not None:
+            assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
+            self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
 
     def get_test_loader(self, batch_size=128, ddp=False):
         assert self.data is not None and self.targets is not None, \
