@@ -80,15 +80,15 @@ class DataHandler:
         features = np.load(path)
         features = features[:self.load_subset]
 
-        features_subset = np.zeros(self.load_subset, self.patch_subset, features.shape[-1])
+        features_subset = np.zeros((self.load_subset, self.patch_subset, features.shape[-1]))
 
         for i in range(self.load_subset):
             features_subset[i] = features[i][np.random.permutation(features.shape[1])[:self.patch_subset]]
 
         if self.pre_average:
-            features = features.mean(axis=1)
+            features_subset = features_subset.mean(axis=1)
 
-        return features
+        return features_subset
 
     def add_data(self, path, patches=False, normalise=False, log=False):
         if patches:
