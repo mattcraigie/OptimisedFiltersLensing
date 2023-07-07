@@ -25,5 +25,5 @@ training:
 
 analysis:
   analysis_name: 'mst_rot_16'
-  data_subsets: [125,]   # Subsets of the data for the scaling analysis
+  data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
