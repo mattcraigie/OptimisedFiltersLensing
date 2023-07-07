@@ -76,10 +76,12 @@ class DataHandler:
 
     def load_features(self, path):
         features = np.load(path)
+        np.random.shuffle(features)
         features = features[:self.load_subset, :self.sub_batch_subset]
 
         if self.pre_average:
             features = features.mean(axis=1)
+
 
         return features
 
