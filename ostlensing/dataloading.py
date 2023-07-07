@@ -83,7 +83,7 @@ class DataHandler:
         features_subset = np.zeros((self.load_subset, self.patch_subset, features.shape[-1]))
 
         for i in range(self.load_subset):
-            np.seed(self.seed + i)  # different for every cosmology, same for every separate analysis
+            np.random.seed(self.seed + i)  # different for every cosmology, same for every separate analysis
             features_subset[i] = features[i][np.random.permutation(features.shape[1])[:self.patch_subset]]
 
         if self.pre_average:
