@@ -79,12 +79,11 @@ class DataHandler:
     def load_features(self, path):
         features = np.load(path)
         features = features[:self.load_subset]
-        num_cosmo, num_patches, vector_size = features.shape
 
-        # Generate random indices for selecting the subsets
-        random_indices = np.random.choice(num_patches, (num_cosmo, self.patch_subset), replace=False)
-        batch_indices = np.arange(num_cosmo)[:, np.newaxis]
-        features = features[batch_indices, random_indices]
+        features_subset = np.zeros(self.load_subset, self.patch_subset, features.shape[-1])
+
+        for i in range(self.load_subset):
+            features_subset[i] = features[i][np.random.permutation(features.shape[1])[:self.patch_subset]]
 
         if self.pre_average:
             features = features.mean(axis=1)
