@@ -4,7 +4,7 @@ data:
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
-    sub_batch_subset: 16                                    # Subset of patches per cosmology, 192 for all
+    patch_subset: 16                                        # Subset of patches per cosmology, 192 for all
     val_ratio: 0.2                                          # Portion of data to use for validation
     test_ratio: 0.2                                         # Portion of data to use for testing
     seed: 0                                                 # Random seed for data splitting
@@ -25,5 +25,5 @@ training:
 
 analysis:
   analysis_name: 'mst_rot_16'
-  data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [125,]   # Subsets of the data for the scaling analysis
   repeats: 10

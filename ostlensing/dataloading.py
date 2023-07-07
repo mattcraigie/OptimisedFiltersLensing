@@ -37,7 +37,7 @@ def norm_scale(x, axis=None):
     return scaler.transform(x), scaler
 
 
-def data_shuffler(*args, seed=None):  # a class method so we can access the DataHandler seed
+def data_shuffler(*args, seed=None):
     if seed is not None:
         torch.manual_seed(seed)
     size = args[0].shape[0]
@@ -48,9 +48,9 @@ def data_shuffler(*args, seed=None):  # a class method so we can access the Data
 class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
 
-    def __init__(self, load_subset=-1, sub_batch_subset=-1, val_ratio=0.2, test_ratio=0.2, seed=None, pre_average=False):
+    def __init__(self, load_subset=None, patch_subset=None, val_ratio=0.2, test_ratio=0.2, seed=None, pre_average=False):
         self.load_subset = load_subset
-        self.sub_batch_subset = sub_batch_subset
+        self.patch_subset = patch_subset
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.seed = seed
@@ -62,22 +62,29 @@ class DataHandler:
         self.data_scaler = None
         self.targets_scaler = None
 
+        self.patch_perm = None
+
     def load_patches(self, path):
         all_dirs = os.listdir(path)
         all_dirs = np.sort(all_dirs)
 
+        num_patches = None
         patches = []
         for dir_ in all_dirs[:self.load_subset]:
             loaded_patches = np.load(os.path.join(path, dir_))
-            np.random.shuffle(loaded_patches)  # shuffling so that we don't train/test on all the same phases
-            patches.append(loaded_patches[:self.sub_batch_subset])
+            if num_patches is None:
+                num_patches = loaded_patches.shape[0]
+                self.patch_perm = np.random.permutation(num_patches)[:self.patch_subset]
+            patches.append(loaded_patches[self.patch_perm])
 
         return np.stack(patches)
 
     def load_features(self, path):
         features = np.load(path)
-        np.random.shuffle(features)
-        features = features[:self.load_subset, :self.sub_batch_subset]
+        features = features[:self.load_subset]
+        num_patches = features.shape[1]
+        self.patch_perm = np.random.permutation(num_patches)[:self.patch_subset]
+        features = features[:, self.patch_perm]
 
         if self.pre_average:
             features = features.mean(axis=1)
@@ -104,22 +111,22 @@ class DataHandler:
             self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
 
     def add_targets(self, path, normalise=False, use_params=None):
+        assert self.data is not None, 'Data must be loaded before targets'
+
         df = pd.read_csv(path)
 
         if use_params is None:
             use_params = df.columns[1:]
 
         targets = df[list(use_params)].values
-        targets = targets[:self.load_subset]
+        targets = targets[self.patch_perm]
 
         if normalise:
             targets, self.targets_scaler = norm_scale(targets, axis=0)
 
         self.targets = torch.from_numpy(targets).float()
-
-        if self.data is not None:
-            assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
-            self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
+        assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
+        self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
 
     def get_test_loader(self, batch_size=128, ddp=False):
         assert self.data is not None and self.targets is not None, \
