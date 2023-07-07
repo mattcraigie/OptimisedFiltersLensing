@@ -82,7 +82,6 @@ class DataHandler:
         if self.pre_average:
             features = features.mean(axis=1)
 
-
         return features
 
     def add_data(self, path, patches=False, normalise=False, log=False):
