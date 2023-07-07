@@ -69,7 +69,7 @@ class DataHandler:
         patches = []
         for dir_ in all_dirs[:self.load_subset]:
             loaded_patches = np.load(os.path.join(path, dir_))
-            np.shuffle(loaded_patches)  # shuffling so that we don't train/test on all the same phases
+            np.random.shuffle(loaded_patches)  # shuffling so that we don't train/test on all the same phases
             patches.append(loaded_patches[:self.sub_batch_subset])
 
         return np.stack(patches)
