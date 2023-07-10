@@ -164,6 +164,10 @@ class Trainer:
                 self.val_pred = torch.cat(gathered_val)
                 self.test_pred = torch.cat(gathered_test)
 
+            self.train_pred = self.train_pred.cpu()
+            self.val_pred = self.val_pred.cpu()
+            self.test_pred = self.test_pred.cpu()
+
 
     def save_model(self, save_path):
         regressor = self.regressor.module if self.ddp else self.regressor
