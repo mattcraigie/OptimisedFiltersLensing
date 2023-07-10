@@ -143,6 +143,13 @@ class ModelPlotter:
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
+        print(self.targets['train'].shape)
+        print(self.predictions['train'].shape)
+        print(self.targets['val'].shape)
+        print(self.predictions['val'].shape)
+        print(self.targets['test'].shape)
+        print(self.predictions['test'].shape)
+
         num_targets = self.targets['train'].shape[1]
 
         if param_names is None:
