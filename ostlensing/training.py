@@ -59,6 +59,8 @@ class Trainer:
         self.num_val_samples = len(self.val_loader.dataset)
         self.num_test_samples = len(self.test_loader.dataset)
 
+        self.best_test_loss = None
+
     def _run_epoch(self, loader, criterion, mode='train'):
         if mode == 'train':
             self.regressor.train()
@@ -134,9 +136,7 @@ class Trainer:
         if self.ddp:
             sum_test_loss = torch.tensor(sum_test_loss).to(self.device)
             dist.reduce(sum_test_loss, dst=0, op=dist.ReduceOp.SUM)
-
-            if self.device == 0:
-                test_loss = sum_test_loss.item() / self.num_test_samples
+            test_loss = sum_test_loss.item() / self.num_test_samples
         else:
             test_loss = sum_test_loss / self.num_test_samples
 
