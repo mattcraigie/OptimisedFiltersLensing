@@ -17,28 +17,26 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     fig, ax = plt.subplots(figsize=(8, 6))
     for i in range(len(scaling_paths)):
         scaling_df = pd.read_csv(scaling_paths[i])
-        data = scaling_df.iloc[:, 1:]
-
-        mean = np.mean(data, axis=1)
-        std = np.std(data, axis=1)
-        upper = mean + std
-        lower = mean - std
-        root_mean, root_lower, root_upper = np.sqrt(mean), np.sqrt(lower), np.sqrt(upper)
+        mse_norm = scaling_df.iloc[:, 1:]
+        rmse_norm = np.sqrt(mse_norm)
 
         # rescale all values to data units if transform is provided
-        if transform_std is not None:
-            root_mean, root_lower, root_upper = root_mean * transform_std, root_lower * transform_std, root_upper * transform_std
+        rmse = rmse_norm * transform_std if transform_std is not None else rmse_norm
+
+        rmse_mean = np.mean(rmse, axis=1)
+        rmse_25 = np.quantile(rmse, 0.25, axis=1)
+        rmse_75 = np.quantile(rmse, 0.75, axis=1)
 
         x = scaling_df['data_subset']
-        ax.plot(x, root_mean, linewidth=4, label=labels[i], c=colours[i])
-        ax.scatter(x, root_mean, c=colours[i])
-        ax.plot(x, root_lower, alpha=0.4, linewidth=1, c=colours[i])
-        ax.plot(x, root_upper, alpha=0.4, linewidth=1, c=colours[i])
-        ax.fill_between(x, root_lower, root_upper, alpha=0.2, color=colours[i])
+        ax.plot(x, rmse_mean, linewidth=4, label=labels[i], c=colours[i])
+        ax.scatter(x, rmse_mean, c=colours[i])
+        ax.plot(x, rmse_25, alpha=0.4, linewidth=1, c=colours[i])
+        ax.plot(x, rmse_75, alpha=0.4, linewidth=1, c=colours[i])
+        ax.fill_between(x, rmse_25, rmse_75, alpha=0.2, color=colours[i])
 
         if show_repeats:
-            for j in range(data.shape[0]):
-                ax.scatter([x[j] for _ in range(data.shape[1])], np.sqrt(data.iloc[j]), c=colours[i], alpha=0.4, marker='x')
+            for j in range(rmse.shape[0]):
+                ax.scatter([x[j] for _ in range(rmse.shape[1])], np.sqrt(rmse.iloc[j]), c=colours[i], alpha=0.4, marker='x')
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
     ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
