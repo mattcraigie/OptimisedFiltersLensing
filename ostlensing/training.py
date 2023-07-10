@@ -29,10 +29,12 @@ def batch_apply(data, bs, func, device):
 
 def dataloader_apply(dataloader, func, device):
     results = []
-    for x, _ in dataloader:
+    targets = []
+    for x, t in dataloader:
         x = x.to(device)
         results.append(func(x))
-    return torch.cat(results, dim=0)
+        targets.append(t)
+    return torch.cat(results, dim=0), torch.cat(targets, dim=0)
 
 
 # ~~~ Trainer Class ~~~ #
@@ -41,6 +43,7 @@ class Trainer:
     # implement gradient averaging
     def __init__(self, regressor, optimizer, train_criterion, val_criterion, train_loader, val_loader, test_loader, device,
                  ddp=False):
+
         self.regressor = regressor
         self.optimizer = optimizer
         self.train_criterion = train_criterion
@@ -54,6 +57,14 @@ class Trainer:
         self.train_losses = []
         self.val_losses = []
         self.ddp = ddp  # distributed data parallel
+
+        self.train_pred = None
+        self.val_pred = None
+        self.test_pred = None
+
+        self.train_targets = None
+        self.val_targets = None
+        self.test_targets = None
 
         self.num_train_samples = len(self.train_loader.dataset)
         self.num_val_samples = len(self.val_loader.dataset)
@@ -146,30 +157,29 @@ class Trainer:
     def make_predictions(self):
         self.regressor.eval()
         with torch.no_grad():
-            self.train_pred = dataloader_apply(self.train_loader, self.regressor, self.device)
-            self.val_pred = dataloader_apply(self.val_loader, self.regressor, self.device)
-            self.test_pred = dataloader_apply(self.test_loader, self.regressor, self.device)
-
-            print(self.device, self.val_pred.shape, next(iter(self.val_loader)))
+            self.train_pred, self.train_targets = dataloader_apply(self.train_loader, self.regressor, self.device)
+            self.val_pred, self.val_targets = dataloader_apply(self.val_loader, self.regressor, self.device)
+            self.test_pred, self.test_targets = dataloader_apply(self.test_loader, self.regressor, self.device)
 
             if self.ddp:
-                gathered_train = [torch.zeros_like(self.train_pred) for _ in range(dist.get_world_size())]
-                dist.all_gather(gathered_train, self.train_pred)
+                def gatherer(x):
+                    gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
+                    dist.all_gather(gathered_x, x)
+                    return torch.cat(gathered_x)
 
-                gathered_val = [torch.zeros_like(self.val_pred) for _ in range(dist.get_world_size())]
-                dist.all_gather(gathered_val, self.val_pred)
-
-                gathered_test = [torch.zeros_like(self.test_pred) for _ in range(dist.get_world_size())]
-                dist.all_gather(gathered_test, self.test_pred)
-
-                self.train_pred = torch.cat(gathered_train)
-                self.val_pred = torch.cat(gathered_val)
-                self.test_pred = torch.cat(gathered_test)
+                self.train_pred = gatherer(self.train_pred)
+                self.val_pred = gatherer(self.val_pred)
+                self.test_pred = gatherer(self.test_pred)
+                self.train_targets = gatherer(self.train_targets)
+                self.val_targets = gatherer(self.val_targets)
+                self.test_targets = gatherer(self.test_targets)
 
             self.train_pred = self.train_pred.cpu()
             self.val_pred = self.val_pred.cpu()
             self.test_pred = self.test_pred.cpu()
-
+            self.train_targets = self.train_targets.cpu()
+            self.val_targets = self.val_targets.cpu()
+            self.test_targets = self.test_targets.cpu()
 
     def save_model(self, save_path):
         regressor = self.regressor.module if self.ddp else self.regressor
@@ -185,10 +195,7 @@ class Trainer:
         torch.save({'train': self.train_pred, 'val': self.val_pred, 'test': self.test_pred}, save_path)
 
     def save_targets(self, save_path):
-        train_targets = self.train_loader.dataset.targets
-        val_targets = self.val_loader.dataset.targets
-        test_targets = self.test_loader.dataset.targets
-        torch.save({'train': train_targets, 'val': val_targets, 'test': test_targets}, save_path)
+        torch.save({'train': self.train_targets, 'val': self.val_targets, 'test': self.test_targets}, save_path)
 
     def load_model(self, load_path):
         self.regressor.load_state_dict(torch.load(load_path))
