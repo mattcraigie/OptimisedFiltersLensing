@@ -143,17 +143,8 @@ class Trainer:
         self.regressor.load_state_dict(self.best_regressor_params)
 
     def test(self):
-        # for test, we must also specify a test_loader
-        sum_test_loss = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
-
-        if self.ddp:
-            sum_test_loss = torch.tensor(sum_test_loss).to(self.device)
-            dist.reduce(sum_test_loss, dst=0, op=dist.ReduceOp.SUM)
-            test_loss = sum_test_loss.item() / self.num_test_samples
-        else:
-            test_loss = sum_test_loss / self.num_test_samples
-
-        return test_loss
+        assert self.test_pred is not None, "You need to run make_predictions() first"
+        return self.val_criterion(self.test_pred, self.test_targets, self.regressor)
 
     def make_predictions(self):
         self.regressor.eval()
@@ -166,7 +157,11 @@ class Trainer:
                 def gatherer(x):
                     gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
                     dist.all_gather(gathered_x, x)
-                    return torch.cat(gathered_x)
+                    gathered_x = torch.cat(gathered_x, dim=0)
+                    print(gathered_x.shape)
+                    gathered_x = torch.unique(gathered_x, dim=0)
+                    print(gathered_x.shape)
+                    return gathered_x
 
                 self.train_pred = gatherer(self.train_pred)
                 self.val_pred = gatherer(self.val_pred)
