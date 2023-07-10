@@ -19,22 +19,22 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         scaling_df = pd.read_csv(scaling_paths[i])
         data = scaling_df.iloc[:, 1:]
 
-        # rescale all values to data units if transform is provided
-        if transform_sigma is not None:
-            data = data * transform_sigma**2
-
         mean = np.mean(data, axis=1)
         std = np.std(data, axis=1)
         upper = mean + std
         lower = mean - std
-        mean, lower, upper = np.sqrt(mean), np.sqrt(lower), np.sqrt(upper)
+        root_mean, root_lower, root_upper = np.sqrt(mean), np.sqrt(lower), np.sqrt(upper)
+
+        # rescale all values to data units if transform is provided
+        if transform_sigma is not None:
+            root_mean, root_lower, root_upper = root_mean * transform_sigma, root_lower * transform_sigma, root_upper * transform_sigma
 
         x = scaling_df['data_subset']
-        ax.plot(x, mean, linewidth=4, label=labels[i], c=colours[i])
-        ax.scatter(x, mean, c=colours[i])
-        ax.plot(x, lower, alpha=0.4, linewidth=1, c=colours[i])
-        ax.plot(x, upper, alpha=0.4, linewidth=1, c=colours[i])
-        ax.fill_between(x, lower, upper, alpha=0.2, color=colours[i])
+        ax.plot(x, root_mean, linewidth=4, label=labels[i], c=colours[i])
+        ax.scatter(x, root_mean, c=colours[i])
+        ax.plot(x, root_lower, alpha=0.4, linewidth=1, c=colours[i])
+        ax.plot(x, root_upper, alpha=0.4, linewidth=1, c=colours[i])
+        ax.fill_between(x, root_lower, root_upper, alpha=0.2, color=colours[i])
 
         if show_repeats:
             for j in range(data.shape[0]):
