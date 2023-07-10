@@ -155,7 +155,7 @@ class DataHandler:
                 f"Load more data or adjust subset.")
         num_remaining = num_remaining if subset is None else subset
 
-        # another layer of randomness to get the bootstrapping working
+        # another layer of randomness to get the bootstrapping working between repeats
         leftover_data = self.data[test_split:num_remaining+test_split]
         leftover_targets = self.targets[test_split:num_remaining+test_split]
         leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets, seed=self.seed)
@@ -168,13 +168,14 @@ class DataHandler:
                                      leftover_targets[:val_split])
 
         if ddp:
-            val_sampler = DistributedSampler(train_dataset)
-            train_sampler = DistributedSampler(val_dataset)
-            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
-            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
+            train_sampler = DistributedSampler(train_dataset)
+            val_sampler = DistributedSampler(val_dataset)
+            train_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=train_sampler)
+            val_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=val_sampler)
         else:
-            val_loader = DataLoader(val_dataset, batch_size=batch_size)
             train_loader = DataLoader(train_dataset, batch_size=batch_size)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size)
+
 
         return train_loader, val_loader
 
