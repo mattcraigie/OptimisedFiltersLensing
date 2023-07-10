@@ -150,6 +150,8 @@ class Trainer:
             self.val_pred = dataloader_apply(self.val_loader, self.regressor, self.device)
             self.test_pred = dataloader_apply(self.test_loader, self.regressor, self.device)
 
+            print(self.device, self.val_pred.shape, self.val_loader.dataset)
+
             if self.ddp:
                 gathered_train = [torch.zeros_like(self.train_pred) for _ in range(dist.get_world_size())]
                 dist.all_gather(gathered_train, self.train_pred)
