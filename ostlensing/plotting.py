@@ -145,8 +145,10 @@ class ModelPlotter:
 
         print(self.targets['train'].shape)
         print(self.predictions['train'].shape)
+
         print(self.targets['val'].shape)
         print(self.predictions['val'].shape)
+
         print(self.targets['test'].shape)
         print(self.predictions['test'].shape)
 

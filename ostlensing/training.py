@@ -127,9 +127,10 @@ class Trainer:
         self.regressor.load_state_dict(self.best_regressor_params)
         return self.regressor
 
-    def test(self, load_best=True):
-        if load_best:
-            self.regressor.load_state_dict(self.best_regressor_params)
+    def load_best_model(self):
+        self.regressor.load_state_dict(self.best_regressor_params)
+
+    def test(self):
         # for test, we must also specify a test_loader
         sum_test_loss = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
 
@@ -142,6 +143,28 @@ class Trainer:
 
         return test_loss
 
+    def make_predictions(self):
+        self.regressor.eval()
+        with torch.no_grad():
+            self.train_pred = dataloader_apply(self.train_loader, self.regressor, self.device)
+            self.val_pred = dataloader_apply(self.val_loader, self.regressor, self.device)
+            self.test_pred = dataloader_apply(self.test_loader, self.regressor, self.device)
+
+            if self.ddp:
+                gathered_train = [torch.zeros_like(self.train_pred) for _ in range(dist.get_world_size())]
+                dist.all_gather(gathered_train, self.train_pred)
+
+                gathered_val = [torch.zeros_like(self.val_pred) for _ in range(dist.get_world_size())]
+                dist.all_gather(gathered_val, self.val_pred)
+
+                gathered_test = [torch.zeros_like(self.test_pred) for _ in range(dist.get_world_size())]
+                dist.all_gather(gathered_test, self.test_pred)
+
+                self.train_pred = torch.cat(gathered_train)
+                self.val_pred = torch.cat(gathered_val)
+                self.test_pred = torch.cat(gathered_test)
+
+
     def save_model(self, save_path):
         regressor = self.regressor.module if self.ddp else self.regressor
         try:
@@ -153,12 +176,7 @@ class Trainer:
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
 
     def save_predictions(self, save_path):
-        self.regressor.eval()
-        with torch.no_grad():
-            train_pred = dataloader_apply(self.train_loader, self.regressor, self.device).cpu().detach().numpy()
-            val_pred = dataloader_apply(self.val_loader, self.regressor, self.device).cpu().detach().numpy()
-            test_pred = dataloader_apply(self.test_loader, self.regressor, self.device).cpu().detach().numpy()
-            torch.save({'train': train_pred, 'val': val_pred, 'test': test_pred}, save_path)
+        torch.save({'train': self.train_pred, 'val': self.val_pred, 'test': self.test_pred}, save_path)
 
     def save_targets(self, save_path):
         train_targets = self.train_loader.dataset.targets

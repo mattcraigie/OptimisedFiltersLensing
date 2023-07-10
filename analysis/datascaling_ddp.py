@@ -144,7 +144,10 @@ def data_scaling(rank, args):
             trainer.train_loop(num_epochs)
 
             logging.debug(f"testing the best validated model on rank {rank}")
-            test_loss = trainer.test(load_best=True)  # reduced across ranks and stored in rank 0's test_loss
+
+            trainer.load_best_model()
+            test_loss = trainer.test()  # reduced across ranks and stored in rank 0's test_loss
+            trainer.make_predictions()
 
             if rank == 0:
                 logging.debug(f"saving the results on rank {rank}")
