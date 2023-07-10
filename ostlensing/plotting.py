@@ -21,7 +21,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         # rescale all values to data units if transform is provided
         if transform_sigma is not None:
-            data = data * transform_sigma
+            data = data * transform_sigma**2
 
         mean = np.mean(data, axis=1)
         std = np.std(data, axis=1)
