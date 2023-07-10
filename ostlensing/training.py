@@ -161,6 +161,7 @@ class Trainer:
                     print(gathered_x.shape)
                     gathered_x = torch.unique(gathered_x, dim=0)
                     print(gathered_x.shape)
+                    print("")
                     return gathered_x
 
                 self.train_pred = gatherer(self.train_pred)
