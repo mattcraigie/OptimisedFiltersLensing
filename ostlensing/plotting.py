@@ -143,14 +143,8 @@ class ModelPlotter:
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
-        print(self.targets['train'].shape)
-        print(self.predictions['train'].shape)
-
-        print(self.targets['val'].shape)
-        print(self.predictions['val'].shape)
-
-        print(self.targets['test'].shape)
-        print(self.predictions['test'].shape)
+        print(self.targets['val'])
+        print(self.predictions['val'])
 
         num_targets = self.targets['train'].shape[1]
 
@@ -170,7 +164,6 @@ class ModelPlotter:
             figsize = (8, num_targets*4)
 
         fig, axes = plt.subplots(num_targets, 2, figsize=figsize)
-
 
         if num_targets == 1:
             axes = axes.reshape(1, 2)  # Reshape the axes to be 2D to handle the 1 parameter case
