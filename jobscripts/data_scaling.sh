@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node 1
 #SBATCH --cpus-per-task 16
 #SBATCH --gpus-per-node 4
-#SBATCH --time=18:00:00
+#SBATCH --time=12:00:00
 #SBATCH -J datascaling
 #SBATCH -o logs/%x-%j.out
 
