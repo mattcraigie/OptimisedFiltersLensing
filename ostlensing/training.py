@@ -55,6 +55,10 @@ class Trainer:
         self.val_losses = []
         self.ddp = ddp  # distributed data parallel
 
+        self.num_train_samples = len(self.train_loader.dataset)
+        self.num_val_samples = len(self.val_loader.dataset)
+        self.num_test_samples = len(self.test_loader.dataset)
+
     def _run_epoch(self, loader, criterion, mode='train'):
         if mode == 'train':
             self.regressor.train()
@@ -62,7 +66,6 @@ class Trainer:
             self.regressor.eval()
 
         total_loss = 0
-        num_samples = len(loader.dataset)
 
         with torch.set_grad_enabled(mode == 'train'):
             for batch_idx, (data, target) in enumerate(loader):
@@ -77,7 +80,7 @@ class Trainer:
 
                 total_loss += loss.item()
 
-        return total_loss, num_samples
+        return total_loss
 
     def train(self):
         return self._run_epoch(self.train_loader, self.train_criterion, mode='train')
@@ -86,30 +89,29 @@ class Trainer:
         return self._run_epoch(self.val_loader, self.val_criterion, mode='eval')
 
     def train_loop(self, epochs=10):
-        for epoch in range(1, epochs + 1):
+        for epoch in range(0, epochs):
 
-            sum_train_loss, num_train_samples = self.train()
-            sum_val_loss, num_val_samples = self.validate()
+            self.train_loader.set_epoch(epoch)
+            self.val_loader.set_epoch(epoch)
+
+            sum_train_loss = self.train()
+            sum_val_loss = self.validate()
+
+            # Everything beyond here is just for visualisation and validation purposes
 
             if self.ddp:
-                train_loss = torch.tensor(sum_train_loss).to(self.device)
-                dist.reduce(train_loss, dst=0, op=dist.ReduceOp.SUM)  # this operation is inplace and returns to rank 0
+                sum_train_loss = torch.tensor(sum_train_loss).to(self.device)
+                dist.reduce(sum_train_loss, dst=0, op=dist.ReduceOp.SUM)  # this operation is inplace and returns to rank 0
 
                 val_loss = torch.tensor(sum_val_loss).to(self.device)
                 dist.reduce(val_loss, dst=0, op=dist.ReduceOp.SUM)
 
-                num_train_samples = torch.tensor(num_train_samples).to(self.device)
-                dist.reduce(num_train_samples, dst=0, op=dist.ReduceOp.SUM)
-
-                num_val_samples = torch.tensor(num_val_samples).to(self.device)
-                dist.reduce(num_val_samples, dst=0, op=dist.ReduceOp.SUM)
-
                 if self.device == 0:
-                    train_loss = train_loss.item() / num_train_samples.item()
-                    val_loss = val_loss.item() / num_val_samples.item()
+                    train_loss = sum_train_loss.item() / self.num_train_samples
+                    val_loss = val_loss.item() / self.num_val_samples
             else:
-                train_loss = sum_train_loss / num_train_samples
-                val_loss = sum_val_loss / num_val_samples
+                train_loss = sum_train_loss / self.num_train_samples
+                val_loss = sum_val_loss / self.num_val_samples
 
             self.train_losses.append(train_loss)
             self.val_losses.append(val_loss)
@@ -126,19 +128,16 @@ class Trainer:
         if load_best:
             self.regressor.load_state_dict(self.best_regressor_params)
         # for test, we must also specify a test_loader
-        sum_test_loss, num_test_samples = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
+        sum_test_loss = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
 
         if self.ddp:
-            test_loss = torch.tensor(sum_test_loss).to(self.device)
-            dist.reduce(test_loss, dst=0, op=dist.ReduceOp.SUM)
+            sum_test_loss = torch.tensor(sum_test_loss).to(self.device)
+            dist.reduce(sum_test_loss, dst=0, op=dist.ReduceOp.SUM)
 
-            num_test_samples = torch.tensor(num_test_samples).to(self.device)
-            dist.reduce(num_test_samples, dst=0, op=dist.ReduceOp.SUM)
-
-            if self.device != 0:
-                test_loss = test_loss.item() / num_test_samples.item()
+            if self.device == 0:
+                test_loss = sum_test_loss.item() / self.num_test_samples
         else:
-            test_loss = sum_test_loss / num_test_samples
+            test_loss = sum_test_loss / self.num_test_samples
 
         return test_loss
 
