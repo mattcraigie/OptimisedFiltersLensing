@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_sigma=None,
+def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
                  show_repeats=False):
 
     if labels is None:
@@ -26,8 +26,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         root_mean, root_lower, root_upper = np.sqrt(mean), np.sqrt(lower), np.sqrt(upper)
 
         # rescale all values to data units if transform is provided
-        if transform_sigma is not None:
-            root_mean, root_lower, root_upper = root_mean * transform_sigma, root_lower * transform_sigma, root_upper * transform_sigma
+        if transform_std is not None:
+            root_mean, root_lower, root_upper = root_mean * transform_std, root_lower * transform_std, root_upper * transform_std
 
         x = scaling_df['data_subset']
         ax.plot(x, root_mean, linewidth=4, label=labels[i], c=colours[i])
