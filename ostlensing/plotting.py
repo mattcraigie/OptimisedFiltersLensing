@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
-                 show_repeats=False):
+                 show_repeats=False, quantiles=True):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -23,16 +23,22 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         # rescale all values to data units if transform is provided
         rmse = rmse_norm * transform_std if transform_std is not None else rmse_norm
 
-        rmse_mean = np.mean(rmse, axis=1)
-        rmse_25 = np.quantile(rmse, 0.25, axis=1)
-        rmse_75 = np.quantile(rmse, 0.75, axis=1)
+        if quantiles:
+            rmse_mid = np.median(rmse, axis=1)
+            rmse_low = np.quantile(rmse, 0.25, axis=1)
+            rmse_high = np.quantile(rmse, 0.75, axis=1)
+        else:
+            rmse_mid = np.mean(rmse, axis=1)
+            rmse_low = rmse_mid - np.std(rmse, axis=1)
+            rmse_high = rmse_mid + np.std(rmse, axis=1)
+
 
         x = scaling_df['data_subset']
-        ax.plot(x, rmse_mean, linewidth=4, label=labels[i], c=colours[i])
-        ax.scatter(x, rmse_mean, c=colours[i])
-        ax.plot(x, rmse_25, alpha=0.4, linewidth=1, c=colours[i])
-        ax.plot(x, rmse_75, alpha=0.4, linewidth=1, c=colours[i])
-        ax.fill_between(x, rmse_25, rmse_75, alpha=0.2, color=colours[i])
+        ax.plot(x, rmse_mid, linewidth=4, label=labels[i], c=colours[i])
+        ax.scatter(x, rmse_mid, c=colours[i])
+        ax.plot(x, rmse_low, alpha=0.4, linewidth=1, c=colours[i])
+        ax.plot(x, rmse_high, alpha=0.4, linewidth=1, c=colours[i])
+        ax.fill_between(x, rmse_low, rmse_high, alpha=0.2, color=colours[i])
 
         if show_repeats:
             for j in range(rmse.shape[0]):
