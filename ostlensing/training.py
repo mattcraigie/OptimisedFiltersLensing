@@ -106,15 +106,16 @@ class Trainer:
                 val_loss = torch.tensor(sum_val_loss).to(self.device)
                 dist.reduce(val_loss, dst=0, op=dist.ReduceOp.SUM)
 
-                if self.device == 0:
-                    train_loss = sum_train_loss.item() / self.num_train_samples
-                    val_loss = val_loss.item() / self.num_val_samples
+                train_loss = sum_train_loss.item() / self.num_train_samples
+                val_loss = val_loss.item() / self.num_val_samples
+
             else:
                 train_loss = sum_train_loss / self.num_train_samples
                 val_loss = sum_val_loss / self.num_val_samples
 
-            self.train_losses.append(train_loss)
-            self.val_losses.append(val_loss)
+            if self.device == 0 or not self.ddp:
+                self.train_losses.append(train_loss)
+                self.val_losses.append(val_loss)
 
             if val_loss < self.best_loss:
                 self.best_loss = val_loss
