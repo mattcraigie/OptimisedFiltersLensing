@@ -217,7 +217,7 @@ class ModelPlotter:
 
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
             # add text showing the rmse in the top left corner of the plot
-            test_loss = transform(np.sqrt(np.mean((y_test - x_test)**2)), i)
+            test_loss = np.sqrt(np.mean((y_test - x_test)**2))
 
             # use scientific notation
             axes[i, 1].text(0.05, 0.95, 'RMSE: {:.3e}'.format(test_loss), transform=axes[i, 1].transAxes,
