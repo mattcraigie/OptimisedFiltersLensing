@@ -80,12 +80,10 @@ class Trainer:
         return total_loss, num_samples
 
     def train(self):
-        train_loss = self._run_epoch(self.train_loader, self.train_criterion, mode='train')
-        return train_loss
+        return self._run_epoch(self.train_loader, self.train_criterion, mode='train')
 
     def validate(self):
-        val_loss = self._run_epoch(self.val_loader, self.val_criterion, mode='eval')
-        return val_loss
+        return self._run_epoch(self.val_loader, self.val_criterion, mode='eval')
 
     def train_loop(self, epochs=10):
         for epoch in range(1, epochs + 1):
@@ -128,7 +126,6 @@ class Trainer:
         if load_best:
             self.regressor.load_state_dict(self.best_regressor_params)
         # for test, we must also specify a test_loader
-        # we do not return the average
         sum_test_loss, num_test_samples = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
 
         if self.ddp:
