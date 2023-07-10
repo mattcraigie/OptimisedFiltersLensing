@@ -152,7 +152,7 @@ def data_scaling(rank, args):
                 if not os.path.exists(subset_folder):
                     os.makedirs(subset_folder)
                 trainer.save_all(subset_folder)
-                model_results.append(test_loss.cpu().item())
+                model_results.append(test_loss)
 
                 subset_end_time = time.time()
                 logging.info("Subset {} took {:.2f} seconds.".format(subset, subset_end_time - subset_start_time))
