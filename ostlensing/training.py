@@ -107,8 +107,8 @@ class Trainer:
                 dist.reduce(num_val_samples, dst=0, op=dist.ReduceOp.SUM)
 
                 if self.device == 0:
-                    train_loss = train_loss.item() / num_train_samples
-                    val_loss = val_loss.item() / num_val_samples
+                    train_loss = train_loss.item() / num_train_samples.item()
+                    val_loss = val_loss.item() / num_val_samples.item()
             else:
                 train_loss = sum_train_loss / num_train_samples
                 val_loss = sum_val_loss / num_val_samples
@@ -139,7 +139,7 @@ class Trainer:
             dist.reduce(num_test_samples, dst=0, op=dist.ReduceOp.SUM)
 
             if self.device != 0:
-                test_loss = test_loss.item() / num_test_samples
+                test_loss = test_loss.item() / num_test_samples.item()
         else:
             test_loss = sum_test_loss / num_test_samples
 
