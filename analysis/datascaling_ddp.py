@@ -124,7 +124,7 @@ def data_scaling(rank, args):
                 logging.info(f"Running subset {subset}.")
 
             logging.debug(f"Making train and val loaders on rank {rank}")
-            train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
+            train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size, ddp=True)
 
             logging.debug(f"Setting up the regressor on rank {rank}")
             regressor = ModelRegressor(**regressor_kwargs)

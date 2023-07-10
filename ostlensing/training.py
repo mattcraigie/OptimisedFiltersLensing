@@ -91,8 +91,8 @@ class Trainer:
     def train_loop(self, epochs=10):
         for epoch in range(0, epochs):
 
-            self.train_loader.set_epoch(epoch)
-            self.val_loader.set_epoch(epoch)
+            self.train_loader.sampler.set_epoch(epoch)
+            self.val_loader.sampler.set_epoch(epoch)
 
             sum_train_loss = self.train()
             sum_val_loss = self.validate()
