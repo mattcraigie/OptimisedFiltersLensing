@@ -170,8 +170,8 @@ class DataHandler:
         if ddp:
             train_sampler = DistributedSampler(train_dataset)
             val_sampler = DistributedSampler(val_dataset)
-            train_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=train_sampler)
-            val_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=val_sampler)
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
         else:
             train_loader = DataLoader(train_dataset, batch_size=batch_size)
             val_loader = DataLoader(val_dataset, batch_size=batch_size)

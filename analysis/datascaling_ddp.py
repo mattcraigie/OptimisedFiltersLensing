@@ -97,7 +97,7 @@ def data_scaling(rank, args):
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
 
     # make test loader outside the loop for consistent test data
-    test_loader = data_handler.get_test_loader()
+    test_loader = data_handler.get_test_loader(ddp=True)
 
     # setup train and test losses
     train_criterion = mse_and_admissibility_ddp if model_type == 'ost' and data_type == 'patches' else mse
