@@ -32,6 +32,7 @@ def dataloader_apply(dataloader, func, device):
     targets = []
     for x, t in dataloader:
         x = x.to(device)
+        t = t.to(device)
         results.append(func(x))
         targets.append(t)
     return torch.cat(results, dim=0), torch.cat(targets, dim=0)
