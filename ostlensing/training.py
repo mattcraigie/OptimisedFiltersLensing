@@ -77,9 +77,7 @@ class Trainer:
 
                 total_loss += loss.item()
 
-        avg_loss = total_loss / num_samples
-
-        return avg_loss
+        return total_loss, num_samples
 
     def train(self):
         train_loss = self._run_epoch(self.train_loader, self.train_criterion, mode='train')
@@ -92,19 +90,28 @@ class Trainer:
     def train_loop(self, epochs=10):
         for epoch in range(1, epochs + 1):
 
-            train_loss = self.train()
-            val_loss = self.validate()
+            sum_train_loss, num_train_samples = self.train()
+            sum_val_loss, num_val_samples = self.validate()
 
             if self.ddp:
-                train_loss = torch.tensor(train_loss).to(self.device)
-                val_loss = torch.tensor(val_loss).to(self.device)
-
+                train_loss = torch.tensor(sum_train_loss).to(self.device)
                 dist.reduce(train_loss, dst=0, op=dist.ReduceOp.SUM)  # this operation is inplace and returns to rank 0
+
+                val_loss = torch.tensor(sum_val_loss).to(self.device)
                 dist.reduce(val_loss, dst=0, op=dist.ReduceOp.SUM)
 
+                num_train_samples = torch.tensor(num_train_samples).to(self.device)
+                dist.reduce(num_train_samples, dst=0, op=dist.ReduceOp.SUM)
+
+                num_val_samples = torch.tensor(num_val_samples).to(self.device)
+                dist.reduce(num_val_samples, dst=0, op=dist.ReduceOp.SUM)
+
                 if self.device == 0:
-                    train_loss = train_loss.item() / dist.get_world_size()
-                    val_loss = val_loss.item() / dist.get_world_size()
+                    train_loss = train_loss.item() / num_train_samples
+                    val_loss = val_loss.item() / num_val_samples
+            else:
+                train_loss = sum_train_loss / num_train_samples
+                val_loss = sum_val_loss / num_val_samples
 
             self.train_losses.append(train_loss)
             self.val_losses.append(val_loss)
@@ -121,13 +128,20 @@ class Trainer:
         if load_best:
             self.regressor.load_state_dict(self.best_regressor_params)
         # for test, we must also specify a test_loader
-        test_loss = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
+        # we do not return the average
+        sum_test_loss, num_test_samples = self._run_epoch(self.test_loader, self.val_criterion, mode='eval')
 
         if self.ddp:
-            test_loss = torch.tensor(test_loss).to(self.device)
+            test_loss = torch.tensor(sum_test_loss).to(self.device)
             dist.reduce(test_loss, dst=0, op=dist.ReduceOp.SUM)
+
+            num_test_samples = torch.tensor(num_test_samples).to(self.device)
+            dist.reduce(num_test_samples, dst=0, op=dist.ReduceOp.SUM)
+
             if self.device != 0:
-                test_loss = test_loss.item() / dist.get_world_size()
+                test_loss = test_loss.item() / num_test_samples
+        else:
+            test_loss = sum_test_loss / num_test_samples
 
         return test_loss
 

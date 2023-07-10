@@ -123,36 +123,31 @@ def data_scaling(rank, args):
                 subset_start_time = time.time()
                 logging.info(f"Running subset {subset}.")
 
-            logging.debug(f"getting train and val loaders on rank {rank}")
-            # make train and val loaders with the subset of data
+            logging.debug(f"Making train and val loaders on rank {rank}")
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size)
 
-            logging.debug(f"setting up the regressor on rank {rank}")
-            # set up the model
+            logging.debug(f"Setting up the regressor on rank {rank}")
             regressor = ModelRegressor(**regressor_kwargs)
 
-            logging.debug(f"sending the regressor to gpu and wrapping in DDP on rank {rank}")
-            # send to gpu and wrap in DDP
+            logging.debug(f"Sending the regressor to rank {rank}")
             regressor.to(rank)
             regressor = DDP(regressor, device_ids=[rank])
 
-            logging.debug(f"setting up the optimizer on rank {rank}")
-            # set up the optimizer
+            logging.debug(f"Setting up the optimizer on rank {rank}")
             optimizer = optim.Adam(regressor.parameters(), lr=learning_rate)
 
-            logging.debug(f"setting up the trainer on rank {rank}")
-            # train the model using Trainer
+            logging.debug(f"Setting up the trainer on rank {rank}")
             trainer = Trainer(regressor, optimizer, train_criterion, test_criterion, train_loader, val_loader, test_loader,
                               rank, ddp=True)
+
+            logging.debug(f"Running train and validation trainer on rank {rank}")
             trainer.train_loop(num_epochs)
 
             logging.debug(f"testing the best validated model on rank {rank}")
-            # test the best validated model with unseen data
             test_loss = trainer.test(load_best=True)  # reduced across ranks and stored in rank 0's test_loss
 
-            logging.debug(f"saving the results on rank {rank}")
-            # only save results for rank 0
             if rank == 0:
+                logging.debug(f"saving the results on rank {rank}")
                 subset_folder = os.path.join(out_folder, f'subset_{subset}')
                 if not os.path.exists(subset_folder):
                     os.makedirs(subset_folder)
