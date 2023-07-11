@@ -175,8 +175,8 @@ class DataHandler:
         if ddp:
             train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True)
             val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True)
-            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
-            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler, num_workers=0, drop_last=True, shuffle=True)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=0, drop_last=True, shuffle=True)
         else:
             train_loader = DataLoader(train_dataset, batch_size=batch_size)
             val_loader = DataLoader(val_dataset, batch_size=batch_size)

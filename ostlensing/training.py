@@ -153,6 +153,7 @@ class Trainer:
 
             if self.ddp:
                 def gatherer(x):
+                    torch.cuda.set_device(self.device)
                     gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
                     dist.all_gather(gathered_x, x)
                     gathered_x = torch.cat(gathered_x, dim=0)
