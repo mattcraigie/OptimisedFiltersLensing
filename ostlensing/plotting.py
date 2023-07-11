@@ -143,7 +143,7 @@ class ModelPlotter:
         else:
             plt.show()
 
-    def plot_predictions(self, flat_plot=False, save_path=None, show_val=True, param_names=None, param_transforms=None):
+    def plot_predictions(self, flat_plot=False, save_path=None, param_names=None, param_transforms=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
@@ -180,52 +180,41 @@ class ModelPlotter:
 
             min_val, max_val = min(y_test), max(y_test)
 
-
             if not flat_plot:
                 axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
+                axes[i, 0].scatter(x_val, y_val, c='green', marker='x', alpha=0.5, label='validation')
+                axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
+
+                axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
+
+                for p in [0, 1]:
+                    axes[i, p].set_xlim(min_val, max_val)
+                    axes[i, p].set_ylim(min_val, max_val)
+                    axes[i, p].set_ylabel('Prediction {}'.format(param_names[i]))
+
             else:
                 axes[i, 0].scatter(x_train, y_train - x_train, c='cornflowerblue', alpha=0.5, label='train')
-
-            if show_val:
-
-
-                if not flat_plot:
-                    axes[i, 0].scatter(x_val, y_val, c='green', marker='x', alpha=0.5, label='validation')
-                else:
-                    axes[i, 0].scatter(x_val, y_val - x_val, c='green', marker='x', alpha=0.5, label='validation')
-
-            axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
-
-            if not flat_plot:
-                axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
-                axes[i, 0].set_xlim(min_val, max_val)
-                axes[i, 0].set_ylim(min_val, max_val)
-                axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
-                axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
-                axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
-                axes[i, 1].set_xlim(min_val, max_val)
-                axes[i, 1].set_ylim(min_val, max_val)
-                axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
-            else:
-                ylims = np.abs(np.max(x_test) - np.min(x_test)) * 0.5
-                axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
-                axes[i, 0].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
+                axes[i, 0].scatter(x_val, y_val - x_val, c='green', marker='x', alpha=0.5, label='validation')
                 axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)
-                axes[i, 1].plot([0, 1], [0.5, 0.5], transform=axes[i, 1].transAxes, c='black')
-                axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
 
-                axes[i, 0].set_xlim(min_val, max_val)
-                axes[i, 0].set_ylim(-ylims, ylims)
-                axes[i, 1].set_xlim(min_val, max_val)
-                axes[i, 1].set_ylim(-ylims, ylims)
+                axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 1].plot([0, 1], [0.5, 0.5], transform=axes[i, 1].transAxes, c='black')
+
+                ylims = np.abs(np.max(x_test) - np.min(x_test)) * 0.5
+                for p in [0, 1]:
+
+                    axes[i, p].set_xlim(min_val, max_val)
+                    axes[i, p].set_ylim(-ylims, ylims)
+                    axes[i, p].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
+
 
             axes[i, 0].legend()
-
+            axes[i, 0].set_xlabel('Target {}'.format(param_names[i]))
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
-            # add text showing the rmse in the top left corner of the plot
-            test_loss = np.sqrt(np.mean((y_test - x_test)**2))
 
-            # use scientific notation
+            # text showing test RMSE on top of each test plot
+            test_loss = np.sqrt(np.mean((y_test - x_test)**2))
             axes[i, 1].text(0.05, 0.95, 'RMSE: {:.3e}'.format(test_loss), transform=axes[i, 1].transAxes,
                             verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
