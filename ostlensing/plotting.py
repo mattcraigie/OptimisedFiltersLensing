@@ -159,10 +159,8 @@ class ModelPlotter:
                 return x
             return (x * param_transforms[i][1]) + param_transforms[i][0]
 
-        if not flat_plot:
-            figsize = (8, num_targets*8)
-        else:
-            figsize = (8, num_targets*4)
+
+        figsize = (8, num_targets*4)
 
         fig, axes = plt.subplots(num_targets, 2, figsize=figsize)
 
