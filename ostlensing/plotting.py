@@ -143,7 +143,7 @@ class ModelPlotter:
         else:
             plt.show()
 
-    def plot_predictions(self, flat_plot=False, save_path=None, show_val=True, num_samples=None, param_names=None, param_transforms=None):
+    def plot_predictions(self, flat_plot=False, save_path=None, show_val=True, param_names=None, param_transforms=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
@@ -171,8 +171,8 @@ class ModelPlotter:
 
         for i in range(num_targets):
             # train (and val)
-            x_train = transform(self.targets['train'][:num_samples, i], i)
-            y_train = transform(self.predictions['train'][:num_samples, i], i)
+            x_train = transform(self.targets['train'][:, i], i)
+            y_train = transform(self.predictions['train'][:, i], i)
 
             if not flat_plot:
                 axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
@@ -180,8 +180,8 @@ class ModelPlotter:
                 axes[i, 0].scatter(x_train, y_train - x_train, c='cornflowerblue', alpha=0.5, label='train')
 
             if show_val:
-                x_val = transform(self.targets['val'][:num_samples, i], i)
-                y_val = transform(self.predictions['val'][:num_samples, i], i)
+                x_val = transform(self.targets['val'][:, i], i)
+                y_val = transform(self.predictions['val'][:, i], i)
 
                 if not flat_plot:
                     axes[i, 0].scatter(x_val, y_val, c='green', marker='x', alpha=0.5, label='validation')
@@ -203,8 +203,8 @@ class ModelPlotter:
             axes[i, 0].legend()
 
             # test
-            x_test = transform(self.targets['test'][:num_samples, i], i)
-            y_test = transform(self.predictions['test'][:num_samples, i], i)
+            x_test = transform(self.targets['test'][:, i], i)
+            y_test = transform(self.predictions['test'][:, i], i)
 
             if not flat_plot:
                 axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
