@@ -172,6 +172,8 @@ class DataHandler:
         val_dataset = GeneralDataset(leftover_data[:val_split],
                                      leftover_targets[:val_split])
 
+        print(val_dataset[:, 0, 0, 0])
+
         if ddp:
             train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=self.seed)
             val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=self.seed)
