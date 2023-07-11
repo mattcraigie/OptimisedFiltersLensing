@@ -172,13 +172,13 @@ class DataHandler:
         val_dataset = GeneralDataset(leftover_data[:val_split],
                                      leftover_targets[:val_split])
 
-        print(val_dataset[:, 0, 0, 0])
+        print(val_dataset.data[:, 0, 0, 0])
 
         if ddp:
-            train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=self.seed)
-            val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=self.seed)
-            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler, num_workers=0)
-            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=0)
+            train_sampler = DistributedSampler(train_dataset, drop_last=True, shuffle=True, seed=self.seed)
+            val_sampler = DistributedSampler(val_dataset, drop_last=True, shuffle=True, seed=self.seed)
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
+            val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
         else:
             train_loader = DataLoader(train_dataset, batch_size=batch_size)
             val_loader = DataLoader(val_dataset, batch_size=batch_size)
