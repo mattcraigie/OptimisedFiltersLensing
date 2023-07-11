@@ -200,29 +200,23 @@ class ModelPlotter:
                 axes[i, 0].set_xlim(min_val, max_val)
                 axes[i, 0].set_ylim(min_val, max_val)
                 axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
-            else:
-                axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
-                axes[i, 0].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
-                ylims = np.abs(np.max(x_train) - np.min(x_train)) * 0.5
-                axes[i, 0].set_ylim(-ylims, ylims)
-
-            axes[i, 0].legend()
-
-            # test
-
-
-            if not flat_plot:
                 axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
                 axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_xlim(min_val, max_val)
                 axes[i, 1].set_ylim(min_val, max_val)
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
+                axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
+                axes[i, 0].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
+                ylims = np.abs(np.max(x_train) - np.min(x_train)) * 0.5
+                axes[i, 0].set_ylim(-ylims, ylims)
                 axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)
                 axes[i, 1].plot([0, 1], [0.5, 0.5], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
                 ylims = np.abs(np.max(x_train) - np.min(x_train)) * 0.5
                 axes[i, 1].set_ylim(-ylims, ylims)
+
+            axes[i, 0].legend()
 
             axes[i, 1].set_xlabel('Target {}'.format(param_names[i]))
             # add text showing the rmse in the top left corner of the plot
