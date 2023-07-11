@@ -143,7 +143,7 @@ class DataHandler:
         else:
             return DataLoader(test_dataset, batch_size=batch_size)
 
-    def get_train_val_loaders(self, subset=None, batch_size=128, ddp=False, seed=None):
+    def get_train_val_loaders(self, subset=None, batch_size=128, ddp=False):
         assert self.data is not None and self.targets is not None, \
             'Data and targets must be loaded before getting dataloaders'
 
@@ -163,7 +163,7 @@ class DataHandler:
         # another layer of randomness to get the bootstrapping working between repeats
         leftover_data = self.data[test_split:num_remaining+test_split]
         leftover_targets = self.targets[test_split:num_remaining+test_split]
-        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets, seed=seed)
+        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets, seed=self.seed)
 
         val_split = int(self.val_ratio * num_remaining)
 
@@ -173,8 +173,8 @@ class DataHandler:
                                      leftover_targets[:val_split])
 
         if ddp:
-            train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=seed)
-            val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=seed)
+            train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=self.seed)
+            val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True, seed=self.seed)
             train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler, num_workers=0)
             val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=0)
         else:
