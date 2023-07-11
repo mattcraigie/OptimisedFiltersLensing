@@ -144,8 +144,9 @@ class Trainer:
 
     def make_predictions(self):
         self.regressor.eval()
+        print(self.device, self.val_loader.dataset.data.shape)
+        print(self.device, self.val_loader.dataset.data[:, 0, 0])
         with torch.no_grad():
-            print(self.device, self.val_loader.dataset.data)
             self.train_pred, self.train_targets = dataloader_apply(self.train_loader, self.regressor, self.device)
             self.val_pred, self.val_targets = dataloader_apply(self.val_loader, self.regressor, self.device)
             self.test_pred, self.test_targets = dataloader_apply(self.test_loader, self.regressor, self.device)
