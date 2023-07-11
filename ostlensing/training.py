@@ -164,6 +164,10 @@ class Trainer:
                 self.val_targets = gatherer(self.val_targets)
                 self.test_targets = gatherer(self.test_targets)
 
+                if self.device == 0:
+                    print('pred', self.val_pred)
+                    print('targ', self.val_targets)
+
             self.train_pred = self.train_pred.cpu()
             self.val_pred = self.val_pred.cpu()
             self.test_pred = self.test_pred.cpu()
