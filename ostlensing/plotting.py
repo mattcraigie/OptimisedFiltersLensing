@@ -178,7 +178,7 @@ class ModelPlotter:
             x_test = transform(self.targets['test'][:, i], i)
             y_test = transform(self.predictions['test'][:, i], i)
 
-            min_val, max_val = min(y_test), max(y_test)
+            min_val, max_val = min(x_test), max(x_test)
 
             if not flat_plot:
                 axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
