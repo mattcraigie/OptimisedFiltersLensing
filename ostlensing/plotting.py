@@ -181,6 +181,7 @@ class ModelPlotter:
             min_val = min(min(x_test), min(y_test))
             max_val = max(max(x_test), max(y_test))
 
+
             if not flat_plot:
                 axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
             else:
@@ -207,16 +208,16 @@ class ModelPlotter:
                 axes[i, 1].set_ylim(min_val, max_val)
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
+                ylims = np.abs(np.max(x_test) - np.min(x_test)) * 0.5
                 axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
                 axes[i, 0].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
-                ylims = np.abs(np.max(x_train) - np.min(x_train)) * 0.5
-                axes[i, 0].set_xlim(min_val, max_val)
-                axes[i, 0].set_ylim(-ylims, ylims)
                 axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)
                 axes[i, 1].plot([0, 1], [0.5, 0.5], transform=axes[i, 1].transAxes, c='black')
                 axes[i, 1].set_ylabel('Prediction {} - Target {}'.format(param_names[i], param_names[i]))
-                ylims = np.abs(np.max(x_train) - np.min(x_train)) * 0.5
+
                 axes[i, 0].set_xlim(min_val, max_val)
+                axes[i, 0].set_ylim(-ylims, ylims)
+                axes[i, 1].set_xlim(min_val, max_val)
                 axes[i, 1].set_ylim(-ylims, ylims)
 
             axes[i, 0].legend()
