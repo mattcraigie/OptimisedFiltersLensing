@@ -192,7 +192,7 @@ class ModelPlotter:
 
             if not flat_plot:
                 axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
-                axes[i, 0].set_aspect('equal')
+                axes[i, 0].set_xlim(axes[i, 0].get_xlim())
                 axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
                 axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
@@ -209,7 +209,7 @@ class ModelPlotter:
             if not flat_plot:
                 axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
                 axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
-                axes[i, 1].set_aspect('equal')
+                axes[i, 1].set_xlim(axes[i, 1].get_xlim())
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
                 axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)

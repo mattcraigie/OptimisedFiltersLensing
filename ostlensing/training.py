@@ -135,10 +135,6 @@ class Trainer:
                 self.best_loss = val_loss
                 self.best_regressor_params = self.regressor.state_dict()
 
-    def get_best_model(self):
-        self.regressor.load_state_dict(self.best_regressor_params)
-        return self.regressor
-
     def load_best_model(self):
         self.regressor.load_state_dict(self.best_regressor_params)
 
