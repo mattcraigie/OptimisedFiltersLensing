@@ -158,13 +158,8 @@ class Trainer:
                     gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
                     dist.all_gather(gathered_x, x)
                     gathered_x = torch.cat(gathered_x, dim=0)
-                    print(gathered_x.shape)
                     gathered_x = torch.unique(gathered_x, dim=0)
-                    print(gathered_x.shape)
                     return gathered_x
-
-                print(self.device, self.val_pred.shape)
-                print(self.device, self.val_targets.shape)
 
                 self.train_pred = gatherer(self.train_pred)
                 self.val_pred = gatherer(self.val_pred)
@@ -172,9 +167,6 @@ class Trainer:
                 self.train_targets = gatherer(self.train_targets)
                 self.val_targets = gatherer(self.val_targets)
                 self.test_targets = gatherer(self.test_targets)
-
-                print(self.device, self.val_pred.shape)
-                print(self.device, self.val_targets.shape)
 
             self.train_pred = self.train_pred.cpu()
             self.val_pred = self.val_pred.cpu()
@@ -194,12 +186,9 @@ class Trainer:
         torch.save({'train': self.train_losses, 'val': self.val_losses}, save_path)
 
     def save_predictions(self, save_path):
-        print('saving pred', self.device, self.val_pred.shape)
-
         torch.save({'train': self.train_pred, 'val': self.val_pred, 'test': self.test_pred}, save_path)
 
     def save_targets(self, save_path):
-        print('saving targ',self.device, self.val_targets.shape)
         torch.save({'train': self.train_targets, 'val': self.val_targets, 'test': self.test_targets}, save_path)
 
     def load_model(self, load_path):

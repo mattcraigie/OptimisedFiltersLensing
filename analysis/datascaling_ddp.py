@@ -151,11 +151,14 @@ def data_scaling(rank, args):
 
             if rank == 0:
                 logging.debug(f"saving the results on rank {rank}")
-                subset_folder = os.path.join(out_folder, f'subset_{subset}')
-                if not os.path.exists(subset_folder):
-                    os.makedirs(subset_folder)
-                trainer.save_all(subset_folder)
                 model_results.append(test_loss)
+
+                # save the model and predictions if it's the first repeat
+                if i == 0:
+                    subset_folder = os.path.join(out_folder, f'subset_{subset}')
+                    if not os.path.exists(subset_folder):
+                        os.makedirs(subset_folder)
+                    trainer.save_all(subset_folder)
 
                 subset_end_time = time.time()
                 logging.info("Subset {} took {:.2f} seconds.".format(subset, subset_end_time - subset_start_time))
