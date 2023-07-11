@@ -172,14 +172,19 @@ class ModelPlotter:
             x_train = transform(self.targets['train'][:, i], i)
             y_train = transform(self.predictions['train'][:, i], i)
 
+            x_val = transform(self.targets['val'][:, i], i)
+            y_val = transform(self.predictions['val'][:, i], i)
+
+            x_test = transform(self.targets['test'][:, i], i)
+            y_test = transform(self.predictions['test'][:, i], i)
+
             if not flat_plot:
                 axes[i, 0].scatter(x_train, y_train, c='cornflowerblue', alpha=0.5, label='train')
             else:
                 axes[i, 0].scatter(x_train, y_train - x_train, c='cornflowerblue', alpha=0.5, label='train')
 
             if show_val:
-                x_val = transform(self.targets['val'][:, i], i)
-                y_val = transform(self.predictions['val'][:, i], i)
+
 
                 if not flat_plot:
                     axes[i, 0].scatter(x_val, y_val, c='green', marker='x', alpha=0.5, label='validation')
@@ -190,7 +195,10 @@ class ModelPlotter:
 
             if not flat_plot:
                 axes[i, 0].plot([0, 1], [0, 1], transform=axes[i, 0].transAxes, c='black')
-                axes[i, 0].set_xlim(axes[i, 0].get_xlim())
+                min_val = min(min(x_test), min(y_test))
+                max_val = max(max(x_test), max(y_test))
+                axes[i, 0].set_xlim(min_val, max_val)
+                axes[i, 0].set_ylim(min_val, max_val)
                 axes[i, 0].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
                 axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
@@ -201,13 +209,13 @@ class ModelPlotter:
             axes[i, 0].legend()
 
             # test
-            x_test = transform(self.targets['test'][:, i], i)
-            y_test = transform(self.predictions['test'][:, i], i)
+
 
             if not flat_plot:
                 axes[i, 1].scatter(x_test, y_test, c='deeppink', alpha=0.5)
                 axes[i, 1].plot([0, 1], [0, 1], transform=axes[i, 1].transAxes, c='black')
-                axes[i, 1].set_xlim(axes[i, 1].get_xlim())
+                axes[i, 1].set_xlim(min_val, max_val)
+                axes[i, 1].set_ylim(min_val, max_val)
                 axes[i, 1].set_ylabel('Prediction {}'.format(param_names[i]))
             else:
                 axes[i, 1].scatter(x_test, y_test - x_test, c='deeppink', alpha=0.5)
