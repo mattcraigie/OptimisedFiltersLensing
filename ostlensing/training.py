@@ -139,7 +139,7 @@ class Trainer:
         self.regressor.load_state_dict(self.best_regressor_params)
 
     def test(self):
-        assert self.test_pred is not None, "You need to run make_predictions() first"
+        assert self.test_pred is not None, "Must run make_predictions() first"
         return self.val_criterion(self.test_pred, self.test_targets, self.regressor).item()
 
     def make_predictions(self):
