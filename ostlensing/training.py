@@ -158,10 +158,7 @@ class Trainer:
                     gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
                     dist.all_gather(gathered_x, x)
                     gathered_x = torch.cat(gathered_x, dim=0)
-                    print(gathered_x.shape)
                     gathered_x = torch.unique(gathered_x, dim=0)
-                    print(gathered_x.shape)
-                    print("")
                     return gathered_x
 
                 self.train_pred = gatherer(self.train_pred)

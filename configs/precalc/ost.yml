@@ -1,6 +1,6 @@
 load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches_log_std'                 # the folder to load from
 save_path: '//pscratch/sd/m/mcraigie/cosmogrid/precalc'                         # must specify the .npy file for output
-file_name: 'ost_rot'
+file_name: 'ost_s125_rot'
 
 method: 'ost'
 kwargs:
