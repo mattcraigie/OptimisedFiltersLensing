@@ -144,7 +144,7 @@ class Trainer:
 
     def test(self):
         assert self.test_pred is not None, "You need to run make_predictions() first"
-        return self.val_criterion(self.test_pred, self.test_targets, self.regressor)
+        return self.val_criterion(self.test_pred, self.test_targets, self.regressor).item()
 
     def make_predictions(self):
         self.regressor.eval()
