@@ -48,13 +48,16 @@ def data_shuffler(*args, seed=None):
 class DataHandler:
     """There are three types of data: patches, features and targets. They are all handled differently."""
 
-    def __init__(self, load_subset=None, patch_subset=None, val_ratio=0.2, test_ratio=0.2, seed=None, pre_average=False):
+    def __init__(self, load_subset=None, patch_subset=None, val_ratio=0.2, test_ratio=0.2, seed=None, pre_average=False,
+                 rank=None, world_size=None):
         self.load_subset = load_subset
         self.patch_subset = patch_subset
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.seed = seed
         self.pre_average = pre_average  # pre average over the patch dimension
+        self.rank = rank
+        self.world_size = world_size
 
         self.data = None
         self.targets = None
@@ -170,8 +173,8 @@ class DataHandler:
                                      leftover_targets[:val_split])
 
         if ddp:
-            train_sampler = DistributedSampler(train_dataset)
-            val_sampler = DistributedSampler(val_dataset)
+            train_sampler = DistributedSampler(train_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True)
+            val_sampler = DistributedSampler(val_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=True)
             train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
             val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
         else:
