@@ -178,8 +178,7 @@ class ModelPlotter:
             x_test = transform(self.targets['test'][:, i], i)
             y_test = transform(self.predictions['test'][:, i], i)
 
-            min_val = min(min(x_test), min(y_test))
-            max_val = max(max(x_test), max(y_test))
+            min_val, max_val = min(y_test), max(y_test)
 
 
             if not flat_plot:
