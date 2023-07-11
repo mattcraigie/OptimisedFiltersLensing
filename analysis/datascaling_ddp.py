@@ -14,6 +14,7 @@ from ostlensing.dataloading import DataHandler
 from ostlensing.models import ModelRegressor
 
 from ddp_nersc import ddp_main, setup, cleanup
+import torch.distributed as dist
 
 
 # Create a custom filter to suppress specific log messages
@@ -90,7 +91,7 @@ def data_scaling(rank, args):
         logging.info('Loading and initialising.')
 
     # load train+val and test data with DataHandler
-    data_handler = DataHandler(**datahandler_kwargs)
+    data_handler = DataHandler(**datahandler_kwargs, rank=rank, world_size=dist.get_world_size())
 
     data_handler.add_data(os.path.join(data_path, data_type, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
