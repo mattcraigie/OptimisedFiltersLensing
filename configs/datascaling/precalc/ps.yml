@@ -16,7 +16,7 @@ regressor:
     model_type: 'ps'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: None
     regressor_inputs: 12                                    # Number of features
-    regressor_hiddens: [32, 32, 32]
+    regressor_hiddens: null
 
 training:
   num_epochs: 1000                                          # Number of training epochs
