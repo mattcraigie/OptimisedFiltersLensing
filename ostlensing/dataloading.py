@@ -130,10 +130,7 @@ class DataHandler:
         self.targets = torch.from_numpy(targets).float()
         if self.data is not None:
             assert self.data.shape[0] == self.targets.shape[0], 'Data and targets must have same number of samples'
-            print('Shuffling')
-            print(self.targets[:4])
             self.data, self.targets = data_shuffler(self.data, self.targets, seed=self.seed)
-            print(self.targets[:4])
 
 
     def get_test_loader(self, batch_size=128, ddp=False):
@@ -176,7 +173,7 @@ class DataHandler:
                                        leftover_targets[val_split:])
         val_dataset = GeneralDataset(leftover_data[:val_split],
                                      leftover_targets[:val_split])
-        print('val targets', val_dataset.targets[:4])
+
 
         if ddp:
             train_sampler = DistributedSampler(train_dataset, drop_last=True, shuffle=True, seed=self.seed)
