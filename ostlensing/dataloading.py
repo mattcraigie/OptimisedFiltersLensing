@@ -140,7 +140,8 @@ class DataHandler:
         test_split = int(self.test_ratio * num_data)
         test_dataset = GeneralDataset(self.data[:test_split], self.targets[:test_split])
         if ddp:
-            test_sampler = DistributedSampler(test_dataset, num_replicas=self.world_size, rank=self.rank, drop_last=True, shuffle=False)
+            print(test_dataset.data.shape, test_dataset.targets.shape)
+            test_sampler = DistributedSampler(test_dataset, drop_last=True, shuffle=False)
             return DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=0)
         else:
             return DataLoader(test_dataset, batch_size=batch_size)
@@ -148,8 +149,6 @@ class DataHandler:
     def get_train_val_loaders(self, subset=None, batch_size=128, ddp=False):
         assert self.data is not None and self.targets is not None, \
             'Data and targets must be loaded before getting dataloaders'
-
-        # todo: THEY ARE COMING OUT IN ASCENDING ORDER! FIX!
 
         # make the samplers
         num_data = len(self.data)
