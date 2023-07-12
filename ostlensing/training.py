@@ -158,7 +158,7 @@ class Trainer:
                     gathered_x = torch.unique(gathered_x, dim=0, sorted=False)
                     return gathered_x
 
-                print(self.device, self.val_pred.shape, self.val_targets.shape)
+                print(self.device, self.test_pred.shape, self.test_targets.shape)
 
                 self.train_pred = gatherer(self.train_pred)
                 self.val_pred = gatherer(self.val_pred)
@@ -168,7 +168,6 @@ class Trainer:
                 self.test_targets = gatherer(self.test_targets)
 
                 if self.device == 0:
-                    print(self.val_pred.shape, self.val_targets.shape)
                     print(self.test_pred.shape, self.test_targets.shape)
 
             self.train_pred = self.train_pred.cpu()
