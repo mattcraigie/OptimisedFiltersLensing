@@ -143,7 +143,7 @@ class ModelPlotter:
         else:
             plt.show()
 
-    def plot_predictions(self, flat_plot=False, save_path=None, param_names=None, param_transforms=None):
+    def plot_predictions(self, flat_plot=False, save_path=None, param_names=None, param_transforms=None, manual_ylims=None):
         if self.predictions is None or self.targets is None:
             raise ValueError('Predictions or targets not set. Call load_folder first.')
 
@@ -201,7 +201,7 @@ class ModelPlotter:
                 axes[i, 0].plot([0, 1], [0.5, 0.5], transform=axes[i, 0].transAxes, c='black')
                 axes[i, 1].plot([0, 1], [0.5, 0.5], transform=axes[i, 1].transAxes, c='black')
 
-                ylims = np.abs(np.max(x_test) - np.min(x_test)) * 0.5
+                ylims = np.abs(np.max(x_test) - np.min(x_test)) * 0.3 if manual_ylims is None else manual_ylims[i]
                 for p in [0, 1]:
 
                     axes[i, p].set_xlim(min_val, max_val)
