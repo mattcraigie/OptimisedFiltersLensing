@@ -72,9 +72,10 @@ class DataHandler:
         all_dirs = np.sort(all_dirs)
 
         patches = []
-        for dir_ in all_dirs[:self.load_subset]:
+        for i, dir_ in enumerate(all_dirs[:self.load_subset]):
             loaded_patches = np.load(os.path.join(path, dir_))
             num_patches = loaded_patches.shape[0]
+            np.random.seed(self.seed + i)  # different for every cosmology, same for every separate analysis
             patches.append(loaded_patches[np.random.permutation(num_patches)][:self.patch_subset])
 
         return np.stack(patches)
