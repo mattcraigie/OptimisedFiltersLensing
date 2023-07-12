@@ -21,7 +21,7 @@ regressor:
 training:
   num_epochs: 1000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: 0.005                                      # Learning rate
+  learning_rate: 0.001                                      # Learning rate
 
 analysis:
   analysis_name: 'ps_16'
