@@ -155,7 +155,7 @@ class Trainer:
                     gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
                     dist.all_gather(gathered_x, x)
                     gathered_x = torch.cat(gathered_x, dim=0)
-                    gathered_x = torch.unique(gathered_x, dim=0, sorted=False)
+                    # gathered_x = torch.unique(gathered_x, dim=0, sorted=False)
                     return gathered_x
 
                 print(self.device, self.test_pred.shape, self.test_targets.shape)
