@@ -144,8 +144,6 @@ class Trainer:
 
     def make_predictions(self):
         self.regressor.eval()
-        print(self.device, self.val_loader.dataset.data.shape)
-        print(self.device, self.val_loader.dataset.data[:, 0, 0, 0])
         with torch.no_grad():
             self.train_pred, self.train_targets = dataloader_apply(self.train_loader, self.regressor, self.device)
             self.val_pred, self.val_targets = dataloader_apply(self.val_loader, self.regressor, self.device)
@@ -157,7 +155,7 @@ class Trainer:
                     gathered_x = [torch.zeros_like(x) for _ in range(dist.get_world_size())]
                     dist.all_gather(gathered_x, x)
                     gathered_x = torch.cat(gathered_x, dim=0)
-                    gathered_x = torch.unique(gathered_x, dim=0)
+                    gathered_x = torch.unique(gathered_x, dim=0, sorted=False)
                     return gathered_x
 
                 self.train_pred = gatherer(self.train_pred)
@@ -166,10 +164,6 @@ class Trainer:
                 self.train_targets = gatherer(self.train_targets)
                 self.val_targets = gatherer(self.val_targets)
                 self.test_targets = gatherer(self.test_targets)
-
-                if self.device == 0:
-                    print('pred', self.val_pred)
-                    print('targ', self.val_targets)
 
             self.train_pred = self.train_pred.cpu()
             self.val_pred = self.val_pred.cpu()
