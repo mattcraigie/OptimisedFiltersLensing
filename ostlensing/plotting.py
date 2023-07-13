@@ -48,10 +48,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
     ax.set_ylabel('Test RMSE', fontsize=20)
 
-    plt.legend(fontsize=18)
-    # increase legend text size
-    for legobj in ax.legend().legendHandles:
-        legobj.set_linewidth(5)
+    # create a legend with the labels fontsize 16
+    ax.legend(fontsize=16)
 
 
 
@@ -66,8 +64,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         plt.ylim(bottom=0)
 
     # set tick label sizes after logging
-    ax.tick_params(axis='both', which='major', labelsize=18)
-    ax.tick_params(axis='both', which='minor', labelsize=18)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.tick_params(axis='both', which='minor', labelsize=16)
 
 
     if save_path is not None:
