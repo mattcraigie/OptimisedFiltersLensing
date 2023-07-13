@@ -47,13 +47,14 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
     ax.set_ylabel('Test RMSE', fontsize=20)
-    plt.legend()
 
+    plt.legend(fontsize=18)
     # increase legend text size
     for legobj in ax.legend().legendHandles:
-        legobj.set_linewidth(10.0)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
+        legobj.set_linewidth(5)
+
+
+
 
     if logy and not logx:
         plt.semilogy()
@@ -63,6 +64,9 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         plt.loglog()
     if not logy:
         plt.ylim(bottom=0)
+
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
 
     if save_path is not None:
         plt.savefig(save_path)
