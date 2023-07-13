@@ -65,8 +65,10 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     if not logy:
         plt.ylim(bottom=0)
 
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
+    # set tick label sizes after logging
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    ax.tick_params(axis='both', which='minor', labelsize=18)
+
 
     if save_path is not None:
         plt.savefig(save_path)
