@@ -140,7 +140,6 @@ class DataHandler:
         test_split = int(self.test_ratio * num_data)
         test_dataset = GeneralDataset(self.data[:test_split], self.targets[:test_split])
         if ddp:
-            print(test_dataset.data.shape, test_dataset.targets.shape)
             test_sampler = DistributedSampler(test_dataset, drop_last=True, shuffle=False)
             return DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler, num_workers=0)
         else:

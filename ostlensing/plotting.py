@@ -45,7 +45,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                 ax.scatter([x[j] for _ in range(rmse.shape[1])], rmse.iloc[j], c=colours[i], alpha=0.4, marker='x')
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
-    ax.set_ylabel('Test Sample RMSE ($\\approx 1\\sigma$ constraint)', fontsize=16)
+    ax.set_ylabel('Test Sample RMSE', fontsize=16)
     plt.legend()
 
     if logy and not logx:
@@ -61,6 +61,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         plt.savefig(save_path)
     else:
         plt.show()
+
 
 
 class ModelPlotter:
