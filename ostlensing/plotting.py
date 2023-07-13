@@ -14,7 +14,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     if colours is None:
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
     for i in range(len(scaling_paths)):
         scaling_df = pd.read_csv(scaling_paths[i])
         mse_norm = scaling_df.iloc[:, 1:]
