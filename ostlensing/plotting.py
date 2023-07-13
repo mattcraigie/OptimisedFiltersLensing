@@ -34,9 +34,9 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
 
         x = scaling_df['data_subset']
-        ax.plot(x, rmse_mid, linewidth=6, label=labels[i], c=colours[i])
+        ax.plot(x, rmse_mid, linewidth=4, label=labels[i], c=colours[i])
         # scatter with a square marker
-        ax.scatter(x, rmse_mid, c=colours[i], s=30, marker='s')
+        ax.scatter(x, rmse_mid, c=colours[i], s=35, marker='s')
         ax.plot(x, rmse_low, alpha=0.3, linewidth=1.5, c=colours[i])
         ax.plot(x, rmse_high, alpha=0.3, linewidth=1.5, c=colours[i])
         ax.fill_between(x, rmse_low, rmse_high, alpha=0.15, color=colours[i])
