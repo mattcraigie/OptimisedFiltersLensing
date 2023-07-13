@@ -48,6 +48,12 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     ax.set_ylabel('Test RMSE', fontsize=20)
     plt.legend()
 
+    # increase legend text size
+    for legobj in ax.legend().legendHandles:
+        legobj.set_linewidth(10.0)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+
     if logy and not logx:
         plt.semilogy()
     if logx and not logy:
