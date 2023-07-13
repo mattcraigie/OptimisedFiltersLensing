@@ -14,7 +14,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     if colours is None:
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(12, 8))
     for i in range(len(scaling_paths)):
         scaling_df = pd.read_csv(scaling_paths[i])
         mse_norm = scaling_df.iloc[:, 1:]
@@ -34,18 +34,18 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
 
         x = scaling_df['data_subset']
-        ax.plot(x, rmse_mid, linewidth=4, label=labels[i], c=colours[i])
+        ax.plot(x, rmse_mid, linewidth=6, label=labels[i], c=colours[i])
         ax.scatter(x, rmse_mid, c=colours[i])
-        ax.plot(x, rmse_low, alpha=0.4, linewidth=1, c=colours[i])
-        ax.plot(x, rmse_high, alpha=0.4, linewidth=1, c=colours[i])
-        ax.fill_between(x, rmse_low, rmse_high, alpha=0.2, color=colours[i])
+        ax.plot(x, rmse_low, alpha=0.3, linewidth=1.5, c=colours[i])
+        ax.plot(x, rmse_high, alpha=0.3, linewidth=1.5, c=colours[i])
+        ax.fill_between(x, rmse_low, rmse_high, alpha=0.15, color=colours[i])
 
         if show_repeats:
             for j in range(rmse.shape[0]):
                 ax.scatter([x[j] for _ in range(rmse.shape[1])], rmse.iloc[j], c=colours[i], alpha=0.4, marker='x')
 
-    ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
-    ax.set_ylabel('Test Sample RMSE', fontsize=16)
+    ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
+    ax.set_ylabel('Test RMSE', fontsize=20)
     plt.legend()
 
     if logy and not logx:
