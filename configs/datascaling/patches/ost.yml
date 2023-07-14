@@ -17,7 +17,7 @@ regressor:
     model_kwargs:
       reduction: 'rot_avg'
     regressor_inputs: 11                                    # Number of features
-    regressor_hiddens: null
+    regressor_hiddens: [32, 32]
 
 training:
   num_epochs: 10000                                          # Number of training epochs
@@ -25,6 +25,6 @@ training:
   learning_rate: 0.003                                      # Learning rate
 
 analysis:
-  analysis_name: 'ost_rot_16'
+  analysis_name: 'ost_rot_16_deep'
   data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 1

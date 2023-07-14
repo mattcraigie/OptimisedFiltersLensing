@@ -16,14 +16,14 @@ regressor:
     model_type: 'resnet'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: None
     regressor_inputs: 512                                    # Number of features
-    regressor_hiddens: null
+    regressor_hiddens: [32, 32]
 
 training:
-  num_epochs: 1000                                          # Number of training epochs
+  num_epochs: 2000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.001                                      # Learning rate
 
 analysis:
-  analysis_name: 'resnet18_16'
+  analysis_name: 'resnet18_16_deep'
   data_subsets: [30, 60, 125, 250, 500, 1000, 2000]  # Subsets of the data for the scaling analysis
   repeats: 10
