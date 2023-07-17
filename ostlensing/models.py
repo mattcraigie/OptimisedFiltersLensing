@@ -77,8 +77,8 @@ class OSTWrapper(nn.Module):
                  num_angles=4,
                  reduction=None,
                  use_subnet=True,
-                 subnet_hiddens=(128, 128, 128),
-                 subnet_activations=nn.SiLU,
+                 subnet_hiddens=(16, 16),
+                 subnet_activations=nn.LeakyReLU,
                  scale_invariant=False
                  ):
         super(OSTWrapper, self).__init__()
