@@ -1,11 +1,11 @@
 load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches_log_std'                 # the folder to load from
 save_path: '//pscratch/sd/m/mcraigie/cosmogrid/precalc'
-file_name:  'mst_rot'
+file_name:  'mst_ang'
 
 method: 'mst'
 kwargs:
   size: 128
   num_scales: 4
   num_angles: 4
-  reduction: 'rot_avg'
+  reduction: 'ang_avg'
   device: 'cuda:0'
