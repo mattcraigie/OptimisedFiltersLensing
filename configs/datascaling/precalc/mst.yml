@@ -15,13 +15,13 @@ regressor:
     regressor_type: 'precalc'
     model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: null
-    regressor_inputs: 23                                    # Number of features
+    regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [32, 32]
 
 training:
   num_epochs: 5000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: [0.00005, 0.0001, 0.0003, 0.0005, 0.001, 0.003, 0.005]                                      # Learning rate
+  learning_rate: [0.0001, 0.0002, 0.0003, 0.0003, 0.001, 0.003, 0.005]                                      # Learning rate
 
 analysis:
   analysis_name: 'mst_rot_16_deep'
