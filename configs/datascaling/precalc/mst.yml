@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'mst_ang_std.npy'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'mst_rot_std.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
@@ -24,6 +24,6 @@ training:
   learning_rate: [0.00005, 0.0001, 0.0003, 0.0005, 0.001, 0.003, 0.005]                                      # Learning rate
 
 analysis:
-  analysis_name: 'mst_ang_16_deep'
+  analysis_name: 'mst_rot_16_deep'
   data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
