@@ -62,13 +62,17 @@ def data_scaling(rank, args):
     train_config = config['training']
     num_epochs = train_config['num_epochs']
     batch_size = train_config['batch_size']
-    learning_rate = train_config['learning_rate']
+    learning_rates = train_config['learning_rate']
+
 
     # analysis params
     analysis_config = config['analysis']
     data_subsets = analysis_config['data_subsets']
     repeats = analysis_config['repeats']
     analysis_name = analysis_config['analysis_name']
+
+    if not isinstance(learning_rates, list):
+        learning_rates = [learning_rates] * len(data_subsets)
 
     # set up logging
     logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}.log')
@@ -119,7 +123,7 @@ def data_scaling(rank, args):
         model_results = []
 
         # iterate over the train/val data subsets
-        for subset in data_subsets:
+        for subset, learning_rate in zip(data_subsets, learning_rates):
             if rank == 0:
                 subset_start_time = time.time()
                 logging.info(f"Running subset {subset}.")
