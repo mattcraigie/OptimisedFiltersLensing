@@ -21,7 +21,7 @@ regressor:
 training:
   num_epochs: 5000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: [0.0001, 0.0001, 0.0005, 0.0005, 0.001, 0.001, 0.001]                                      # Learning rate
+  learning_rate: [0.00005, 0.0001, 0.0003, 0.0005, 0.001, 0.003, 0.005]                                      # Learning rate
 
 analysis:
   analysis_name: 'mst_ang_16_deep'
