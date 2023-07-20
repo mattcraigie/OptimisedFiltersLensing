@@ -18,12 +18,12 @@ regressor:
       reduction: 'rot_avg'
       use_subnet: False
     regressor_inputs: 11                                    # Number of features
-    regressor_hiddens: null
+    regressor_hiddens: [32, 32]
 
 training:
-  num_epochs: 2000                                          # Number of training epochs
+  num_epochs: 20000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: 0.003                                      # Learning rate
+  learning_rate: 0.0005                                      # Learning rate
 
 analysis:
   analysis_name: 'ost_rot_direct_16'
