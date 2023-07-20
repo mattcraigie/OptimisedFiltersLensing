@@ -28,5 +28,5 @@ training:
 
 analysis:
   analysis_name: 'ost_rot_16_direct_deep_morlet'
-  data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
   repeats: 1
