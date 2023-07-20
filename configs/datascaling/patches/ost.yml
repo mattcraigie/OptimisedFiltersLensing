@@ -16,6 +16,7 @@ regressor:
     model_type: 'ost'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs:
       reduction: 'rot_avg'
+      init_morlet: True
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [32, 32]
 
@@ -25,6 +26,6 @@ training:
   learning_rate: 0.0005                                      # Learning rate
 
 analysis:
-  analysis_name: 'ost_rot_16_deep_silu'
+  analysis_name: 'ost_rot_16_deep_morlet'
   data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
   repeats: 1

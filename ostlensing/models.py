@@ -79,15 +79,17 @@ class OSTWrapper(nn.Module):
                  use_subnet=True,
                  subnet_hiddens=(16, 16),
                  subnet_activations=nn.SiLU,
-                 scale_invariant=False
+                 scale_invariant=False,
+                 init_morlet=False,
                  ):
         super(OSTWrapper, self).__init__()
         if use_subnet:
             subnet_inputs = 2 if scale_invariant else 3
             self.subnet = SubNet(subnet_inputs, hidden_sizes=subnet_hiddens, activation=subnet_activations)
-            self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet, scale_invariant=scale_invariant)
+            self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
+                                                scale_invariant=scale_invariant, init_morlet=init_morlet)
         else:
-            self.filters = FourierDirectFilters(size, num_scales, num_angles)
+            self.filters = FourierDirectFilters(size, num_scales, num_angles, init_morlet=init_morlet)
 
         self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
         self.reducer = Reducer(self.filters, reduction)
