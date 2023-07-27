@@ -136,7 +136,7 @@ def data_scaling(rank, args):
 
             logging.debug(f"Sending the regressor to rank {rank}")
             regressor.to(rank)
-            regressor = DDP(regressor, device_ids=[rank], find_unused_parameters=True)
+            regressor = DDP(regressor, device_ids=[rank], find_unused_parameters=False)
 
             logging.debug(f"Setting up the optimizer on rank {rank}")
             optimizer = optim.Adam(regressor.parameters(), lr=learning_rate)
