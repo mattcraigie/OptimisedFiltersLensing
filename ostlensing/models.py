@@ -78,6 +78,7 @@ class OSTWrapper(nn.Module):
                  reduction=None,
                  type=None,
                  subnet_hiddens=(128, 128),
+                 enforce_symmetry=False,
                  subnet_activations=nn.ReLU,
                  scale_invariant=False,
                  init_morlet=False,
@@ -96,7 +97,7 @@ class OSTWrapper(nn.Module):
 
         elif type == 'trainable_morlet':
             self.filters = TrainableMorlet(size, num_scales, num_angles, scale_invariant=scale_invariant,
-                                           enforce_symmetry=True)
+                                           enforce_symmetry=enforce_symmetry)
 
         self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
         self.reducer = Reducer(self.filters, reduction)
