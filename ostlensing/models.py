@@ -4,7 +4,7 @@ import torch.nn as nn
 from transformers import ResNetModel, ResNetConfig
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import FourierSubNetFilters, SubNet, FourierDirectFilters
+from scattering_transform.filters import FourierSubNetFilters, SubNet, FourierDirectFilters, TrainableMorlet
 
 
 # ~~~ General Models ~~~ #
@@ -76,20 +76,27 @@ class OSTWrapper(nn.Module):
                  num_scales=4,
                  num_angles=4,
                  reduction=None,
-                 use_subnet=True,
+                 type=None,
                  subnet_hiddens=(128, 128),
-                 subnet_activations=nn.LeakyReLU,
+                 subnet_activations=nn.ReLU,
                  scale_invariant=False,
                  init_morlet=False,
                  ):
         super(OSTWrapper, self).__init__()
-        if use_subnet:
+
+        assert type in ['subnet', 'direct', 'trainable_morlet'], 'Invalid OST type'
+
+        if type == 'subnet':
             subnet_inputs = 2 if scale_invariant else 3
-            self.subnet = SubNet(subnet_inputs, hidden_sizes=subnet_hiddens, activation=subnet_activations)
+            self.subnet = SubNet(subnet_inputs, subnet_hiddens, subnet_activations)
             self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
                                                 scale_invariant=scale_invariant, init_morlet=init_morlet)
-        else:
+        elif type == 'direct':
             self.filters = FourierDirectFilters(size, num_scales, num_angles, init_morlet=init_morlet)
+
+        elif type == 'trainable_morlet':
+            self.filters = TrainableMorlet(size, num_scales, num_angles, scale_invariant=scale_invariant,
+                                           enforce_symmetry=True)
 
         self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
         self.reducer = Reducer(self.filters, reduction)
