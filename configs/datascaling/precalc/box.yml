@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'mst_rot_std.npy'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'box_std.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
@@ -13,9 +13,9 @@ data:
 regressor:
   regressor_kwargs:
     regressor_type: 'precalc'
-    model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
+    model_type: 'box'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: null
-    regressor_inputs: 23                                    # Number of features  (4, 4: 11 rot /23 ang)
+    regressor_inputs: 11                                    # Number of features  (4, 4: 11 rot /23 ang)
     regressor_hiddens: [32, 32]
 
 training:

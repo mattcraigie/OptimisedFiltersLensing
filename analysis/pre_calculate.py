@@ -7,7 +7,7 @@ import numpy as np
 
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import Morlet, FixedFilterBank
+from scattering_transform.filters import Morlet, FixedFilterBank, Box
 from scattering_transform.power_spectrum import PowerSpectrum
 
 from ostlensing.dataloading import load_and_apply, Scaler
@@ -46,8 +46,13 @@ def pk(size, num_bins, device):
     return ps
 
 
+def box(size, num_scales, num_angles, reduction, device):
+    b = Box(size, num_scales, num_angles)
+    return st_func(b, reduction, device)
+
+
 def pre_calc(load_path, save_path, file_name, method, kwargs):
-    function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet}
+    function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet, 'box': box}
     with torch.no_grad():
         data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
 
