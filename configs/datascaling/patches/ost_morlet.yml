@@ -23,11 +23,11 @@ regressor:
     regressor_batchnorm: True
 
 training:
-  num_epochs: 5000                                          # Number of training epochs
+  num_epochs: 2000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: [0.0001, 0.001, 0.001, 0.003]              # Learning rate
+  learning_rate: [0.0001, 0.001, 0.001]              # Learning rate
 
 analysis:
   analysis_name: 'ost_rot_16_trainablemorlet_deep'
-  data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
   repeats: 1
