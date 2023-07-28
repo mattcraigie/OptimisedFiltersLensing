@@ -136,6 +136,7 @@ class ModelRegressor(nn.Module):
                  regressor_hiddens=None,
                  regressor_outputs=1,
                  regressor_activations=nn.ReLU,
+                 regressor_batchnorm=False,
                  ):
         super(ModelRegressor, self).__init__()
 
@@ -148,7 +149,13 @@ class ModelRegressor(nn.Module):
             self.model = nn.Identity()
             self.patch = False
 
-        self.regressor = MLP(regressor_inputs, regressor_hiddens, regressor_outputs, regressor_activations)
+        if regressor_batchnorm:
+            self.regressor = nn.Sequential(
+                nn.BatchNorm1d(regressor_inputs),
+                MLP(regressor_inputs, regressor_hiddens, regressor_outputs, regressor_activations)
+            )
+        else:
+            self.regressor = MLP(regressor_inputs, regressor_hiddens, regressor_outputs, regressor_activations)
 
     def to(self, device):
         super(ModelRegressor, self).to(device)

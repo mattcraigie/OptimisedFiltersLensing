@@ -20,6 +20,7 @@ regressor:
       init_morlet: False
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [32, 32]
+    regressor_batchnorm: True
 
 training:
   num_epochs: 5000                                          # Number of training epochs
