@@ -4,10 +4,8 @@ import yaml
 import os
 import numpy as np
 
-
-
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import Morlet, FixedFilterBank, Box
+from scattering_transform.filters import Morlet, FixedFilterBank, Box, BandPass, LowPass
 from scattering_transform.power_spectrum import PowerSpectrum
 
 from ostlensing.dataloading import load_and_apply, Scaler
@@ -51,8 +49,24 @@ def box(size, num_scales, num_angles, reduction, device):
     return st_func(b, reduction, device)
 
 
+def bandpass(size, num_scales, num_angles, reduction, device):
+    b = BandPass(size, num_scales, num_angles)
+    return st_func(b, reduction, device)
+
+def lowpass(size, num_scales, num_angles, reduction, device):
+    b = LowPass(size, num_scales, num_angles)
+    return st_func(b, reduction, device)
+
+
 def pre_calc(load_path, save_path, file_name, method, kwargs):
-    function_mapping = {'ost': ost, 'mst': mst, 'ps': pk, 'resnet': resnet, 'box': box}
+    function_mapping = {'ost': ost,
+                        'mst': mst,
+                        'ps': pk,
+                        'resnet': resnet,
+                        'box': box,
+                        'bandpass': bandpass,
+                        'lowpass': lowpass}
+
     with torch.no_grad():
         data = load_and_apply(load_path, function_mapping[method](**kwargs), device=torch.device('cuda:0'))
 
