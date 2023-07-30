@@ -16,14 +16,16 @@ regressor:
     model_type: 'ost'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs:
       reduction: 'rot_avg'
+      type: 'subnet'
       init_morlet: True
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [32, 32]
+    regressor_batchnorm: True
 
 training:
   num_epochs: 20000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: 0.0005                                      # Learning rate
+  learning_rate: [0.0001, 0.0005, 0.001, 0.001]                                     # Learning rate
 
 analysis:
   analysis_name: 'ost_rot_16_deep_morlet'
