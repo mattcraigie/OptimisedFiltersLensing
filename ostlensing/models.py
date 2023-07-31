@@ -76,7 +76,7 @@ class OSTWrapper(nn.Module):
                  num_scales=4,
                  num_angles=4,
                  reduction=None,
-                 type=None,
+                 ost_type=None,
                  subnet_hiddens=(128, 128),
                  enforce_symmetry=True,
                  subnet_activations=nn.ReLU,
@@ -87,17 +87,17 @@ class OSTWrapper(nn.Module):
 
         print(subnet_hiddens, subnet_activations)
 
-        assert type in ['subnet', 'direct', 'trainable_morlet'], 'Invalid OST type'
+        assert ost_type in ['subnet', 'direct', 'trainable_morlet'], 'Invalid OST type'
 
-        if type == 'subnet':
+        if ost_type == 'subnet':
             subnet_inputs = 2 if scale_invariant else 3
             self.subnet = SubNet(subnet_inputs, subnet_hiddens, subnet_activations)
             self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
                                                 scale_invariant=scale_invariant, init_morlet=init_morlet)
-        elif type == 'direct':
+        elif ost_type == 'direct':
             self.filters = FourierDirectFilters(size, num_scales, num_angles, init_morlet=init_morlet)
 
-        elif type == 'trainable_morlet':
+        elif ost_type == 'trainable_morlet':
             self.filters = TrainableMorlet(size, num_scales, num_angles, scale_invariant=scale_invariant,
                                            enforce_symmetry=enforce_symmetry)
 

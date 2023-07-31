@@ -18,6 +18,7 @@ regressor:
       reduction: 'rot_avg'
       use_subnet: False
       init_morlet: True
+      ost_type: 'direct'
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [32, 32]
 
