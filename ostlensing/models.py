@@ -85,6 +85,8 @@ class OSTWrapper(nn.Module):
                  ):
         super(OSTWrapper, self).__init__()
 
+        print(subnet_hiddens, subnet_activations)
+
         assert type in ['subnet', 'direct', 'trainable_morlet'], 'Invalid OST type'
 
         if type == 'subnet':
