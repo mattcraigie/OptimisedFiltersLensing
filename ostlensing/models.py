@@ -85,13 +85,11 @@ class OSTWrapper(nn.Module):
                  ):
         super(OSTWrapper, self).__init__()
 
-        print(subnet_hiddens, subnet_activations)
-
         assert ost_type in ['subnet', 'direct', 'trainable_morlet'], 'Invalid OST type'
 
         if ost_type == 'subnet':
             subnet_inputs = 2 if scale_invariant else 3
-            self.subnet = SubNet(subnet_inputs, subnet_hiddens, subnet_activations)
+            self.subnet = SubNet(num_ins=subnet_inputs, hidden_sizes=subnet_hiddens, num_outs=subnet_activations)
             self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
                                                 scale_invariant=scale_invariant, init_morlet=init_morlet)
         elif ost_type == 'direct':
