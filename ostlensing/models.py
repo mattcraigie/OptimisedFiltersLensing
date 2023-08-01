@@ -79,7 +79,7 @@ class OSTWrapper(nn.Module):
                  ost_type=None,
                  subnet_hiddens=(128, 128),
                  enforce_symmetry=True,
-                 subnet_activations=nn.ReLU,
+                 subnet_activations=nn.LeakyReLU,
                  scale_invariant=False,
                  init_morlet=False,
                  ):
