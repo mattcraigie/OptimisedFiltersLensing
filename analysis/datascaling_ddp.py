@@ -99,7 +99,8 @@ def data_scaling(rank, args):
 
     data_handler.add_data(os.path.join(data_path, data_type, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
-    data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False, use_params=('s8',))
+    data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False,
+                             use_params=('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0'))
 
     # make test loader outside the loop for consistent test data
     test_loader = data_handler.get_test_loader(ddp=True)
