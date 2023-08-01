@@ -17,15 +17,15 @@ regressor:
     model_kwargs:
       reduction: 'rot_avg'
       ost_type: 'subnet'
-      init_morlet: True
+      init_morlet: False
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [32, 32]
-    regressor_batchnorm: True
+    regressor_batchnorm: False
 
 training:
   num_epochs: 20000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: [0.0001, 0.0005, 0.001, 0.001]                                     # Learning rate
+  learning_rate: [0.001, 0.001, 0.001, 0.001]                                     # Learning rate
 
 analysis:
   analysis_name: 'ost_rot_16_deep'
