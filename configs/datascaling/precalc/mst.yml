@@ -15,15 +15,15 @@ regressor:
     regressor_type: 'precalc'
     model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: null
-    regressor_inputs: 23                                    # Number of features  (4, 4: 11 rot /23 ang)
-    regressor_hiddens: [32, 32]
+    regressor_inputs: 11                                    # Number of features  (4, 4: 11 rot /23 ang)
+    regressor_hiddens: [64, 64]
 
 training:
-  num_epochs: 5000                                          # Number of training epochs
+  num_epochs: 2000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: [0.0001, 0.0005, 0.001, 0.001, 0.001, 0.003, 0.003]                                      # Learning rate
+  learning_rate: 0.001                                     # Learning rate
 
 analysis:
-  analysis_name: 'mst_ang_16_deep'
+  analysis_name: 'mst_deep_allparams'
   data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
