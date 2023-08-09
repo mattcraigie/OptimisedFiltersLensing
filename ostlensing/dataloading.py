@@ -195,13 +195,12 @@ def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
     patch_map = np.arange(hp.nside2npix(patch_nside))
     patch_thetas, patch_phis = hp.pix2ang(patch_nside, patch_map)  # theta and phi are the centrepoints of the patches
 
-    patch_thetas = np.rad2deg(patch_thetas)
-    patch_phis = np.rad2deg(patch_phis)
+
 
     if mask is None:
+        patch_thetas = np.rad2deg(patch_thetas)
+        patch_phis = np.rad2deg(patch_phis)
         return [(i, j) for i, j in zip(patch_thetas, patch_phis)]
-
-    warnings.warn('Masking not tested yet')
 
     # Downside the mask to the smaller map size. ud_grade uses an averaging to downsample. As a result, the pixel value
     # in the smaller map will represent the number of pixels in the mask
@@ -210,6 +209,8 @@ def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
     patch_centres = []
     for patch_theta, patch_phi in zip(patch_thetas, patch_phis):
         if mask_downsized[hp.ang2pix(patch_nside, patch_theta, patch_phi)] > threshold:
+            patch_theta = np.rad2deg(patch_theta)
+            patch_phi = np.rad2deg(patch_phi)
             patch_centres.append((patch_theta, patch_phi))
 
     return patch_centres
@@ -218,10 +219,11 @@ def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
 def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
     patch_set = []
     for patch_ra, patch_dec in patch_centres:
+        rot= (patch_dec, -patch_ra + 90)
         # gnomview vs cartview? I think they are both equivalent for dtheta, dphi ~ 0
         gnomonic_projection = hp.gnomview(healpix_map,
                                           xsize=patch_size,
-                                          rot=(patch_ra, patch_dec),
+                                          rot=rot,
                                           no_plot=True,
                                           reso=resolution,
                                           return_projected_map=True)
