@@ -17,7 +17,7 @@ regressor:
     model_kwargs:
       pretrained_model: '//pscratch/sd/m/mcraigie/huggingface_models/resnet18'
     regressor_inputs: 512                                    # Number of features
-    regressor_hiddens: [512, 512]
+    regressor_hiddens: [64, 64]
 
 training:
   num_epochs: 2000                                          # Number of training epochs
@@ -25,7 +25,7 @@ training:
   learning_rate: 0.000001                                      # Learning rate
 
 analysis:
-  analysis_name: 'resnet18_16_deep'
+  analysis_name: 'resnet18_deep_oms8'
   data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 1
 
