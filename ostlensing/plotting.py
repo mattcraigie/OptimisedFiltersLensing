@@ -75,7 +75,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
 
 def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labels=None, colours=None,
-                     show_repeats=False, quantiles=True):
+                     show_repeats=False, quantiles=True, ylims=None):
     if labels is None:
         labels = [str(i) for i in range(len(other_paths))]
 
@@ -103,7 +103,7 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
 
         # calculate the fractional improvement from the baseline
         x = scaling_df['data_subset']
-        includes = indices = np.where(np.in1d(x.values, baseline_x.values))[0]
+        includes = np.where(np.in1d(baseline_x.values, x.values))[0]
         print(includes)
 
         a = rmse.values
@@ -133,6 +133,9 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
     ax.set_ylabel('Change over Baseline (%)', fontsize=20)
+
+    if ylims is not None:
+        ax.set_ylim(ylims)
 
     # create a legend with the labels fontsize 16
     ax.legend(fontsize=16)
