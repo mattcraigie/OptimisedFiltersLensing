@@ -130,8 +130,8 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
     # create a legend with the labels fontsize 16
     ax.legend(fontsize=16)
 
-    if logx:
-        plt.semilogx()
+    # if logx:
+    #     plt.semilogx()
 
     # set tick label sizes after logging
     ax.tick_params(axis='both', which='major', labelsize=16)
