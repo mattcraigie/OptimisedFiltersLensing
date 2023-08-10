@@ -53,6 +53,7 @@ def bandpass(size, num_scales, num_angles, reduction, device):
     b = BandPass(size, num_scales, num_angles)
     return st_func(b, reduction, device)
 
+
 def lowpass(size, num_scales, num_angles, reduction, device):
     b = LowPass(size, num_scales, num_angles)
     return st_func(b, reduction, device)
