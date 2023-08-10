@@ -74,24 +74,26 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         plt.show()
 
 
-def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labels=None, colours=None, show_repeats=False, quantiles=True):
-
+def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labels=None, colours=None,
+                     show_repeats=False, quantiles=True):
     if labels is None:
         labels = [str(i) for i in range(len(other_paths))]
 
     if colours is None:
         colours = ['C' + str(i) for i in range(len(other_paths))]
 
-
     # baseline
 
     baseline_df = pd.read_csv(baseline_path)
+    baseline_x = baseline_df['data_subset']
     baseline_mse = baseline_df.iloc[:, 1:]
     baseline_rmse = np.sqrt(baseline_mse)
     if quantiles:
         baseline_rmse = np.median(baseline_rmse, axis=1)
     else:
         baseline_rmse = np.mean(baseline_rmse, axis=1)
+
+    print(baseline_rmse)
 
     fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
     for i in range(len(other_paths)):
@@ -100,7 +102,13 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
         rmse = np.sqrt(mse)
 
         # calculate the fractional improvement from the baseline
-        improvement = (baseline_rmse - rmse) / baseline_rmse * 100
+        x = scaling_df['data_subset']
+        includes = indices = np.where(np.in1d(x.values, baseline_x.values))[0]
+        print(includes)
+
+        a = rmse.values
+        b = baseline_rmse.values[includes, None]
+        improvement = (a - b) / b * 100
 
         if quantiles:
             improvement_mid = np.median(improvement, axis=1)
@@ -111,8 +119,6 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
             improvement_low = improvement_mid - np.std(improvement, axis=1)
             improvement_high = improvement_mid + np.std(improvement, axis=1)
 
-
-        x = scaling_df['data_subset']
         ax.plot(x, improvement_mid, linewidth=4, label=labels[i], c=colours[i])
         # scatter with a square marker
         ax.scatter(x, improvement_mid, c=colours[i], s=35, marker='s')
@@ -122,27 +128,26 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
 
         if show_repeats:
             for j in range(improvement.shape[0]):
-                ax.scatter([x[j] for _ in range(improvement.shape[1])], improvement.iloc[j], c=colours[i], alpha=0.4, marker='x')
+                ax.scatter([x[j] for _ in range(improvement.shape[1])], improvement[j], c=colours[i], alpha=0.4,
+                           marker='x')
 
     ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
-    ax.set_ylabel('Improvement over Baseline (%)', fontsize=20)
+    ax.set_ylabel('Change over Baseline (%)', fontsize=20)
 
     # create a legend with the labels fontsize 16
     ax.legend(fontsize=16)
 
-    # if logx:
-    #     plt.semilogx()
+    if logx:
+        plt.semilogx()
 
     # set tick label sizes after logging
     ax.tick_params(axis='both', which='major', labelsize=16)
     ax.tick_params(axis='both', which='minor', labelsize=16)
 
-
     if save_path is not None:
         plt.savefig(save_path)
     else:
         plt.show()
-
 
 
 class ModelPlotter:
