@@ -21,7 +21,7 @@ regressor:
 training:
   num_epochs: 5000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: 0.001                                     # Learning rate
+  learning_rate: 0.0005                                     # Learning rate
 
 analysis:
   analysis_name: 'ost_s2000_deep'
