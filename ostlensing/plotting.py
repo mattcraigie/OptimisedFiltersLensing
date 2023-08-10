@@ -93,8 +93,6 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
     else:
         baseline_rmse = np.mean(baseline_rmse, axis=1)
 
-    print(baseline_rmse)
-
     fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
     for i in range(len(other_paths)):
         scaling_df = pd.read_csv(other_paths[i])
@@ -104,7 +102,6 @@ def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labe
         # calculate the fractional improvement from the baseline
         x = scaling_df['data_subset']
         includes = np.where(np.in1d(baseline_x.values, x.values))[0]
-        print(includes)
 
         a = rmse.values
         b = baseline_rmse.values[includes, None]
