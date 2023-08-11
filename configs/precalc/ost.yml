@@ -1,9 +1,9 @@
 load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches_log_std'                 # the folder to load from
 save_path: '//pscratch/sd/m/mcraigie/cosmogrid/precalc'                         # must specify the .npy file for output
-file_name: 'ost_s125_rot'
+file_name: 'ost_s2000_oms8'
 
 method: 'ost'
 kwargs:
-  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/ost/ost_rot_16_deep/subset_125/filters.pt'
+  filter_path: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/ost/ost_deep_oms8/subset_2000/filters.pt'
   reduction: 'rot_avg'
   device: 'cuda:0'
