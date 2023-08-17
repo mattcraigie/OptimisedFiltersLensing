@@ -66,8 +66,6 @@ class ResNetWrapper(nn.Module):
         x = self.resnet(x).pooler_output
         return x.reshape(batch, patch, self.num_outputs)
 
-    def save(self, path):
-        torch.save(self.state_dict(), path)
 
 
 class OSTWrapper(nn.Module):
@@ -116,8 +114,7 @@ class OSTWrapper(nn.Module):
         self.device = device
         return self
 
-    def save(self, path):
-        torch.save(self.state_dict(), path)
+
 
 
 # ~~~ Model Dict ~~~ #
@@ -171,5 +168,5 @@ class ModelRegressor(nn.Module):
         return x  # final output should have shape (batch, regressor_outputs)
 
     def save(self, path):
-        self.model.save(path)
+        torch.save(self.state_dict(), path)
 
