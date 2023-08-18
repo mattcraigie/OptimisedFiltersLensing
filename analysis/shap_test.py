@@ -5,17 +5,6 @@ import matplotlib.pyplot as plt
 # load the deep regression model
 
 
-def load_model(model_path):
-    model = torch.load(model_path)
-    model.eval()
-    return model
-
-
-def load_data(data_path):
-    data = torch.load(data_path)
-    return data
-
-
 def get_shap_values(model, data, subset):
     if subset is not None:
         data = data[:subset]
@@ -30,9 +19,7 @@ def get_summary_plot(shap_values, data, save_path=None):
         plt.savefig(save_path)
 
 
-def produce_summary_plot(model_path, data_path, save_path=None, subset=None):
-    model = load_model(model_path)
-    data = load_data(data_path)
+def produce_summary_plot(model, data, save_path=None, subset=None):
     shap_values = get_shap_values(model, data, subset)
     get_summary_plot(shap_values, data, save_path)
 
