@@ -77,13 +77,13 @@ def pre_calc(load_path, save_path, file_name, method, kwargs):
     np.save(main_path + '.npy', data)
 
     # with std
-    scaler = Scaler(np.mean(data), np.std(data))
+    scaler = Scaler(np.mean(data, axis=0), np.std(data, axis=0))
     std_data = scaler.transform(data)
     np.save(main_path + '_std.npy', std_data)
 
     # with std and log
     log_data = np.log(data)
-    scaler = Scaler(np.mean(log_data), np.std(log_data))
+    scaler = Scaler(np.mean(log_data, axis=0), np.std(log_data, axis=0))
     log_std_data = scaler.transform(log_data)
     np.save(main_path + '_log_std.npy', log_std_data)
 
