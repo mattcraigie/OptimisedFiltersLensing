@@ -98,7 +98,7 @@ class OSTWrapper(nn.Module):
                                            enforce_symmetry=enforce_symmetry)
 
         self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
-        self.reducer = Reducer(self.filters, reduction)
+        self.reducer = Reducer(self.filters, reduction, normalise_s2=True)
         self.num_outputs = self.reducer.num_outputs
 
     def forward(self, x):
