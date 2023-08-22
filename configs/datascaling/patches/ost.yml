@@ -23,7 +23,7 @@ regressor:
     regressor_batchnorm: False
 
 training:
-  num_epochs: 20000                                          # Number of training epochs
+  num_epochs: 10000                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: [0.001, 0.001, 0.001, 0.001]                                     # Learning rate
 
