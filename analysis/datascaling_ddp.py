@@ -79,7 +79,7 @@ def data_scaling(rank, args):
     if rank == 0 and os.path.exists(logging_filename):
         os.remove(logging_filename)
 
-    logging.basicConfig(filename=logging_filename, level=logging.INFO)
+    logging.basicConfig(filename=logging_filename, level=logging.DEBUG)
     logging.info(f"Running data scaling analysis on rank {rank}.")
     logger = logging.getLogger()
     logger.addFilter(SuppressFilter())  # suppress log messages from pytorch
