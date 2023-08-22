@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.distributed as dist
 import matplotlib.pyplot as plt
 import os
+import copy
 
 # ~~~ Loss Functions ~~~ #
 
@@ -132,10 +133,8 @@ class Trainer:
                 self.val_losses.append(val_loss)
 
             if val_loss < self.best_loss:
-                print("New best model found at epoch {}".format(epoch))
-                print("New params: {}".format(self.regressor.module.regressor.model[0].weight[0]))
                 self.best_loss = val_loss
-                self.best_regressor_params = self.regressor.state_dict()
+                self.best_regressor_params = copy.deepcopy(self.regressor.state_dict())
 
     def load_best_model(self):
         self.regressor.load_state_dict(self.best_regressor_params)
