@@ -108,7 +108,7 @@ class Trainer:
             self.train_loader.sampler.set_epoch(epoch)
             self.val_loader.sampler.set_epoch(epoch)
 
-            if self.device == 0:
+            if self.device == 0 and epoch % 100 == 0:
                 print(self.regressor.module.regressor.model[0].weight[0])
 
             sum_train_loss = self.train()
