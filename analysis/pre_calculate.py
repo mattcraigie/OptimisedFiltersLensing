@@ -15,7 +15,7 @@ from ostlensing.models import ResNetWrapper
 def st_func(filters, reduction, device):
     st = ScatteringTransform2d(filters)
     st.to(device)
-    reducer = Reducer(filters, reduction=reduction)
+    reducer = Reducer(filters, reduction=reduction, normalise_s2=True)
     return lambda x: reducer(st(x))
 
 
