@@ -109,7 +109,7 @@ class Trainer:
             self.val_loader.sampler.set_epoch(epoch)
 
             if self.device == 0 and epoch % 100 == 0:
-                print(self.regressor.module.regressor.model[0].weight[0])
+
 
             sum_train_loss = self.train()
             sum_val_loss = self.validate()
@@ -136,6 +136,7 @@ class Trainer:
 
             if val_loss < self.best_loss:
                 print("New best model found at epoch {}".format(epoch))
+                print("New params: {}".format(self.regressor.module.regressor.model[0].weight[0]))
                 self.best_loss = val_loss
                 self.best_regressor_params = self.regressor.state_dict()
 
