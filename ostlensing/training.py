@@ -132,6 +132,7 @@ class Trainer:
                 self.val_losses.append(val_loss)
 
             if val_loss < self.best_loss:
+                print("New best model found at epoch {}".format(epoch))
                 self.best_loss = val_loss
                 self.best_regressor_params = self.regressor.state_dict()
 
