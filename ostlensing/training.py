@@ -108,10 +108,13 @@ class Trainer:
             self.train_loader.sampler.set_epoch(epoch)
             self.val_loader.sampler.set_epoch(epoch)
 
+            if self.device == 0:
+                print(self.regressor.module.regressor.model[0].weight[0])
+
             sum_train_loss = self.train()
             sum_val_loss = self.validate()
 
-            # Everything beyond here is just for visualisation and validation purposes
+            # Everything beyond here is just for loss visualisation and validation purposes
 
             if self.ddp:
                 sum_train_loss = torch.tensor(sum_train_loss).to(self.device)
