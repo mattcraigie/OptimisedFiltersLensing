@@ -160,15 +160,15 @@ def data_scaling(rank, args):
 
             if rank == 0:
 
-                logging.debug(f"final model is {trainer.regressor.module.regressor.model[0].weight}")
-                logging.debug(f"best model is {trainer.best_regressor_params['module.regressor.model.0.weight']}")
+                logging.debug(f"final model is {trainer.regressor.module.regressor.model[0].weight[0]}")
+                logging.debug(f"best model is {trainer.best_regressor_params['module.regressor.model.0.weight'][0]}")
                 logging.debug(f"loading the best model on rank {rank}")
 
             trainer.load_best_model()
 
             if rank == 0:
 
-                logging.debug(f"loaded model is {trainer.regressor.module.regressor.model[0].weight}")
+                logging.debug(f"loaded model is {trainer.regressor.module.regressor.model[0].weight[0]}")
 
             logging.debug(f"making predictions on rank {rank}")
             trainer.make_predictions()
