@@ -158,13 +158,15 @@ def data_scaling(rank, args):
 
             logging.debug(f"testing the best validated model on rank {rank}")
 
-            logging.debug(f"final model is {[i for i in trainer.regressor.parameters()]}")
+            logging.debug(f"final model is {trainer.regressor.module.regressor.model[0].weight}")
+            logging.debug(f"best model is {trainer.best_regressor_params.regressor.module.model[0].weight}")
             logging.debug(f"loading the best model on rank {rank}")
 
             trainer.load_best_model()
 
+            logging.debug("loaded model is {trainer.best_regressor_params.regressor.module.model[0].weight}")
+
             logging.debug(f"making predictions on rank {rank}")
-            logging.debug(f"best model is {[i for i in trainer.best_regressor_params]}")
             trainer.make_predictions()
             test_loss = trainer.test()
 
