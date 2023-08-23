@@ -61,10 +61,12 @@ def make_patches_cosmogrid(output_path,
             f.close()
         return mute
 
-    mask = load_obj('/global/cfs/cdirs/des//mass_maps/Maps_final//mask_DES_y3')
-    mask = hp.ud_grade(mask, nside_out=512)
+    # mask = load_obj('/global/cfs/cdirs/des//mass_maps/Maps_final//mask_DES_y3')
+    # mask = hp.ud_grade(mask, nside_out=512)
+    # patch_centres = compute_patch_centres(patch_nside, mask.copy().astype(np.float64), threshold)
 
-    patch_centres = compute_patch_centres(patch_nside, mask.copy().astype(np.float64), threshold)
+    mask = None
+    patch_centres = compute_patch_centres(patch_nside, mask, threshold)
 
     # run loop with mp
     pool = mp.Pool()
@@ -87,7 +89,7 @@ def make_patches_cosmogrid(output_path,
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/patches/"
+    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/unmasked/"
     make_patches_cosmogrid(output_path=output_path,
                            patch_nside=4,
                            patch_size=128,
