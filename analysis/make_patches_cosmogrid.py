@@ -37,6 +37,10 @@ def process_cosmo_dir(cosmo_dir,
         cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
 
     cosmo_patches = np.stack(cosmo_patches).reshape((num_perms * len(patch_centres), patch_size, patch_size))
+
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
     np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
 
 
