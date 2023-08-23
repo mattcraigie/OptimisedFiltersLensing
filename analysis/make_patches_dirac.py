@@ -4,8 +4,6 @@ import h5py
 import multiprocessing as mp
 from functools import partial
 import numpy as np
-import healpy as hp
-import pickle
 
 
 def process_cosmo_dir(cosmo_dir,
@@ -46,14 +44,8 @@ def make_patches_cosmogrid(output_path,
     cosmo_dirs = os.listdir(main_path)
     cosmo_dirs = np.sort(cosmo_dirs)
 
-    def load_obj(name):
-        with open(name + '.pkl', 'rb') as f:
-            mute = pickle.load(f)
-            f.close()
-        return mute
-
-    mask = load_obj('/global/cfs/cdirs/des//mass_maps/Maps_final//mask_DES_y3')
-    mask = hp.ud_grade(mask, nside_out=512).astype(np.float)
+    # replace with DES mask? Or are they in-built?
+    mask = None
 
     patch_centres = compute_patch_centres(patch_nside, mask, threshold)
 
