@@ -77,7 +77,7 @@ def make_patches_cosmogrid(output_path,
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/"
+    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/patches/"
     make_patches_cosmogrid(output_path=output_path,
                            patch_nside=4,
                            patch_size=128,
@@ -85,7 +85,7 @@ def main():
                            threshold=0.2,
                            num_perms=1,
                            map_type='kg',
-                           redshift_bin=3
+                           redshift_bin=2
                            )
 
 
