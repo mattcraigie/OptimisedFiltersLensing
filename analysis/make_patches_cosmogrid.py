@@ -19,6 +19,8 @@ def process_cosmo_dir(cosmo_dir,
                       patch_size,
                       resolution,
                       mask):
+
+    print("processing {}".format(cosmo_dir))
     cosmo_patches = []
     permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
 
