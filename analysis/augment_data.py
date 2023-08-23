@@ -28,11 +28,11 @@ def augment_patches():
     op_dev = torch.device('cuda')
     end_dev = torch.device('cpu')
 
-    load_path = '//pscratch/sd/m/mcraigie/cosmogrid/patches/'
+    load_path = '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches/'
     if use_log:
-        save_path = '//pscratch/sd/m/mcraigie/cosmogrid/patches_log_std/'
+        save_path = '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches_log_std/'
     else:
-        save_path = '//pscratch/sd/m/mcraigie/cosmogrid/patches_std/'
+        save_path = '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches_std/'
 
     all_dirs = os.listdir(os.path.join(load_path))
     all_dirs = np.sort(all_dirs)
@@ -40,17 +40,16 @@ def augment_patches():
     data = []
     for dir_ in all_dirs:
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
+
+        if use_log:
+            fields = fields.log()
+
         fm = fields.mean()
         fields /= fm  # should become mean 1. Already strictly positive so no shift needed before logging
-        if use_log:
-            fields -= 1
+
         data.append(fields)
 
     data = torch.stack(data)
-
-    if use_log:
-        data = batch_apply(data, 16, torch.log, operate_device=op_dev, end_device=end_dev)
-        # should become a mean 1, approx gaussian 1 pt pdf
 
     #  global std
     result = data / data.std()
