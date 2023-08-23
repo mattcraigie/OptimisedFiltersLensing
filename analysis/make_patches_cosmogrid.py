@@ -17,7 +17,8 @@ def process_cosmo_dir(cosmo_dir,
                       redshift_bin,
                       patch_centres,
                       patch_size,
-                      resolution):
+                      resolution,
+                      mask):
     cosmo_patches = []
     permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
 
@@ -25,6 +26,8 @@ def process_cosmo_dir(cosmo_dir,
         p = os.path.join(main_path, cosmo_dir, permute_dir, fname)
         f = h5py.File(p, 'r')
         full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
+        if mask is not None:
+            full_map[~mask] = 0
         cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
 
     cosmo_patches = np.stack(cosmo_patches).reshape((num_perms * len(patch_centres), patch_size, patch_size))
@@ -53,9 +56,9 @@ def make_patches_cosmogrid(output_path,
         return mute
 
     mask = load_obj('/global/cfs/cdirs/des//mass_maps/Maps_final//mask_DES_y3')
-    mask = hp.ud_grade(mask, nside_out=512).astype(np.float)
+    mask = hp.ud_grade(mask, nside_out=512)
 
-    patch_centres = compute_patch_centres(patch_nside, mask, threshold)
+    patch_centres = compute_patch_centres(patch_nside, mask.copy().astype(np.float64), threshold)
 
     # run loop with mp
     pool = mp.Pool()
@@ -69,7 +72,8 @@ def make_patches_cosmogrid(output_path,
                                redshift_bin=redshift_bin,
                                patch_centres=patch_centres,
                                patch_size=patch_size,
-                               resolution=resolution)
+                               resolution=resolution,
+                               mask=mask)
 
     pool.map(process_function, cosmo_dirs)
     pool.close()
