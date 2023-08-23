@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'patches_log_std'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'patches'                                   # file name or folder (e.g. 'patches')
   data_type: 'patches'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
@@ -28,6 +28,6 @@ training:
   learning_rate: [0.001, 0.001, 0.001, 0.001]                                     # Learning rate
 
 analysis:
-  analysis_name: 'ost_deep_oms8'
+  analysis_name: 'ost_oms8_masked'
   data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 1
