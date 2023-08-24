@@ -35,6 +35,9 @@ def process_cosmo_dir(cosmo_dir,
             full_map[mask] = np.log(full_map[mask])
             full_map[mask] = (full_map[mask] - np.mean(full_map[mask])) / np.std(full_map[mask])
             full_map[~mask] = 0
+        else:
+            full_map = np.log(full_map)
+            full_map = (full_map - np.mean(full_map)) / np.std(full_map)
 
         cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
 
