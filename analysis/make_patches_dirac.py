@@ -21,8 +21,8 @@ def process_cosmo_file(fname,
     full_map = hp.fitsfunc.read_map(path)
 
     # map normalisation
-    full_map[mask] = np.log(full_map[mask])
-    full_map[mask] = (full_map[mask] - np.mean(full_map[mask])) / np.std(full_map[mask])
+    # full_map[mask] = np.log(full_map[mask])
+    full_map[mask] = full_map[mask] / np.std(full_map[mask])
     full_map[~mask] = 0
 
     cosmo_patches = healpix_map_to_patches(full_map, patch_centres, patch_size, resolution)
