@@ -1,6 +1,7 @@
-load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches/'                 # the folder to load from
-save_path: '//pscratch/sd/m/mcraigie/cosmogrid/precalc'
-file_name:  'mst_masked'
+#load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches/'                 # the folder to load from
+load_path: '//pscratch/sd/m/mcraigie/dirac/patches/masked/'                 # the folder to load from
+save_path: '//pscratch/sd/m/mcraigie/dirac/precalc/'
+file_name:  'mst'
 
 method: 'mst'
 kwargs:

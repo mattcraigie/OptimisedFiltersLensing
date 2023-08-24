@@ -123,6 +123,24 @@ def make_params():
     transform_df.to_csv(save_path)
 
 
+def make_params_dirac():
+
+    load_path = '//pscratch/sd/m/mcraigie/dirac/params_clean.csv'
+    clean_df = pd.read_csv(load_path)
+    clean_df.drop('Unnamed: 0', axis=1, inplace=True)
+
+    trans_df = pd.read_csv('//pscratch/sd/m/mcraigie/cosmogrid/params_transvals.csv')
+    trans_df.drop(['bary_Mc', 'bary_nu', 'As', 'O_nu', 'Unnamed: 0'], axis=1, inplace=True)
+    means = trans_df.loc[0].astype(np.float64)
+    stds = trans_df.loc[1].astype(np.float64)
+
+    standardised_df = (clean_df - means) / stds
+
+    save_path = '//pscratch/sd/m/mcraigie/dirac/params_std.csv'
+    standardised_df.to_csv(save_path)
+
+
+
 if __name__ == '__main__':
     augment_patches()
 

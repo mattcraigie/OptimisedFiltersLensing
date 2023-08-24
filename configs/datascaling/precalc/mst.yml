@@ -1,6 +1,6 @@
 data:
-  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'mst_masked_std.npy'                       # file name or folder (e.g. 'patches')
+  data_path: '//pscratch/sd/m/mcraigie/dirac/'          # path to main data directory
+  data_subpath: 'mst_dirac_std.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
