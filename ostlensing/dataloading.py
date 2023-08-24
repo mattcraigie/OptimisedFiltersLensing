@@ -68,8 +68,7 @@ class DataHandler:
         self.patch_perm = None
 
     def load_patches(self, path):
-        all_dirs = [i for i in os.listdir(path) if not i.startswith('.')]
-        print(all_dirs)
+        all_dirs = [i for i in os.listdir(os.path.join(path)) if i.endswith('.npy')]
         all_dirs = np.sort(all_dirs)
 
         patches = []
@@ -237,7 +236,7 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
 # Other functions
 
 def load_and_apply(load_path, function, device, save_path=None):
-    all_dirs = os.listdir(os.path.join(load_path))
+    all_dirs = [i for i in os.listdir(os.path.join(load_path)) if i.endswith('.npy')]
     all_dirs = np.sort(all_dirs)
 
     data = []
