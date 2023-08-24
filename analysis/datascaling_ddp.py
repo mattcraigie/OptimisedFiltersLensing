@@ -74,6 +74,9 @@ def data_scaling(rank, args):
     if not isinstance(learning_rates, list):
         learning_rates = [learning_rates] * len(data_subsets)
 
+    if not isinstance(num_epochs, list):
+        num_epochs = [num_epochs] * len(data_subsets)
+
     # set up logging
     logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}.log')
     if rank == 0 and os.path.exists(logging_filename):
@@ -131,7 +134,7 @@ def data_scaling(rank, args):
         model_results = []
 
         # iterate over the train/val data subsets
-        for subset, learning_rate in zip(data_subsets, learning_rates):
+        for subset, learning_rate, num_epoch in zip(data_subsets, learning_rates, num_epochs):
             if rank == 0:
                 subset_start_time = time.time()
                 logging.info(f"Running subset {subset}.")
@@ -154,7 +157,7 @@ def data_scaling(rank, args):
                               rank, ddp=True)
 
             logging.debug(f"Running train and validation trainer on rank {rank}")
-            trainer.train_loop(num_epochs)
+            trainer.train_loop(num_epoch)
 
             logging.debug(f"testing the best validated model on rank {rank}")
 
