@@ -69,6 +69,7 @@ class DataHandler:
 
     def load_patches(self, path):
         all_dirs = [i for i in os.listdir(path) if not i.startswith('.')]
+        print(all_dirs)
         all_dirs = np.sort(all_dirs)
 
         patches = []
