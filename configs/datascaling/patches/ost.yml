@@ -7,7 +7,7 @@ data:
     patch_subset: 16                                    # Subset of patches per cosmology, 192 for all
     val_ratio: 0.2                                          # Portion of data to use for validation
     test_ratio: 0.2                                         # Portion of data to use for testing
-    seed: 100                                                 # Random seed for data splitting
+    seed: 0                                                 # Random seed for data splitting
     pre_average: False
 
 regressor:
@@ -23,11 +23,11 @@ regressor:
     regressor_batchnorm: False
 
 training:
-  num_epochs: [5000, 5000, 10000]                                          # Number of training epochs
+  num_epochs: [10000, 100000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
-  learning_rate: [0.001, 0.001, 0.001, 0.001]                                     # Learning rate
+  learning_rate: [0.001, 0.001,]                                     # Learning rate
 
 analysis:
   analysis_name: 'ost_oms8'
-  data_subsets: [30, 125, 500,]   # Subsets of the data for the scaling analysis
-  repeats: 5
+  data_subsets: [30, 125,]   # Subsets of the data for the scaling analysis
+  repeats: 1
