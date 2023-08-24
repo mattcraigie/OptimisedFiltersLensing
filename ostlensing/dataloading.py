@@ -238,7 +238,7 @@ def healpix_map_to_patches(healpix_map, patch_centres, patch_size, resolution):
 def load_and_apply(load_path, function, device, save_path=None):
     all_dirs = [i for i in os.listdir(os.path.join(load_path)) if i.endswith('.npy')]
     all_dirs = np.sort(all_dirs)
-
+    print(all_dirs)
     data = []
     for dir_ in all_dirs:
         fields = torch.from_numpy(np.load(os.path.join(load_path, dir_))).float()
