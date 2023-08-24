@@ -4,7 +4,7 @@ import h5py
 import multiprocessing as mp
 from functools import partial
 import numpy as np
-import healpy
+import healpy as hp
 import pickle
 
 
