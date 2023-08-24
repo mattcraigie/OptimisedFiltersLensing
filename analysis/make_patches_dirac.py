@@ -29,7 +29,7 @@ def process_cosmo_file(fname,
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    name = fname[20:23]
+    name = fname[15:23]
     np.save(os.path.join(output_path, 'patches_{}.npy'.format(name)), cosmo_patches)
 
 
@@ -78,7 +78,7 @@ def make_patches_cosmogrid(output_path,
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/"
+    output_path = "/pscratch/sd/m/mcraigie/dirac/patches/masked/"
     make_patches_cosmogrid(output_path=output_path,
                            patch_nside=4,
                            patch_size=128,
