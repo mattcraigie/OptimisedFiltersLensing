@@ -19,11 +19,11 @@ regressor:
       ost_type: 'subnet'
       init_morlet: True
     regressor_inputs: 11                                    # Number of features
-    regressor_hiddens: [64, 64]
+    regressor_hiddens: [128, 128]
     regressor_batchnorm: False
 
 training:
-  num_epochs: [10000, 10000]                                          # Number of training epochs
+  num_epochs: [100000, 100000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: [0.001, 0.001,]                                     # Learning rate
 
