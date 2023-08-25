@@ -17,7 +17,7 @@ regressor:
     model_kwargs:
       reduction: 'rot_avg'
       ost_type: 'subnet'
-      init_morlet: False
+      init_morlet: True
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [64, 64]
     regressor_batchnorm: False
