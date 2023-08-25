@@ -105,7 +105,7 @@ def main():
                            resolution=7,  # arcmin
                            threshold=0.2,
                            num_perms=1,
-                           map_type='kg',
+                           map_type='dg',
                            redshift_bin=2
                            )
 

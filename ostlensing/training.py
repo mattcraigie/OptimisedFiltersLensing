@@ -2,14 +2,41 @@ import torch
 import torch.nn as nn
 import torch.distributed as dist
 import matplotlib.pyplot as plt
+from scattering_transform.filters import scale2size
 import os
 import copy
 
 # ~~~ Loss Functions ~~~ #
 
-def mse_and_admissibility(output, target, model, weighting=1.0):
+
+def mse_and_admissibility(output, target, model, weighting=1.0, edge_constraints=True):
     loss = nn.functional.mse_loss(output, target)
-    loss += weighting * model.filters.filter_tensor[1, 0, 0, 0]**2  # (zero-freq fourier mode / mean config space)
+    ft = model.filters.filter_tensor
+
+    loss += weighting * ft[:, 0, 0, 0].abs().sum()  # (zero-freq fourier mode / mean config space)
+
+    if edge_constraints:
+
+        size = ft.shape[-1]
+
+        for i in range(ft.shape[0]):
+            # also add a loss term to penalise the model for having nonzero edges
+            scaled_size = scale2size(size, i)
+            k = ft[i, 0]
+            half = size // 2
+            half_scaled = scaled_size // 2
+            k = torch.fft.fftshift(k)
+            start = half - half_scaled
+            end = half + half_scaled
+            edge_loss = k[start, start:end].abs().sum() + \
+                        k[start:end, start].abs().sum() + \
+                        k[start + 1, start + 1:end].abs().sum() + \
+                        k[start + 1:end, start + 1].abs().sum() + \
+                        k[end - 1, start + 1:end].abs().sum() + \
+                        k[start + 1:end, end - 1].abs().sum()
+
+            loss += weighting * edge_loss
+
     return loss
 
 

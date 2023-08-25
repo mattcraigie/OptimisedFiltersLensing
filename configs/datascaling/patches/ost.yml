@@ -23,11 +23,11 @@ regressor:
     regressor_batchnorm: False
 
 training:
-  num_epochs: [10000, 100000]                                          # Number of training epochs
+  num_epochs: [10000, 10000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: [0.001, 0.001,]                                     # Learning rate
 
 analysis:
-  analysis_name: 'ost_oms8'
+  analysis_name: 'ost_oms8_newcriterion'
   data_subsets: [30, 125,]   # Subsets of the data for the scaling analysis
   repeats: 1
