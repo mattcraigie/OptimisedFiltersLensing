@@ -50,13 +50,14 @@ def process_cosmo_dir(cosmo_dir,
 
 
 def make_patches_cosmogrid(output_path,
-                          patch_nside=4,
-                          patch_size=128,
-                          resolution=7,  # arcmin
-                          threshold=0.2,
-                          num_perms=1,
-                          map_type='kg',
-                          redshift_bin=3):
+                           patch_nside=4,
+                           patch_size=128,
+                           resolution=7,  # arcmin
+                           threshold=0.2,
+                           num_perms=1,
+                           map_type='kg',
+                           redshift_bin=3,
+                           subset=None):
 
     main_path = r'//global/cfs/cdirs/des/cosmogrid/DESY3/grid'
     fname = r'projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
@@ -76,6 +77,9 @@ def make_patches_cosmogrid(output_path,
 
     mask = None
     patch_centres = compute_patch_centres(patch_nside, mask, threshold)
+
+    if subset is not None:
+        patch_centres = patch_centres[:subset]
 
     # run loop with mp
     pool = mp.Pool()
@@ -98,7 +102,7 @@ def make_patches_cosmogrid(output_path,
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/unmasked/"
+    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/clustering/unmasked/"
     make_patches_cosmogrid(output_path=output_path,
                            patch_nside=4,
                            patch_size=128,
@@ -106,7 +110,8 @@ def main():
                            threshold=0.2,
                            num_perms=1,
                            map_type='dg',
-                           redshift_bin=2
+                           redshift_bin=2,
+                           subset=30,
                            )
 
 
