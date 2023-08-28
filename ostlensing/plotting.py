@@ -54,6 +54,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         if transform_std is not None:
             transform_std = np.array(transform_std)[None, None, :]
+            print(transform_std)
+            print(transform_std.shape)
             all_rmse *= transform_std
 
         if quantiles:
