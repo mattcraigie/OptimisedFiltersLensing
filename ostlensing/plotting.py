@@ -83,7 +83,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             axes[j].fill_between(subset_sizes, rmse_low[:, j], rmse_high[:, j], alpha=0.15, color=colours[i])
 
             if show_repeats:
-                for k in range(rmse.shape[0]):
+                for k in range(all_rmse.shape[1]):
                     axes.scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i], alpha=0.4, marker='x')
 
             axes[j].set_xlabel('Number of Training Cosmologies', fontsize=20)
