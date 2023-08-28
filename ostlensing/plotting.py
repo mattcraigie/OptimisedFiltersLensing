@@ -32,7 +32,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             for subset_dir in subset_dirs:
 
-                subset_sizes.append(int(path[7:]))
+                subset_sizes.append(int(subset_dir[7:]))
 
                 targets = torch.load(os.path.join(scaling_dir, repeat_dir, subset_dir, 'targets.pt'))
                 predictions = torch.load(os.path.join(scaling_dir, repeat_dir, subset_dir, 'predictions.pt'))
