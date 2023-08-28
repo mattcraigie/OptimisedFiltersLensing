@@ -119,9 +119,6 @@ def data_scaling(rank, args):
     train_criterion = mse_and_admissibility_ddp if model_type == 'ost' and data_type == 'patches' else mse
     test_criterion = mse
 
-    # set up the results dataframe
-    df = pd.DataFrame({'data_subset': data_subsets})
-
     # iterate of repeat number i
     for i in range(repeats):
         if rank == 0:
@@ -130,8 +127,6 @@ def data_scaling(rank, args):
 
         # set the seed for the train and val split. This should be consistent amongst the subsets for the same repeat
         data_handler.seed = i
-
-        model_results = []
 
         # iterate over the train/val data subsets
         for subset, learning_rate, num_epoch in zip(data_subsets, learning_rates, num_epochs):
@@ -175,11 +170,9 @@ def data_scaling(rank, args):
 
             logging.debug(f"making predictions on rank {rank}")
             trainer.make_predictions()
-            test_loss = trainer.test()
 
             if rank == 0:
                 logging.debug(f"saving the results on rank {rank}")
-                model_results.append(test_loss)
 
                 # save the model and predictions if it's the first repeat
                 if i == 0:
@@ -197,9 +190,6 @@ def data_scaling(rank, args):
             repeat_end_time = time.time()
             logging.info("Repeat {} took {:.2f} seconds.".format(i, repeat_end_time - repeat_start_time))
 
-    if rank == 0:  # only save the results once!
-        df.to_csv(os.path.join(out_folder, 'data_scaling_{}.csv'.format(model_type)), index=False)
-
     cleanup()
 
     if rank == 0:
@@ -209,3 +199,8 @@ def data_scaling(rank, args):
 
 if __name__ == '__main__':
     ddp_main(data_scaling)
+
+
+# todo: edit the way I plot the datascaling
+# This code just runs the models and saves the predictions. The plotting script then takes the folder and parses it.
+# It handles pulling out targets and predictions and then it can build any metric required based on those

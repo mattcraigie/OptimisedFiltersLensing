@@ -166,10 +166,6 @@ class Trainer:
     def load_best_model(self):
         self.regressor.load_state_dict(self.best_regressor_params)
 
-    def test(self):
-        assert self.test_pred is not None, "Must run make_predictions() first"
-        return self.val_criterion(self.test_pred, self.test_targets, self.regressor).item()
-
     def make_predictions(self):
         self.regressor.eval()
         with torch.no_grad():

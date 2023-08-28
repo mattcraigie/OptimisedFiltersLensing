@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
-                 show_repeats=False, quantiles=True):
+                 show_repeats=False, quantiles=True, figsize=(12, 8)):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -14,14 +14,37 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     if colours is None:
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
-    fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
-    for i in range(len(scaling_paths)):
-        scaling_df = pd.read_csv(scaling_paths[i])
-        mse_norm = scaling_df.iloc[:, 1:]
-        rmse_norm = np.sqrt(mse_norm)
+    # test run to get the num_params setup for plotting
+    fig, axes = plt.subplots(figsize=figsize, dpi=100)
 
+    for i in range(len(scaling_paths)):
+
+        #### ~~~~ REPLACE ~~~~ ####
+        subsets = []
+        subset_rmses = []
+        for path in os.listdir(scaling_paths[i]):
+            subset_size = int(path[7:])
+
+            targets = torch.load(os.path.join(scaling_paths[i], path, 'targets.pt'))
+            predictions = torch.load(os.path.join(scaling_paths[i], path, 'predictions.pt'))
+
+
+            param_rmses = []
+            for j in range(num_params):
+                targs_test_j = transform(targets['test'][:, j], j)
+                preds_test_j = transform(predictions['test'][:, j], j)
+
+                rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j) ** 2))
+                subset_rmses.append(rmse_j)
+
+            subsets.append(subset_size)
+            subset_rmses.append(param_rmses)
+
+        rmse = np.array(subset_rmses)  # shape (subsets, params)
         # rescale all values to data units if transform is provided
-        rmse = rmse_norm * transform_std if transform_std is not None else rmse_norm
+
+        transform_std = np.array(transform_std)[None, :]
+        rmse *= transform_std if transform_std is not None else 1
 
         if quantiles:
             rmse_mid = np.median(rmse, axis=1)
@@ -32,46 +55,53 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             rmse_low = rmse_mid - np.std(rmse, axis=1)
             rmse_high = rmse_mid + np.std(rmse, axis=1)
 
+        num_params = rmse.shape[1]
 
-        x = scaling_df['data_subset']
-        ax.plot(x, rmse_mid, linewidth=4, label=labels[i], c=colours[i])
-        # scatter with a square marker
-        ax.scatter(x, rmse_mid, c=colours[i], s=35, marker='s')
-        ax.plot(x, rmse_low, alpha=0.3, linewidth=1.5, c=colours[i])
-        ax.plot(x, rmse_high, alpha=0.3, linewidth=1.5, c=colours[i])
-        ax.fill_between(x, rmse_low, rmse_high, alpha=0.15, color=colours[i])
+        for j in range(num_params):
+            if i == 0:
+                fig.add_subplot(1, num_params, j)
 
-        if show_repeats:
-            for j in range(rmse.shape[0]):
-                ax.scatter([x[j] for _ in range(rmse.shape[1])], rmse.iloc[j], c=colours[i], alpha=0.4, marker='x')
+            x = scaling_df['data_subset']
+            axes[j].plot(x, rmse_mid, linewidth=4, label=labels[i], c=colours[i])
+            # scatter with a square marker
+            axes[j].scatter(x, rmse_mid, c=colours[i], s=35, marker='s')
+            axes[j].plot(x, rmse_low, alpha=0.3, linewidth=1.5, c=colours[i])
+            axes[j].plot(x, rmse_high, alpha=0.3, linewidth=1.5, c=colours[i])
+            axes[j].fill_between(x, rmse_low, rmse_high, alpha=0.15, color=colours[i])
 
-    ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
-    ax.set_ylabel('Test RMSE', fontsize=20)
+            if show_repeats:
+                for j in range(rmse.shape[0]):
+                    axes.scatter([x[j] for _ in range(rmse.shape[1])], rmse.iloc[j], c=colours[i], alpha=0.4, marker='x')
 
-    # create a legend with the labels fontsize 16
-    ax.legend(fontsize=16)
+            axes[j].set_xlabel('Number of Training Cosmologies', fontsize=20)
+
+            if logy and not logx:
+                axes[j].semilogy()
+            elif logx and not logy:
+                axes[j].semilogx()
+            elif logy and logx:
+                axes[j].loglog()
+
+            if not logy:
+                axes[j].set_ylim(bottom=0)
+
+            # Set tick label sizes after logging
+            axes[j].tick_params(axis='both', which='major', labelsize=16)
+            axes[j].tick_params(axis='both', which='minor', labelsize=16)
 
 
+        # create a legend with the labels fontsize 16
+        axes[0].legend(fontsize=16)
+        axes[0].set_ylabel('Test RMSE', fontsize=20)
 
 
-    if logy and not logx:
-        plt.semilogy()
-    if logx and not logy:
-        plt.semilogx()
-    if logy and logx:
-        plt.loglog()
-    if not logy:
-        plt.ylim(bottom=0)
-
-    # set tick label sizes after logging
-    ax.tick_params(axis='both', which='major', labelsize=16)
-    ax.tick_params(axis='both', which='minor', labelsize=16)
 
 
     if save_path is not None:
         plt.savefig(save_path)
     else:
         plt.show()
+
 
 
 def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labels=None, colours=None,
