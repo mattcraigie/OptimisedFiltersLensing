@@ -154,25 +154,12 @@ def data_scaling(rank, args):
             logging.debug(f"Running train and validation trainer on rank {rank}")
             trainer.train_loop(num_epoch)
 
-            logging.debug(f"testing the best validated model on rank {rank}")
-
-            if rank == 0:
-
-                logging.debug(f"final model is {trainer.regressor.module.regressor.model[0].weight[0]}")
-                logging.debug(f"best model is {trainer.best_regressor_params['module.regressor.model.0.weight'][0]}")
-                logging.debug(f"loading the best model on rank {rank}")
-
+            logging.debug(f"Making predictions on rank {rank}")
             trainer.load_best_model()
-
-            if rank == 0:
-
-                logging.debug(f"loaded model is {trainer.regressor.module.regressor.model[0].weight[0]}")
-
-            logging.debug(f"making predictions on rank {rank}")
             trainer.make_predictions()
 
             if rank == 0:
-                logging.debug(f"saving the results on rank {rank}")
+                logging.debug(f"Saving the results on rank {rank}")
 
                 # save the model and predictions if it's the first repeat
                 repeat_padded = str(i).zfill(2)
@@ -186,8 +173,6 @@ def data_scaling(rank, args):
                 logging.info("Subset {} took {:.2f} seconds.".format(subset, subset_end_time - subset_start_time))
 
         if rank == 0:
-            df[f'run_{str(i)}'] = model_results
-
             repeat_end_time = time.time()
             logging.info("Repeat {} took {:.2f} seconds.".format(i, repeat_end_time - repeat_start_time))
 
