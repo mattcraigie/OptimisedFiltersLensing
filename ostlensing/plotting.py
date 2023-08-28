@@ -63,8 +63,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             rmse_high = np.quantile(all_rmse, 0.75, axis=0)
         else:
             rmse_mid = np.mean(rmse, axis=0)
-            rmse_low = rmse_mid - np.std(rmse, axis=0)
-            rmse_high = rmse_mid + np.std(rmse, axis=0)
+            rmse_low = rmse_mid - np.std(all_rmse, axis=0)
+            rmse_high = rmse_mid + np.std(all_rmse, axis=0)
 
         # rmses are shape (subsets, params)
 
