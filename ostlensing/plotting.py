@@ -88,16 +88,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             axes[j].set_xlabel('Number of Training Cosmologies', fontsize=20)
 
-            if logy and not logx:
-                axes[j].semilogy()
-            elif logx and not logy:
-                axes[j].semilogx()
-            elif logy and logx:
-                axes[j].loglog()
-
-            if not logy:
-                axes[j].set_ylim(bottom=0)
-
             # Set tick label sizes after logging
             axes[j].tick_params(axis='both', which='major', labelsize=16)
             axes[j].tick_params(axis='both', which='minor', labelsize=16)
