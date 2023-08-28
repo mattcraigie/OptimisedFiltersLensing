@@ -9,7 +9,7 @@ import copy
 # ~~~ Loss Functions ~~~ #
 
 
-def mse_and_admissibility(output, target, model, weighting=1.0, edge_constraints=True):
+def mse_and_admissibility(output, target, model, weighting=1.0, edge_constraints=False):
     loss = nn.functional.mse_loss(output, target)
     ft = model.filters.filter_tensor
 
