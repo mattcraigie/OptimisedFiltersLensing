@@ -44,8 +44,9 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         rmse = np.array(subset_rmses)  # shape (subsets, params)
         # rescale all values to data units if transform is provided
 
-        transform_std = np.array(transform_std)[None, :]
-        rmse *= transform_std if transform_std is not None else 1
+        if transform_std is not None:
+            transform_std = np.array(transform_std)[None, :]
+            rmse *= transform_std
 
         if quantiles:
             rmse_mid = np.median(rmse, axis=1)
