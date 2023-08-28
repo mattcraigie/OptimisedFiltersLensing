@@ -20,13 +20,13 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     for i, scaling_dir in enumerate(scaling_paths):
 
         repeat_dirs = os.listdir(scaling_dir)
-        repeat_dirs = np.shuffle(repeat_dirs)
+        repeat_dirs = np.sort(repeat_dirs)
         repeat_rmses = []
 
         for repeat_dir in repeat_dirs:
 
             subset_dirs = os.listdir(os.path.join(scaling_dir, repeat_dir))
-            subset_dirs = np.shuffle(subset_dirs)
+            subset_dirs = np.sort(subset_dirs)
             subset_sizes = []
             subset_rmses = []
 
