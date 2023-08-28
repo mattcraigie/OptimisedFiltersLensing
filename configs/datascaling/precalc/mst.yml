@@ -1,9 +1,9 @@
 data:
-  data_path: '//pscratch/sd/m/mcraigie/dirac/'          # path to main data directory
+  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
   data_subpath: 'mst_std.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
-    load_subset: 83                                       # Subset of cosmologies to load (saves memory), 2500 for all
+    load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
     patch_subset: 16                                        # Subset of patches per cosmology, 192 for all
     val_ratio: 0.2                                          # Portion of data to use for validation
     test_ratio: 0.2                                         # Portion of data to use for testing
@@ -24,6 +24,6 @@ training:
   learning_rate: 0.0005                                     # Learning rate
 
 analysis:
-  analysis_name: 'mst_dirac'
-  data_subsets: [67,] #[30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
+  analysis_name: 'mst'
+  data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
