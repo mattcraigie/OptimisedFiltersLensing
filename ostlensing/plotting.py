@@ -79,16 +79,21 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                 for k in range(all_rmse.shape[1]):
                     axes[j].scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i], alpha=0.4, marker='x')
 
-            axes[j].set_xlabel('Number of Training Cosmologies', fontsize=20)
+            axes[j].set_xlabel('Number of Training Cosmologies', fontsize=16)
 
             # Set tick label sizes after logging
-            axes[j].tick_params(axis='both', which='major', labelsize=16)
-            axes[j].tick_params(axis='both', which='minor', labelsize=16)
+            axes[j].tick_params(axis='both', which='major', labelsize=12)
+            axes[j].tick_params(axis='both', which='minor', labelsize=12)
 
+            if logx and logy:
+                axes[j].loglog()
+            elif logx:
+                axes[j].semilogx()
+            elif logy:
+                axes[j].semilogy()
 
-        # create a legend with the labels fontsize 16
-        axes[0].legend(fontsize=16)
-        axes[0].set_ylabel('Test RMSE', fontsize=20)
+        axes[0].legend(fontsize=12)
+        axes[0].set_ylabel('Test RMSE', fontsize=16)
 
 
 
