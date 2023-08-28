@@ -46,6 +46,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                     param_rmses.append(rmse_j)
 
                 subset_rmses.append(np.array(param_rmses))
+            print(subset_rmses)
             repeat_rmses.append(subset_rmses)
 
         subset_sizes = np.array(subset_sizes)  # shape (subsets,)
