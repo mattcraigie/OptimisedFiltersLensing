@@ -43,7 +43,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                     targs_test_j = targets['test'][:, j].numpy()
                     preds_test_j = predictions['test'][:, j].numpy()
                     rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j)**2))
-                    subset_rmses.append(rmse_j)
+                    param_rmses.append(rmse_j)
 
                 subset_rmses.append(param_rmses)
             repeat_rmses.append(subset_rmses)
