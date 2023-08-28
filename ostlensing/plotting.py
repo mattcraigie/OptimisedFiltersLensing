@@ -71,11 +71,10 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             rmse_high = rmse_mid + np.std(all_rmse, axis=0)
 
         # rmses are shape (subsets, params)
+        if i == 0:
+            axes = [fig.add_subplot(1, num_params, j + 1) for j in range(num_params)]
 
         for j in range(num_params):
-            if i == 0:
-                fig.add_subplot(1, num_params, j+1)
-
             axes[j].plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
             # scatter with a square marker
             axes[j].scatter(subset_sizes, rmse_mid[:, j], c=colours[i], s=35, marker='s')
