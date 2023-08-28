@@ -81,16 +81,19 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             axes[j].set_xlabel('Number of Training Cosmologies', fontsize=16)
 
-            # Set tick label sizes after logging
-            axes[j].tick_params(axis='both', which='major', labelsize=12)
-            axes[j].tick_params(axis='both', which='minor', labelsize=12)
-
             if logx and logy:
+                print('should be loglog')
                 axes[j].loglog()
             elif logx:
                 axes[j].semilogx()
             elif logy:
                 axes[j].semilogy()
+
+            # Set tick label sizes after logging
+            axes[j].tick_params(axis='both', which='major', labelsize=12)
+            axes[j].tick_params(axis='both', which='minor', labelsize=12)
+
+
 
         axes[0].legend(fontsize=12)
         axes[0].set_ylabel('Test RMSE', fontsize=16)
