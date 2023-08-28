@@ -15,7 +15,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
     # test run to get the num_params setup for plotting
-    fig, axes = plt.subplots(figsize=figsize, dpi=100, ncols=ncols)
+    fig, axes = plt.subplots(ncols=2, figsize=figsize, dpi=100)
 
     for i, scaling_dir in enumerate(scaling_paths):
 
@@ -51,11 +51,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         subset_sizes = np.array(subset_sizes)  # shape (subsets,)
         all_rmse = np.stack(repeat_rmses)  # shape (repeats, subsets, params)
 
-        print(all_rmse)
-        print(all_rmse.shape)
-        print(type(all_rmse))
-
-        # rescale all values to data units if transform is provided
 
         if transform_std is not None:
             transform_std = np.array(transform_std)[None, None, :]
