@@ -27,7 +27,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             targets = torch.load(os.path.join(scaling_paths[i], path, 'targets.pt'))
             predictions = torch.load(os.path.join(scaling_paths[i], path, 'predictions.pt'))
-
+            num_params = targets['test'].shape[1]
 
             param_rmses = []
             for j in range(num_params):
