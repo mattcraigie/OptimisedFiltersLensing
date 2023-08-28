@@ -51,6 +51,10 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         subset_sizes = np.array(subset_sizes)  # shape (subsets,)
         all_rmse = np.array(repeat_rmses)  # shape (repeats, subsets, params)
 
+        print(all_rmse)
+        print(all_rmse.shape)
+        print(type(all_rmse))
+
         # rescale all values to data units if transform is provided
 
         if transform_std is not None:
@@ -62,7 +66,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             rmse_low = np.quantile(all_rmse, 0.25, axis=0)
             rmse_high = np.quantile(all_rmse, 0.75, axis=0)
         else:
-            rmse_mid = np.mean(rmse, axis=0)
+            rmse_mid = np.mean(all_rmse, axis=0)
             rmse_low = rmse_mid - np.std(all_rmse, axis=0)
             rmse_high = rmse_mid + np.std(all_rmse, axis=0)
 
