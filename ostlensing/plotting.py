@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
-                 show_repeats=False, quantiles=True, figsize=(12, 8), ncols=1):
+                 show_repeats=False, quantiles=True, figsize=(12, 8), ncols=1, param_labels=None):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -81,6 +81,9 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             axes[j].set_xlabel('Number of Training Cosmologies', fontsize=16)
 
+            if param_labels is not None:
+                axes[j].set_title(param_labels[j])
+
             if logx and logy:
                 print('should be loglog')
                 axes[j].loglog()
@@ -100,83 +103,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
 
 
-
-    if save_path is not None:
-        plt.savefig(save_path)
-    else:
-        plt.show()
-
-
-
-def plot_improvement(baseline_path, other_paths, save_path=None, logx=True, labels=None, colours=None,
-                     show_repeats=False, quantiles=True, ylims=None):
-    if labels is None:
-        labels = [str(i) for i in range(len(other_paths))]
-
-    if colours is None:
-        colours = ['C' + str(i) for i in range(len(other_paths))]
-
-    # baseline
-
-    baseline_df = pd.read_csv(baseline_path)
-    baseline_x = baseline_df['data_subset']
-    baseline_mse = baseline_df.iloc[:, 1:]
-    baseline_rmse = np.sqrt(baseline_mse)
-    if quantiles:
-        baseline_rmse = np.median(baseline_rmse, axis=1)
-    else:
-        baseline_rmse = np.mean(baseline_rmse, axis=1)
-
-    fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
-    for i in range(len(other_paths)):
-        scaling_df = pd.read_csv(other_paths[i])
-        mse = scaling_df.iloc[:, 1:]
-        rmse = np.sqrt(mse)
-
-        # calculate the fractional improvement from the baseline
-        x = scaling_df['data_subset']
-        includes = np.where(np.in1d(baseline_x.values, x.values))[0]
-
-        a = rmse.values
-        b = baseline_rmse.values[includes, None]
-        improvement = (a - b) / b * 100
-
-        if quantiles:
-            improvement_mid = np.median(improvement, axis=1)
-            improvement_low = np.quantile(improvement, 0.25, axis=1)
-            improvement_high = np.quantile(improvement, 0.75, axis=1)
-        else:
-            improvement_mid = np.mean(improvement, axis=1)
-            improvement_low = improvement_mid - np.std(improvement, axis=1)
-            improvement_high = improvement_mid + np.std(improvement, axis=1)
-
-        ax.plot(x, improvement_mid, linewidth=4, label=labels[i], c=colours[i])
-        # scatter with a square marker
-        ax.scatter(x, improvement_mid, c=colours[i], s=35, marker='s')
-        ax.plot(x, improvement_low, alpha=0.3, linewidth=1.5, c=colours[i])
-        ax.plot(x, improvement_high, alpha=0.3, linewidth=1.5, c=colours[i])
-        ax.fill_between(x, improvement_low, improvement_high, alpha=0.15, color=colours[i])
-
-        if show_repeats:
-            for j in range(improvement.shape[0]):
-                ax.scatter([x[j] for _ in range(improvement.shape[1])], improvement[j], c=colours[i], alpha=0.4,
-                           marker='x')
-
-    ax.set_xlabel('Number of Training Cosmologies', fontsize=20)
-    ax.set_ylabel('Change over Baseline (%)', fontsize=20)
-
-    if ylims is not None:
-        ax.set_ylim(ylims)
-
-    # create a legend with the labels fontsize 16
-    ax.legend(fontsize=16)
-
-    if logx:
-        plt.semilogx()
-
-    # set tick label sizes after logging
-    ax.tick_params(axis='both', which='major', labelsize=16)
-    ax.tick_params(axis='both', which='minor', labelsize=16)
 
     if save_path is not None:
         plt.savefig(save_path)
