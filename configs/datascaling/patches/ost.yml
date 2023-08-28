@@ -28,6 +28,6 @@ training:
   learning_rate: [0.001, 0.001, 0.001]                                     # Learning rate
 
 analysis:
-  analysis_name: 'ost_oms8_newcriterion'
+  analysis_name: 'ost_oms8'
   data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
   repeats: 1
