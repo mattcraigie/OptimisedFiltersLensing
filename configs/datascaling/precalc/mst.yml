@@ -24,6 +24,6 @@ training:
   learning_rate: 0.0005                                     # Learning rate
 
 analysis:
-  analysis_name: 'mst'
+  analysis_name: 'mst_oms8'
   data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
