@@ -175,11 +175,12 @@ def data_scaling(rank, args):
                 logging.debug(f"saving the results on rank {rank}")
 
                 # save the model and predictions if it's the first repeat
-                if i == 0:
-                    subset_folder = os.path.join(out_folder, f'subset_{subset}')
-                    if not os.path.exists(subset_folder):
-                        os.makedirs(subset_folder)
-                    trainer.save_all(subset_folder)
+                repeat_padded = str(i).zfill(2)
+                subset_padded = str(subset).zfill(4)
+                subset_folder = os.path.join(out_folder, f'repeat_{repeat_padded}', f'subset_{subset_padded}')
+                if not os.path.exists(subset_folder):
+                    os.makedirs(subset_folder)
+                trainer.save_all(subset_folder)
 
                 subset_end_time = time.time()
                 logging.info("Subset {} took {:.2f} seconds.".format(subset, subset_end_time - subset_start_time))
@@ -199,8 +200,3 @@ def data_scaling(rank, args):
 
 if __name__ == '__main__':
     ddp_main(data_scaling)
-
-
-# todo: edit the way I plot the datascaling
-# This code just runs the models and saves the predictions. The plotting script then takes the folder and parses it.
-# It handles pulling out targets and predictions and then it can build any metric required based on those

@@ -17,63 +17,71 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     # test run to get the num_params setup for plotting
     fig, axes = plt.subplots(figsize=figsize, dpi=100)
 
-    for i in range(len(scaling_paths)):
+    for i, scaling_dir in enumerate(scaling_paths):
 
-        #### ~~~~ REPLACE ~~~~ ####
-        subsets = []
-        subset_rmses = []
-        for path in os.listdir(scaling_paths[i]):
-            if 'subset' not in path:
-                continue
+        repeat_dirs = os.listdir(scaling_dir)
+        repeat_dirs = np.shuffle(repeat_dirs)
+        repeat_rmses = []
 
-            subset_size = int(path[7:])
-            targets = torch.load(os.path.join(scaling_paths[i], path, 'targets.pt'))
-            predictions = torch.load(os.path.join(scaling_paths[i], path, 'predictions.pt'))
-            num_params = targets['test'].shape[1]
+        for repeat_dir in repeat_dirs:
 
-            param_rmses = []
-            for j in range(num_params):
-                targs_test_j = targets['test'][:, j].numpy()
-                preds_test_j = predictions['test'][:, j].numpy()
-                rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j)**2))
-                subset_rmses.append(rmse_j)
+            subset_dirs = os.listdir(os.path.join(scaling_dir, repeat_dir))
+            subset_dirs = np.shuffle(subset_dirs)
+            subset_sizes = []
+            subset_rmses = []
 
-            subsets.append(subset_size)
-            subset_rmses.append(param_rmses)
+            for subset_dir in subset_dirs:
 
-        rmse = np.array(subset_rmses)  # shape (subsets, params)
+                subset_sizes.append(int(path[7:]))
+
+                targets = torch.load(os.path.join(scaling_dir, repeat_dir, subset_dir, 'targets.pt'))
+                predictions = torch.load(os.path.join(scaling_dir, repeat_dir, subset_dir, 'predictions.pt'))
+                num_params = targets['test'].shape[1]
+
+                param_rmses = []
+                for j in range(num_params):
+                    targs_test_j = targets['test'][:, j].numpy()
+                    preds_test_j = predictions['test'][:, j].numpy()
+                    rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j)**2))
+                    subset_rmses.append(rmse_j)
+
+                subset_rmses.append(param_rmses)
+            repeat_rmses.append(subset_rmses)
+
+        subset_sizes = np.array(subset_sizes)  # shape (subsets,)
+        all_rmse = np.array(repeat_rmses)  # shape (repeats, subsets, params)
+
         # rescale all values to data units if transform is provided
 
         if transform_std is not None:
-            transform_std = np.array(transform_std)[None, :]
-            rmse *= transform_std
+            transform_std = np.array(transform_std)[None, None, :]
+            all_rmse *= transform_std
 
         if quantiles:
-            rmse_mid = np.median(rmse, axis=1)
-            rmse_low = np.quantile(rmse, 0.25, axis=1)
-            rmse_high = np.quantile(rmse, 0.75, axis=1)
+            rmse_mid = np.median(all_rmse, axis=0)
+            rmse_low = np.quantile(all_rmse, 0.25, axis=0)
+            rmse_high = np.quantile(all_rmse, 0.75, axis=0)
         else:
-            rmse_mid = np.mean(rmse, axis=1)
-            rmse_low = rmse_mid - np.std(rmse, axis=1)
-            rmse_high = rmse_mid + np.std(rmse, axis=1)
+            rmse_mid = np.mean(rmse, axis=0)
+            rmse_low = rmse_mid - np.std(rmse, axis=0)
+            rmse_high = rmse_mid + np.std(rmse, axis=0)
 
-        num_params = rmse.shape[1]
+        # rmses are shape (subsets, params)
 
         for j in range(num_params):
             if i == 0:
                 fig.add_subplot(1, num_params, j)
 
-            x = scaling_df['data_subset']
-            axes[j].plot(x, rmse_mid, linewidth=4, label=labels[i], c=colours[i])
+            axes[j].plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
             # scatter with a square marker
-            axes[j].scatter(x, rmse_mid, c=colours[i], s=35, marker='s')
-            axes[j].plot(x, rmse_low, alpha=0.3, linewidth=1.5, c=colours[i])
-            axes[j].plot(x, rmse_high, alpha=0.3, linewidth=1.5, c=colours[i])
-            axes[j].fill_between(x, rmse_low, rmse_high, alpha=0.15, color=colours[i])
+            axes[j].scatter(subset_sizes, rmse_mid[:, j], c=colours[i], s=35, marker='s')
+            axes[j].plot(subset_sizes, rmse_low[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
+            axes[j].plot(subset_sizes, rmse_high[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
+            axes[j].fill_between(subset_sizes, rmse_low[:, j], rmse_high[:, j], alpha=0.15, color=colours[i])
 
             if show_repeats:
-                for j in range(rmse.shape[0]):
-                    axes.scatter([x[j] for _ in range(rmse.shape[1])], rmse.iloc[j], c=colours[i], alpha=0.4, marker='x')
+                for k in range(rmse.shape[0]):
+                    axes.scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i], alpha=0.4, marker='x')
 
             axes[j].set_xlabel('Number of Training Cosmologies', fontsize=20)
 
