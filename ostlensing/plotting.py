@@ -31,10 +31,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             param_rmses = []
             for j in range(num_params):
-                targs_test_j = transform(targets['test'][:, j], j)
-                preds_test_j = transform(predictions['test'][:, j], j)
-
-                rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j) ** 2))
+                rmse_j = np.sqrt(np.mean((targets['test'][:, j] - predictions['test'][:, j]) ** 2))
                 subset_rmses.append(rmse_j)
 
             subsets.append(subset_size)
