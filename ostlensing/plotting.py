@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
-                 show_repeats=False, quantiles=True, figsize=(12, 8)):
+                 show_repeats=False, quantiles=True, figsize=(12, 8), ncols=1):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -15,7 +15,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
     # test run to get the num_params setup for plotting
-    fig, axes = plt.subplots(figsize=figsize, dpi=100)
+    fig, axes = plt.subplots(figsize=figsize, dpi=100, ncols=ncols)
 
     for i, scaling_dir in enumerate(scaling_paths):
 
@@ -71,8 +71,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             rmse_high = rmse_mid + np.std(all_rmse, axis=0)
 
         # rmses are shape (subsets, params)
-        if i == 0:
-            axes = [fig.add_subplot(1, num_params, j + 1) for j in range(num_params)]
 
         for j in range(num_params):
             axes[j].plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
