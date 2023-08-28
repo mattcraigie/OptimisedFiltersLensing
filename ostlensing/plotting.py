@@ -24,13 +24,19 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         repeat_rmses = []
 
         for repeat_dir in repeat_dirs:
-            print(repeat_dir)
+
+            if 'repeat' not in repeat_dir:
+                continue
+
             subset_dirs = os.listdir(os.path.join(scaling_dir, repeat_dir))
             subset_dirs = np.sort(subset_dirs)
             subset_sizes = []
             subset_rmses = []
 
             for subset_dir in subset_dirs:
+
+                if 'subset' not in subset_dir:
+                    continue
 
                 subset_sizes.append(int(subset_dir[7:]))
 
@@ -46,7 +52,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                     param_rmses.append(rmse_j)
 
                 subset_rmses.append(np.array(param_rmses))
-            print(subset_rmses)
             repeat_rmses.append(np.stack(subset_rmses))
 
         subset_sizes = np.array(subset_sizes)  # shape (subsets,)
