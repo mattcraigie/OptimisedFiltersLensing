@@ -74,7 +74,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         for j in range(num_params):
             if i == 0:
-                fig.add_subplot(1, num_params, j)
+                fig.add_subplot(1, num_params, j+1)
 
             axes[j].plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
             # scatter with a square marker
