@@ -23,8 +23,10 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         subsets = []
         subset_rmses = []
         for path in os.listdir(scaling_paths[i]):
-            subset_size = int(path[7:])
+            if 'subset' not in path:
+                continue
 
+            subset_size = int(path[7:])
             targets = torch.load(os.path.join(scaling_paths[i], path, 'targets.pt'))
             predictions = torch.load(os.path.join(scaling_paths[i], path, 'predictions.pt'))
             num_params = targets['test'].shape[1]
