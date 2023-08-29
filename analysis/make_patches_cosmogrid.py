@@ -31,7 +31,7 @@ def process_cosmo_dir(cosmo_dir,
 
         if mask is not None:
 
-            # map normalisation
+            # map normalisation -- I'm concerned this isn't the best way to do it. I should think about this.
             full_map[mask] = np.log(full_map[mask])
             full_map[mask] = (full_map[mask] - np.mean(full_map[mask])) / np.std(full_map[mask])
             full_map[~mask] = 0
@@ -109,7 +109,7 @@ def main():
                            resolution=7,  # arcmin
                            threshold=0.2,
                            num_perms=1,
-                           map_type='dg',
+                           map_type='kg',
                            redshift_bin=2,
                            subset=30,
                            )
