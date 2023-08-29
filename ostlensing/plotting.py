@@ -16,6 +16,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
     # test run to get the num_params setup for plotting
     fig, axes = plt.subplots(ncols=ncols, figsize=figsize, dpi=100)
+    if ncols == 1:
+        axes = [axes,]
 
     for i, scaling_dir in enumerate(scaling_paths):
 
