@@ -23,7 +23,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         varied_params = False
 
     # test run to get the num_params setup for plotting
-    fig, axes = plt.subplots(ncols=len(column_params), figsize=figsize, dpi=100)
+    ncols = len(column_params)
+    fig, axes = plt.subplots(ncols=ncols, figsize=figsize, dpi=100)
 
     if ncols == 1:
         axes = [axes,]
