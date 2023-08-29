@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
-                 show_repeats=False, quantiles=True, figsize=(12, 8), ncols=1, param_labels=None):
+                 show_repeats=False, quantiles=True, figsize=(12, 8), param_labels=None):
 
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
@@ -14,8 +14,17 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     if colours is None:
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
+    if type(param_labels[0]) != str:
+        flattened = [p for params in param_labels for p in params]
+        column_params = np.unique(flattened)
+        varied_params = True
+    else:
+        column_params = param_labels
+        varied_params = False
+
     # test run to get the num_params setup for plotting
-    fig, axes = plt.subplots(ncols=ncols, figsize=figsize, dpi=100)
+    fig, axes = plt.subplots(ncols=len(column_params), figsize=figsize, dpi=100)
+
     if ncols == 1:
         axes = [axes,]
 
@@ -76,29 +85,34 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         # rmses are shape (subsets, params)
 
         for j in range(num_params):
-            axes[j].plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
+            if varied_params:
+                ax = axes[np.where(column_params == param_labels[i][j])]
+            else:
+                ax = axes[j]
+
+            ax.plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
             # scatter with a square marker
-            axes[j].scatter(subset_sizes, rmse_mid[:, j], c=colours[i], s=35, marker='s')
-            axes[j].plot(subset_sizes, rmse_low[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
-            axes[j].plot(subset_sizes, rmse_high[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
-            axes[j].fill_between(subset_sizes, rmse_low[:, j], rmse_high[:, j], alpha=0.15, color=colours[i])
+            ax.scatter(subset_sizes, rmse_mid[:, j], c=colours[i], s=35, marker='s')
+            ax.plot(subset_sizes, rmse_low[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
+            ax.plot(subset_sizes, rmse_high[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
+            ax.fill_between(subset_sizes, rmse_low[:, j], rmse_high[:, j], alpha=0.15, color=colours[i])
 
             if show_repeats:
                 for k in range(all_rmse.shape[1]):
-                    axes[j].scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i], alpha=0.4, marker='x')
+                    ax.scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i], alpha=0.4, marker='x')
 
-            axes[j].set_xlabel('Number of Training Cosmologies', fontsize=16)
+            ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
 
             if param_labels is not None:
-                axes[j].set_title(param_labels[j])
+                ax.set_title(param_labels[j])
 
             if logx and logy:
                 print('should be loglog')
-                axes[j].loglog()
+                ax.loglog()
             elif logx:
-                axes[j].semilogx()
+                ax.semilogx()
             elif logy:
-                axes[j].semilogy()
+                ax.semilogy()
 
             # Set tick label sizes after logging
             axes[j].tick_params(axis='both', which='major', labelsize=12)
