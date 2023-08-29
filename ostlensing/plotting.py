@@ -59,8 +59,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
 
         if transform_std is not None:
-            transform_std = np.array(transform_std)[None, None, :]
-            all_rmse *= transform_std
+            transform_std_arr = np.array(transform_std)[None, None, :]
+            all_rmse *= transform_std_arr
 
         if quantiles:
             rmse_mid = np.median(all_rmse, axis=0)
