@@ -15,7 +15,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         colours = ['C' + str(i) for i in range(len(scaling_paths))]
 
     # test run to get the num_params setup for plotting
-    fig, axes = plt.subplots(ncols=2, figsize=figsize, dpi=100)
+    fig, axes = plt.subplots(ncols=ncols, figsize=figsize, dpi=100)
 
     for i, scaling_dir in enumerate(scaling_paths):
 
