@@ -28,6 +28,6 @@ training:
   learning_rate: 0.001                                    # Learning rate
 
 analysis:
-  analysis_name: 'om'
+  analysis_name: 'oms8'
   data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 1

@@ -105,10 +105,10 @@ def data_scaling(rank, args):
                           log=False)
 
     # use_params = ('s8',)
-    use_params = ('Om',)
+    # use_params = ('Om',)
     # use_params = ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
     # use_params = ('s8', 'As', 'O_cdm', 'Om')
-    # use_params = ('s8', 'Om')
+    use_params = ('s8', 'Om')
     regressor_kwargs['regressor_outputs'] = len(use_params)
 
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False,
