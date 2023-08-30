@@ -117,7 +117,8 @@ def data_scaling(rank, args):
     test_loader = data_handler.get_test_loader(ddp=True)
 
     # setup train and test losses
-    train_criterion = mse_and_admissibility_ddp if model_type == 'ost' and data_type == 'patches' else mse
+    # train_criterion = mse_and_admissibility_ddp if model_type == 'ost' and data_type == 'patches' else mse
+    train_criterion = mse
     test_criterion = mse
 
     # iterate of repeat number i
