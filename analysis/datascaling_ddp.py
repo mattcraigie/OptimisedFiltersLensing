@@ -78,13 +78,7 @@ def data_scaling(rank, args):
         num_epochs = [num_epochs] * len(data_subsets)
 
     # set up logging
-    logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}_{analysis_name}_0.log')
-    if rank == 0:
-        i = 1
-        while os.path.exists(logging_filename):
-            logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}_{analysis_name}_{i}.log')
-            i += 1
-
+    logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}_{analysis_name}.log')
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")
     logger = logging.getLogger()
