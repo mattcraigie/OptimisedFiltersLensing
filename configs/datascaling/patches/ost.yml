@@ -29,5 +29,5 @@ training:
 
 analysis:
   analysis_name: 's8'
-  data_subsets: [60, 125, 500, 2000]   # Subsets of the data for the scaling analysis
+  data_subsets: [30, 125, 500, 2000]   # Subsets of the data for the scaling analysis
   repeats: 1
