@@ -57,6 +57,7 @@ def data_scaling(rank, args):
     regressor_kwargs = regressor_config['regressor_kwargs']
     model_type = regressor_kwargs['model_type']
     pretrained_model = regressor_config['pretrained_model']
+    unfreeze_filters = regressor_config['unfreeze_filters']
 
     # training params
     train_config = config['training']
@@ -144,6 +145,9 @@ def data_scaling(rank, args):
 
             try:
                 regressor.load_state_dict(torch.load(pretrained_model))
+                if unfreeze_filters:
+                    for param in regressor.model.subnet.parameters():
+                        param.requires_grad = True
                 if rank == 0:
                     logging.info("Pre-trained model loaded")
             except:
