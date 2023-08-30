@@ -7,7 +7,6 @@ import numpy as np
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
                  show_repeats=False, quantiles=True, figsize=(12, 8), param_labels=None):
-
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
 
@@ -18,6 +17,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
         flattened = [p for params in param_labels for p in params]
         column_params = np.unique(flattened)
         varied_params = True
+
     else:
         column_params = param_labels
         varied_params = False
@@ -27,7 +27,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
     fig, axes = plt.subplots(ncols=ncols, figsize=figsize, dpi=100)
 
     if ncols == 1:
-        axes = [axes,]
+        axes = [axes, ]
 
     for i, scaling_dir in enumerate(scaling_paths):
 
@@ -60,7 +60,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                 for j in range(num_params):
                     targs_test_j = targets['test'][:, j].numpy()
                     preds_test_j = predictions['test'][:, j].numpy()
-                    rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j)**2))
+                    rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j) ** 2))
                     param_rmses.append(rmse_j)
 
                 subset_rmses.append(np.array(param_rmses))
@@ -68,7 +68,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         subset_sizes = np.array(subset_sizes)  # shape (subsets,)
         all_rmse = np.stack(repeat_rmses)  # shape (repeats, subsets, params)
-
 
         if transform_std is not None:
             transform_std_arr = np.array(transform_std)[None, None, :]
@@ -87,7 +86,7 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         for j in range(num_params):
             if varied_params:
-                ax = axes[np.where(column_params == param_labels[i][j])]
+                ax = axes[np.where(column_params == param_labels[i][j])][0]
             else:
                 ax = axes[j]
 
@@ -100,12 +99,15 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
             if show_repeats:
                 for k in range(all_rmse.shape[1]):
-                    ax.scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i], alpha=0.4, marker='x')
+                    ax.scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i],
+                               alpha=0.4, marker='x')
 
             ax.set_xlabel('Number of Training Cosmologies', fontsize=16)
+            ax.legend(fontsize=12)
 
+        for i, ax in enumerate(axes):
             if param_labels is not None:
-                ax.set_title(param_labels[j])
+                ax.set_title(column_params[i])
 
             if logx and logy:
                 print('should be loglog')
@@ -116,16 +118,10 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                 ax.semilogy()
 
             # Set tick label sizes after logging
-            axes[j].tick_params(axis='both', which='major', labelsize=12)
-            axes[j].tick_params(axis='both', which='minor', labelsize=12)
+            ax.tick_params(axis='both', which='major', labelsize=12)
+            ax.tick_params(axis='both', which='minor', labelsize=12)
 
-
-
-        axes[0].legend(fontsize=12)
         axes[0].set_ylabel('Test RMSE', fontsize=16)
-
-
-
 
     if save_path is not None:
         plt.savefig(save_path)
