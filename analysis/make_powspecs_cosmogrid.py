@@ -12,7 +12,7 @@ import healpy as hp
 import pickle
 
 
-def compute_power_spectrum(data, nside, mask=None, deconv=False):
+def compute_power_spectrum(data, mask=None, deconv=False):
 
     masked_map = np.where(mask, data, hp.UNSEEN)
     alm = hp.map2alm(masked_map)
@@ -32,13 +32,10 @@ def process_cosmo_dir(cosmo_dir,
                       fname,
                       map_type,
                       redshift_bin,
-                      patch_centres,
-                      patch_size,
-                      resolution,
                       mask):
 
     print("processing {}".format(cosmo_dir))
-    cosmo_patches = []
+    power_spectra = []
     permute_dirs = np.sort([pa for pa in os.listdir(os.path.join(main_path, cosmo_dir)) if 'perm' in pa])[:num_perms]
 
     for n, permute_dir in enumerate(permute_dirs):
@@ -46,31 +43,20 @@ def process_cosmo_dir(cosmo_dir,
         f = h5py.File(p, 'r')
         full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
 
-        if mask is not None:
+        power_spectra.append(compute_power_spectrum(full_map, mask=mask))
 
-            # map normalisation -- I'm concerned this isn't the best way to do it. I should think about this.
-            full_map[mask] = np.log(full_map[mask])
-            full_map[mask] = (full_map[mask] - np.mean(full_map[mask])) / np.std(full_map[mask])
-            full_map[~mask] = 0
-        else:
-            full_map = np.log(full_map)
-            full_map = (full_map - np.mean(full_map)) / np.std(full_map)
-
-        cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
-
-    cosmo_patches = np.stack(cosmo_patches).reshape((num_perms * len(patch_centres), patch_size, patch_size))
+    cosmo_patches = np.stack(power_spectra).reshape((num_perms * len(patch_centres), patch_size, patch_size))
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
+    np.save(os.path.join(output_path, 'powspec_{}.npy'.format(cosmo_dir)), cosmo_patches)
 
 
 def make_powspecs_cosmogrid(output_path,
                            num_perms=1,
                            map_type='kg',
-                           redshift_bin=3,
-                           subset=None):
+                           redshift_bin=3):
 
     main_path = r'//global/cfs/cdirs/des/cosmogrid/DESY3/grid'
     fname = r'projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
@@ -92,8 +78,6 @@ def make_powspecs_cosmogrid(output_path,
     theta, phi = hp.pix2ang(nside, ipix)
     mask = (theta <= np.pi / 2)  # Octant mask
 
-
-
     # run loop with mp
     pool = mp.Pool()
 
@@ -104,8 +88,6 @@ def make_powspecs_cosmogrid(output_path,
                                fname=fname,
                                map_type=map_type,
                                redshift_bin=redshift_bin,
-                               patch_centres=patch_centres,
-                               patch_size=patch_size,
                                resolution=resolution,
                                mask=mask)
 
@@ -113,19 +95,25 @@ def make_powspecs_cosmogrid(output_path,
     pool.close()
     pool.join()
 
+    cosmo_dirs = os.listdir(output_path)
+    cosmo_dirs = np.sort(cosmo_dirs)
+
+    final_path = "/pscratch/sd/m/mcraigie/cosmogrid/precalc/cl_powspecs.npy"
+    all_powspecs = []
+    for cd in cosmo_dirs:
+        cosmo_powspec = np.load(cd)
+        all_powspecs.append(cosmo_powspec)
+
+    result = np.stack(all_powspecs)
+    np.save(final_path, result)
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/clustering/unmasked/"
-    make_patches_cosmogrid(output_path=output_path,
-                           patch_nside=4,
-                           patch_size=128,
-                           resolution=7,  # arcmin
-                           threshold=0.2,
+    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/powspecs/unmasked/"
+    make_powspecs_cosmogrid(output_path=output_path,
                            num_perms=1,
                            map_type='kg',
                            redshift_bin=2,
-                           subset=30,
                            )
 
 
