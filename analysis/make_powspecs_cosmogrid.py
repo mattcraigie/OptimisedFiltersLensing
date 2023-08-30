@@ -100,7 +100,7 @@ def make_powspecs_cosmogrid(output_path,
     final_path = r'//pscratch/sd/m/mcraigie/cosmogrid/precalc/cl_powspecs.npy'
     all_powspecs = []
     for cd in cosmo_dirs:
-        cosmo_powspec = np.load(cd)
+        cosmo_powspec = np.load(os.path.join(output_path, cd))
         all_powspecs.append(cosmo_powspec)
 
     result = np.stack(all_powspecs)  # shape num_cosmo, num_cls
