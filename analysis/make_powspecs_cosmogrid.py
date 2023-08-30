@@ -45,7 +45,7 @@ def process_cosmo_dir(cosmo_dir,
 
         power_spectra.append(compute_power_spectrum(full_map, mask=mask))
 
-    power_spectra = np.stack(power_spectra).reshape((num_perms * len(power_spectra), patch_size, patch_size))
+    power_spectra = np.stack(power_spectra)
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
