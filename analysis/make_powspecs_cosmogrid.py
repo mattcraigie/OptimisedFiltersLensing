@@ -75,8 +75,8 @@ def make_powspecs_cosmogrid(output_path,
 
     npix = hp.nside2npix(512)
     ipix = np.arange(npix)
-    theta, phi = hp.pix2ang(nside, ipix)
-    mask = (theta <= np.pi / 2)  # Octant mask
+    theta, phi = hp.pix2ang(512, ipix)
+    mask = np.logical_and((theta <= np.pi / 2), (phi <= np.pi / 2))
 
     # run loop with mp
     pool = mp.Pool()
@@ -104,7 +104,8 @@ def make_powspecs_cosmogrid(output_path,
         cosmo_powspec = np.load(cd)
         all_powspecs.append(cosmo_powspec)
 
-    result = np.stack(all_powspecs)
+    result = np.stack(all_powspecs)  # shape num_cosmo, num_cls
+    result = (result - np.mean(result, axis=0)) / np.std(result, axis=0)
     np.save(final_path, result)
 
 
