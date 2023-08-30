@@ -12,6 +12,19 @@ import healpy as hp
 import pickle
 
 
+def compute_power_spectrum(data, nside, mask=None, deconv=False):
+
+    masked_map = np.where(mask, data, hp.UNSEEN)
+    alm = hp.map2alm(masked_map)
+    power_spectrum = hp.alm2cl(alm)
+
+    if deconv:
+        mask_power_spectrum = hp.anafast(mask)
+        return power_spectrum / mask_power_spectrum
+
+    return power_spectrum
+
+
 def process_cosmo_dir(cosmo_dir,
                       main_path,
                       output_path,
@@ -53,11 +66,7 @@ def process_cosmo_dir(cosmo_dir,
     np.save(os.path.join(output_path, 'patches_{}.npy'.format(cosmo_dir)), cosmo_patches)
 
 
-def make_patches_cosmogrid(output_path,
-                           patch_nside=4,
-                           patch_size=128,
-                           resolution=7,  # arcmin
-                           threshold=0.2,
+def make_powspecs_cosmogrid(output_path,
                            num_perms=1,
                            map_type='kg',
                            redshift_bin=3,
@@ -77,13 +86,32 @@ def make_patches_cosmogrid(output_path,
 
     # mask = load_obj('/global/cfs/cdirs/des//mass_maps/Maps_final//mask_DES_y3')
     # mask = hp.ud_grade(mask, nside_out=512)
-    # patch_centres = compute_patch_centres(patch_nside, mask.copy().astype(np.float64), threshold)
 
-    mask = None
-    patch_centres = compute_patch_centres(patch_nside, mask, threshold)
+    npix = hp.nside2npix(512)
+    ipix = np.arange(npix)
+    theta, phi = hp.pix2ang(nside, ipix)
+    mask = (theta <= np.pi / 2)  # Octant mask
 
-    if subset is not None:
-        patch_centres = patch_centres[:subset]
+
+
+    # run loop with mp
+    pool = mp.Pool()
+
+    process_function = partial(process_cosmo_dir,
+                               main_path=main_path,
+                               output_path=output_path,
+                               num_perms=num_perms,
+                               fname=fname,
+                               map_type=map_type,
+                               redshift_bin=redshift_bin,
+                               patch_centres=patch_centres,
+                               patch_size=patch_size,
+                               resolution=resolution,
+                               mask=mask)
+
+    pool.map(process_function, cosmo_dirs)
+    pool.close()
+    pool.join()
 
 
 
@@ -104,22 +132,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-compute_power_spectrum(nside=512)
-
-def compute_power_spectrum(data, nside, mask=None, deconv=False):
-
-    if mask is None:
-        npix = hp.nside2npix(nside)
-        ipix = np.arange(npix)
-        theta, phi = hp.pix2ang(nside, ipix)
-        mask = (theta <= np.pi / 2)  # Octant mask
-
-    masked_map = np.where(mask, data, hp.UNSEEN)
-    alm = hp.map2alm(masked_map)
-    power_spectrum = hp.alm2cl(alm)
-
-    if deconv:
-        mask_power_spectrum = hp.anafast(mask)
-        return power_spectrum / mask_power_spectrum
-
-    return power_spectrum
