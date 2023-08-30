@@ -88,7 +88,6 @@ def make_powspecs_cosmogrid(output_path,
                                fname=fname,
                                map_type=map_type,
                                redshift_bin=redshift_bin,
-                               resolution=resolution,
                                mask=mask)
 
     pool.map(process_function, cosmo_dirs)
