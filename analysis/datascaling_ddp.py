@@ -81,7 +81,7 @@ def data_scaling(rank, args):
     logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}_{analysis_name}_0.log')
     if rank == 0:
         i = 1
-        while not os.path.exists(logging_filename):
+        while os.path.exists(logging_filename):
             logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}_{analysis_name}_{i}.log')
             i += 1
 
