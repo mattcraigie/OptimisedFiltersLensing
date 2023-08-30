@@ -21,6 +21,7 @@ regressor:
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [64, 64]
     regressor_batchnorm: False
+  pretrained_model: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/ost/oms8/repeat_00/subset_2000/model.pt'
 
 training:
   num_epochs: 10000                                          # Number of training epochs

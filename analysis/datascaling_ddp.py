@@ -56,6 +56,7 @@ def data_scaling(rank, args):
     regressor_config = config['regressor']
     regressor_kwargs = regressor_config['regressor_kwargs']
     model_type = regressor_kwargs['model_type']
+    pretrained_model = regressor_config['pretrained_model']
 
     # training params
     train_config = config['training']
@@ -140,6 +141,9 @@ def data_scaling(rank, args):
 
             logging.debug(f"Setting up the regressor on rank {rank}")
             regressor = ModelRegressor(**regressor_kwargs)
+
+            if pretrained_model is not None:
+                regressor.load_state_dict(torch.load(pretrained_model))
 
             logging.debug(f"Sending the regressor to rank {rank}")
             regressor.to(rank)
