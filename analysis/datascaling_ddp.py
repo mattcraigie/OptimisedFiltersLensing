@@ -144,9 +144,11 @@ def data_scaling(rank, args):
 
             try:
                 regressor.load_state_dict(torch.load(pretrained_model))
-                logging.info("Pre-trained model loaded")
+                if rank == 0:
+                    logging.info("Pre-trained model loaded")
             except:
-                logging.info("No pre-trained model loaded")
+                if rank == 0:
+                    logging.info("No pre-trained model loaded")
 
             logging.debug(f"Sending the regressor to rank {rank}")
             regressor.to(rank)
