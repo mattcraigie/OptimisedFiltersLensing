@@ -104,8 +104,8 @@ def data_scaling(rank, args):
     data_handler.add_data(os.path.join(data_path, data_type, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
 
-    use_params = ('s8',)
-    # use_params = ('Om',)
+    # use_params = ('s8',)
+    use_params = ('Om',)
     # use_params = ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
     # use_params = ('s8', 'As', 'O_cdm', 'Om')
     # use_params = ('s8', 'Om')
