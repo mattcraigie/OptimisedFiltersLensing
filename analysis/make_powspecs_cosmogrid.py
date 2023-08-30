@@ -104,7 +104,7 @@ def make_powspecs_cosmogrid(output_path,
         cosmo_powspec = np.log(cosmo_powspec)
         all_powspecs.append(cosmo_powspec)
 
-    result = np.cat(all_powspecs, axis=0)  # shape num_cosmo, num_cls
+    result = np.stack(all_powspecs)  # shape num_cosmo, num_cls
     result = (result - np.mean(result, axis=0)) / np.std(result, axis=0)
     np.save(final_path, result)
 

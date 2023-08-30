@@ -1,10 +1,10 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'ps_std.npy'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'cl_powspecs.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
-    patch_subset: 16                                    # Subset of patches per cosmology, 192 for all
+    patch_subset: 1                                    # Subset of patches per cosmology, 192 for all
     val_ratio: 0.2                                          # Portion of data to use for validation
     test_ratio: 0.2                                         # Portion of data to use for testing
     seed: 0                                                 # Random seed for data splitting
@@ -15,8 +15,8 @@ regressor:
     regressor_type: 'precalc'
     model_type: 'ps'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: None
-    regressor_inputs: 12                                    # Number of features
-    regressor_hiddens: [64, 64]
+    regressor_inputs: 1536                                    # Number of features
+    regressor_hiddens: [512, 512]
 
 training:
   num_epochs: 2000                                          # Number of training epochs
