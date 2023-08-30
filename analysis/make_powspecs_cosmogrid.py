@@ -62,7 +62,7 @@ def make_powspecs_cosmogrid(output_path,
     fname = r'projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
 
     cosmo_dirs = os.listdir(main_path)
-    cosmo_dirs = np.sort(cosmo_dirs)[:10]
+    cosmo_dirs = np.sort(cosmo_dirs)
 
     def load_obj(name):
         with open(name + '.pkl', 'rb') as f:
@@ -101,9 +101,10 @@ def make_powspecs_cosmogrid(output_path,
     all_powspecs = []
     for cd in cosmo_dirs:
         cosmo_powspec = np.load(os.path.join(output_path, cd))
+        cosmo_powspec = np.log(cosmo_powspec)
         all_powspecs.append(cosmo_powspec)
 
-    result = np.stack(all_powspecs)  # shape num_cosmo, num_cls
+    result = np.cat(all_powspecs, axis=0)  # shape num_cosmo, num_cls
     result = (result - np.mean(result, axis=0)) / np.std(result, axis=0)
     np.save(final_path, result)
 
