@@ -39,10 +39,9 @@ def data_scaling(rank, args):
         rank (int): The rank of the process.
         args (argparse.Namespace): The command line arguments. This function only uses args.config.
     """
-    print('starting the datascaling function')
     # look at path and
     setup(rank, args)
-    print('finished setup')
+
     # Load configuration settings
     config = args.config
 
@@ -81,7 +80,6 @@ def data_scaling(rank, args):
     logging_filename = os.path.join('outputs', 'logs', f'{data_type}_{model_type}_{analysis_name}.log')
     print(logging_filename)
     if rank == 0 and os.path.exists(logging_filename):
-        print('deleting old log file')
         os.remove(logging_filename)
     logging.basicConfig(filename=logging_filename, level=logging.INFO)
     logging.info(f"Running data scaling analysis on rank {rank}.")

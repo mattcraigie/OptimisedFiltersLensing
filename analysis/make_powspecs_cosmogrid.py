@@ -45,12 +45,12 @@ def process_cosmo_dir(cosmo_dir,
 
         power_spectra.append(compute_power_spectrum(full_map, mask=mask))
 
-    cosmo_patches = np.stack(power_spectra).reshape((num_perms * len(patch_centres), patch_size, patch_size))
+    power_spectra = np.stack(power_spectra).reshape((num_perms * len(patch_centres), patch_size, patch_size))
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    np.save(os.path.join(output_path, 'powspec_{}.npy'.format(cosmo_dir)), cosmo_patches)
+    np.save(os.path.join(output_path, 'powspec_{}.npy'.format(cosmo_dir)), power_spectra)
 
 
 def make_powspecs_cosmogrid(output_path,
@@ -62,7 +62,7 @@ def make_powspecs_cosmogrid(output_path,
     fname = r'projected_probes_maps_baryonified512.h5'  # can also be nobaryons512.h5
 
     cosmo_dirs = os.listdir(main_path)
-    cosmo_dirs = np.sort(cosmo_dirs)
+    cosmo_dirs = np.sort(cosmo_dirs)[:10]
 
     def load_obj(name):
         with open(name + '.pkl', 'rb') as f:
@@ -97,7 +97,7 @@ def make_powspecs_cosmogrid(output_path,
     cosmo_dirs = os.listdir(output_path)
     cosmo_dirs = np.sort(cosmo_dirs)
 
-    final_path = "/pscratch/sd/m/mcraigie/cosmogrid/precalc/cl_powspecs.npy"
+    final_path = r'//pscratch/sd/m/mcraigie/cosmogrid/precalc/cl_powspecs.npy'
     all_powspecs = []
     for cd in cosmo_dirs:
         cosmo_powspec = np.load(cd)
@@ -109,7 +109,7 @@ def make_powspecs_cosmogrid(output_path,
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/powspecs/unmasked/"
+    output_path = r'//pscratch/sd/m/mcraigie/cosmogrid/powspecs/unmasked/'
     make_powspecs_cosmogrid(output_path=output_path,
                            num_perms=1,
                            map_type='kg',
