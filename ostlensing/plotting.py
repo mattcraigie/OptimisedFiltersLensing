@@ -166,10 +166,14 @@ class ModelPlotter:
             k = filters[j, 0, :, :]
 
             # keep the corners of the filters
-            cs = size // 2**j
             if j != 0:
+                cs = size // 2 ** j
                 sl = slice(size // 2 - cs // 2, size // 2 + cs // 2)
                 k = torch.fft.fftshift(torch.fft.fftshift(k)[sl, sl])
+                print(k.shape)
+                print(k[0])
+
+
             x = torch.fft.fftshift(torch.fft.fft2(k))
 
             axes[j, 0].imshow(torch.fft.fftshift(k))
