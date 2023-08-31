@@ -80,7 +80,7 @@ class OSTWrapper(nn.Module):
                  subnet_activations=nn.SiLU,
                  scale_invariant=False,
                  init_morlet=False,
-                 freeze_subnet=False
+                 freeze_filters=False
                  ):
         super(OSTWrapper, self).__init__()
 
@@ -91,7 +91,7 @@ class OSTWrapper(nn.Module):
             self.subnet = SubNet(num_ins=subnet_inputs, hidden_sizes=subnet_hiddens, num_outs=1, activation=subnet_activations)
             self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
                                                 scale_invariant=scale_invariant, init_morlet=init_morlet)
-            if freeze_subnet:
+            if freeze_filters:
                 for param in self.subnet.parameters():
                     param.requires_grad = False
 
