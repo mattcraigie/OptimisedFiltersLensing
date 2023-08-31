@@ -164,29 +164,25 @@ class ModelPlotter:
         fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols * 3, nrows * 3))
         for j in range(filters.shape[0]):
             k = filters[j, 0, :, :]
-            k_full = k.clone()
 
             # keep the corners of the filters
-            k = torch.fft.fftshift(k)
-            keep_size = filter_size // 2**j
-            half = keep_size // 2
-            k = k[64 - half:64 + half, 64 - half:64 + half]
+            cs = filter_size // 2**j
+            sl = slice(size // 2 - cs // 2, size // 2 + cs // 2)
+            k = torch.fft.fftshift(torch.fft.fftshift(k)[sl, sl])
+            x = torch.fft.fftshift(torch.fft.fft2(k))
 
-            axes[j, 0].imshow(k)
-            axes[j, 0].axis('off')
+            fig, axes = plt.subplots(ncols=3, figsize=(16, 5))
 
-            x = torch.fft.fft2(k_full)
-            x = torch.fft.fftshift(x)
-            # keep the middle of the filters
-            keep_size = 2**(j+3)
-            half = keep_size // 2
-            x = x[64 - half:64 + half, 64 - half:64 + half]
-
+            axes[j, 0].imshow(torch.fft.fftshift(k))
             axes[j, 1].imshow(x.real)
             axes[j, 1].axis('off')
 
             axes[j, 2].imshow(x.imag)
             axes[j, 2].axis('off')
+
+            plt.show()
+
+
         plt.tight_layout()
         if save_path is not None:
             plt.savefig(save_path)
