@@ -157,7 +157,7 @@ class ModelPlotter:
             raise AttributeError('Model does not have filters.')
 
         filters = self.filters
-        filter_size = filters.shape[-1]
+        size = filters.shape[-1]
 
         ncols = 3
         nrows = filters.shape[0]
@@ -166,12 +166,11 @@ class ModelPlotter:
             k = filters[j, 0, :, :]
 
             # keep the corners of the filters
-            cs = filter_size // 2**j
-            sl = slice(size // 2 - cs // 2, size // 2 + cs // 2)
-            k = torch.fft.fftshift(torch.fft.fftshift(k)[sl, sl])
+            cs = size // 2**j
+            if j != 0:
+                sl = slice(size // 2 - cs // 2, size // 2 + cs // 2)
+                k = torch.fft.fftshift(torch.fft.fftshift(k)[sl, sl])
             x = torch.fft.fftshift(torch.fft.fft2(k))
-
-            fig, axes = plt.subplots(ncols=3, figsize=(16, 5))
 
             axes[j, 0].imshow(torch.fft.fftshift(k))
             axes[j, 1].imshow(x.real)
