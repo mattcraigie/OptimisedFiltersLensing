@@ -170,14 +170,9 @@ class ModelPlotter:
                 cs = size // 2 ** j
                 sl = slice(size // 2 - cs // 2, size // 2 + cs // 2)
                 k = torch.fft.fftshift(torch.fft.fftshift(k)[sl, sl])
-                print(k.shape)
-                print(k[0])
-
-            print(j)
 
             x = torch.fft.fftshift(torch.fft.fft2(k))
 
-            print('should be plotting')
             axes[j, 0].imshow(torch.fft.fftshift(k))
             axes[j, 0].axis('off')
 
@@ -186,9 +181,6 @@ class ModelPlotter:
 
             axes[j, 2].imshow(x.imag)
             axes[j, 2].axis('off')
-
-            plt.show()
-
 
         plt.tight_layout()
         if save_path is not None:
