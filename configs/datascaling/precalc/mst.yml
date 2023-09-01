@@ -17,6 +17,8 @@ regressor:
     model_kwargs: null
     regressor_inputs: 11                                    # Number of features  (4, 4: 11 rot /23 ang)
     regressor_hiddens: [64, 64]
+  pretrained_model: None
+  unfreeze_filters: False
 
 training:
   num_epochs: 5000                                          # Number of training epochs
