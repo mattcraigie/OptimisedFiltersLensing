@@ -12,8 +12,8 @@ from ostlensing.dataloading import load_and_apply, Scaler
 from ostlensing.models import ResNetWrapper
 
 
-def st_func(filters, reduction, device):
-    st = ScatteringTransform2d(filters)
+def st_func(filters, reduction, device, clip_sizes=None):
+    st = ScatteringTransform2d(filters, clip_sizes=clip_sizes)
     st.to(device)
     reducer = Reducer(filters, reduction=reduction, normalise_s2=True)
     return lambda x: reducer(st(x))
@@ -24,10 +24,15 @@ def mst(size, num_scales, num_angles, reduction, device):
     return st_func(morlet, reduction, device)
 
 
+def clipped_mst(size, num_scales, num_angles, reduction, device):
+    morlet = ClippedMorlet(size, num_scales, num_angles)
+    return st_func(morlet, reduction, device, clip_sizes=[size // 2 ** j for j in range(num_scales)])
+
+
 def ost(filter_path, reduction, device):
     filters = torch.load(filter_path)
     filter_bank = FixedFilterBank(filters)
-    return st_func(filter_bank, reduction, device)
+    return st_func(filter_bank, reduction, device, clip_sizes=[size // 2 ** j for j in range(num_scales)])
 
 
 def resnet(model_state_dict_path, pretrained_model, device):
@@ -46,17 +51,17 @@ def pk(size, num_bins, device):
 
 def box(size, num_scales, num_angles, reduction, device):
     b = Box(size, num_scales, num_angles)
-    return st_func(b, reduction, device)
+    return st_func(b, reduction, device, clip_sizes=[size // 2 ** j for j in range(num_scales)])
 
 
 def bandpass(size, num_scales, num_angles, reduction, device):
     b = BandPass(size, num_scales, num_angles)
-    return st_func(b, reduction, device)
+    return st_func(b, reduction, device, clip_sizes=[size // 2 ** j for j in range(num_scales)])
 
 
 def lowpass(size, num_scales, num_angles, reduction, device):
     b = LowPass(size, num_scales, num_angles)
-    return st_func(b, reduction, device)
+    return st_func(b, reduction, device, clip_sizes=[size // 2 ** j for j in range(num_scales)])
 
 
 def pre_calc(load_path, save_path, file_name, method, kwargs):
