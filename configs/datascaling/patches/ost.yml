@@ -22,15 +22,15 @@ regressor:
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [64, 64]
     regressor_batchnorm: False
-  pretrained_model: '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/ost/oms8_freeze/repeat_00/subset_2000/model.pt'                                  # the pre-trained ost model to load
-  unfreeze_filters: True                                 # unfreeze the loaded filters from the pretrained_model
+  pretrained_model: None # '//global/homes/m/mcraigie/ost_project/OptimisedFiltersLensing/outputs/datascaling/patches/ost/oms8_freeze/repeat_00/subset_2000/model.pt'                                  # the pre-trained ost model to load
+  unfreeze_filters: False                                 # unfreeze the loaded filters from the pretrained_model
 
 training:
-  num_epochs: [10000, 10000, 20000, 20000]                                          # Number of training epochs
+  num_epochs: [10000, 10000, 20000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.001                                    # Learning rate
 
 analysis:
-  analysis_name: 'oms8'
-  data_subsets: [30, 125, 500, 2000,]   # Subsets of the data for the scaling analysis
+  analysis_name: 'oms8_unclipped'
+  data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
   repeats: 1
