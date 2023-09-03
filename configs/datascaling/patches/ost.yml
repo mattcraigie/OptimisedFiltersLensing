@@ -26,7 +26,7 @@ regressor:
   unfreeze_filters: False                                 # unfreeze the loaded filters from the pretrained_model
 
 training:
-  num_epochs: [10000, 10000, 20000]                                          # Number of training epochs
+  num_epochs: [10000, 20000, 20000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.001                                    # Learning rate
 
