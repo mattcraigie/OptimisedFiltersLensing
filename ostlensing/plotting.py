@@ -151,13 +151,16 @@ class ModelPlotter:
         except FileNotFoundError:
             pass
 
-    def plot_filters(self, save_path=None):
+    def plot_filters(self, save_path=None, scaled_sizes=None):
 
         if self.filters is None:
             raise AttributeError('Model does not have filters.')
 
         filters = self.filters
         size = filters.shape[-1]
+
+        if scaled_sizes is None:
+           scaled_sizes = [size // 2 ** j for j in range(filters.shape[0])]
 
         ncols = 3
         nrows = filters.shape[0]
@@ -167,7 +170,7 @@ class ModelPlotter:
 
             # keep the corners of the filters
             if j != 0:
-                cs = size // 2 ** j
+                cs = scaled_sizes[j]
                 sl = slice(size // 2 - cs // 2, size // 2 + cs // 2)
                 k = torch.fft.fftshift(torch.fft.fftshift(k)[sl, sl])
 
