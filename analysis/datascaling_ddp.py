@@ -71,6 +71,7 @@ def data_scaling(rank, args):
     data_subsets = analysis_config['data_subsets']
     repeats = analysis_config['repeats']
     analysis_name = analysis_config['analysis_name']
+    cosmo_params = analysis_config['cosmo_params']
 
     if not isinstance(learning_rates, list):
         learning_rates = [learning_rates] * len(data_subsets)
@@ -104,15 +105,10 @@ def data_scaling(rank, args):
     data_handler.add_data(os.path.join(data_path, data_type, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
 
-    # use_params = ('s8',)
-    # use_params = ('Om',)
-    # use_params = ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
-    # use_params = ('s8', 'As', 'O_cdm', 'Om')
-    use_params = ('s8', 'Om')
-    regressor_kwargs['regressor_outputs'] = len(use_params)
+    regressor_kwargs['regressor_outputs'] = len(cosmo_params)
 
     data_handler.add_targets(os.path.join(data_path, 'params_std.csv'), normalise=False,
-                             use_params=use_params)
+                             use_params=cosmo_params)
 
     # make test loader outside the loop for consistent test data
     test_loader = data_handler.get_test_loader(ddp=True)
