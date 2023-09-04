@@ -81,7 +81,7 @@ class OSTWrapper(nn.Module):
                  scale_invariant=False,
                  init_morlet=False,
                  freeze_filters=False,
-                 scaled_sizes=[128, 128, 128, 128],
+                 scaled_sizes=None,
                  periodic=False,
                  ):
         super(OSTWrapper, self).__init__()

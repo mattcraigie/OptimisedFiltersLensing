@@ -26,11 +26,11 @@ regressor:
   unfreeze_filters: False                                 # unfreeze the loaded filters from the pretrained_model
 
 training:
-  num_epochs: [10000, 20000, 20000]                                          # Number of training epochs
+  num_epochs: [5000, 10000, 20000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.001                                    # Learning rate
 
 analysis:
-  analysis_name: 'oms8_unclipped'
+  analysis_name: 'oms8'
   data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
-  repeats: 1
+  repeats: 4
