@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=None, colours=None, transform_std=None,
-                 show_repeats=False, quantiles=True, figsize=(12, 8), param_labels=None):
+                 show_repeats=False, quantiles=True, figsize=(12, 8), param_labels=None, best_vals=False):
     if labels is None:
         labels = [str(i) for i in range(len(scaling_paths))]
 
@@ -33,7 +33,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         repeat_dirs = os.listdir(scaling_dir)
         repeat_dirs = np.sort(repeat_dirs)
-        repeat_rmses = []
+        repeat_rmses_test = []
+        repeat_rmses_val = []
 
         for repeat_dir in repeat_dirs:
 
@@ -43,7 +44,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             subset_dirs = os.listdir(os.path.join(scaling_dir, repeat_dir))
             subset_dirs = np.sort(subset_dirs)
             subset_sizes = []
-            subset_rmses = []
+            subset_rmses_test = []
+            subset_rmses_val = []
 
             for subset_dir in subset_dirs:
 
@@ -56,31 +58,43 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                 predictions = torch.load(os.path.join(scaling_dir, repeat_dir, subset_dir, 'predictions.pt'))
                 num_params = targets['test'].shape[1]
 
-                param_rmses = []
+                param_rmses_test = []
+                param_rmses_val = []
                 for j in range(num_params):
                     targs_test_j = targets['test'][:, j].numpy()
                     preds_test_j = predictions['test'][:, j].numpy()
                     rmse_j = np.sqrt(np.mean((preds_test_j - targs_test_j) ** 2))
-                    param_rmses.append(rmse_j)
+                    param_rmses_test.append(rmse_j)
 
-                subset_rmses.append(np.array(param_rmses))
-            repeat_rmses.append(subset_rmses)
+                    targs_val_j = targets['val'][:, j].numpy()
+                    preds_val_j = predictions['val'][:, j].numpy()
+                    rmse_j = np.sqrt(np.mean((preds_val_j - targs_val_j) ** 2))
+                    param_rmses_val.append(rmse_j)
+
+                subset_rmses_test.append(np.array(param_rmses_test))
+                subset_rmses_val.append(np.array(param_rmses_val))
+            repeat_rmses_test.append(subset_rmses_test)
+            repeat_rmses_val.append(subset_rmses_val)
 
         subset_sizes = np.array(subset_sizes)  # shape (subsets,)
-        all_rmse = np.stack(repeat_rmses)  # shape (repeats, subsets, params)
+        all_rmse_test = np.stack(repeat_rmses_test)  # shape (repeats, subsets, params)
+        all_rmse_val = np.stack(repeat_rmses_val)  # shape (repeats, subsets, params)
 
         if transform_std is not None:
             transform_std_arr = np.array(transform_std)[None, None, :]
-            all_rmse *= transform_std_arr
+            all_rmse_test *= transform_std_arr
 
-        if quantiles:
-            rmse_mid = np.median(all_rmse, axis=0)
-            rmse_low = np.quantile(all_rmse, 0.25, axis=0)
-            rmse_high = np.quantile(all_rmse, 0.75, axis=0)
+        if best_vals:
+            best_val_idx = np.argmin(all_rmse_val, axis=0)
+            rmse_mid = np.array([all_rmse_test[best_val_idx[i], i, :] for i in range(len(subset_sizes))])  # shape (subsets, params)
+        elif quantiles:
+            rmse_mid = np.median(all_rmse_test, axis=0)
+            rmse_low = np.quantile(all_rmse_test, 0.25, axis=0)
+            rmse_high = np.quantile(all_rmse_test, 0.75, axis=0)
         else:
-            rmse_mid = np.mean(all_rmse, axis=0)
-            rmse_low = rmse_mid - np.std(all_rmse, axis=0)
-            rmse_high = rmse_mid + np.std(all_rmse, axis=0)
+            rmse_mid = np.mean(all_rmse_test, axis=0)
+            rmse_low = rmse_mid - np.std(all_rmse_test, axis=0)
+            rmse_high = rmse_mid + np.std(all_rmse_test, axis=0)
 
         # rmses are shape (subsets, params)
 
@@ -93,13 +107,14 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
             ax.plot(subset_sizes, rmse_mid[:, j], linewidth=4, label=labels[i], c=colours[i])
             # scatter with a square marker
             ax.scatter(subset_sizes, rmse_mid[:, j], c=colours[i], s=35, marker='s')
-            ax.plot(subset_sizes, rmse_low[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
-            ax.plot(subset_sizes, rmse_high[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
-            ax.fill_between(subset_sizes, rmse_low[:, j], rmse_high[:, j], alpha=0.15, color=colours[i])
+            if not best_vals:
+                ax.plot(subset_sizes, rmse_low[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
+                ax.plot(subset_sizes, rmse_high[:, j], alpha=0.3, linewidth=1.5, c=colours[i])
+                ax.fill_between(subset_sizes, rmse_low[:, j], rmse_high[:, j], alpha=0.15, color=colours[i])
 
             if show_repeats:
-                for k in range(all_rmse.shape[1]):
-                    ax.scatter([subset_sizes[k] for _ in range(all_rmse.shape[0])], all_rmse[:, k, j], c=colours[i],
+                for k in range(all_rmse_test.shape[1]):
+                    ax.scatter([subset_sizes[k] for _ in range(all_rmse_test.shape[0])], all_rmse_test[:, k, j], c=colours[i],
                                alpha=0.4, marker='x')
 
             ax.set_xlabel('Number of Training Cosmologies', fontsize=16)

@@ -137,7 +137,7 @@ def data_scaling(rank, args):
             train_loader, val_loader = data_handler.get_train_val_loaders(subset=subset, batch_size=batch_size, ddp=True)
 
             logging.debug(f"Setting up the regressor on rank {rank}")
-            regressor = ModelRegressor(**regressor_kwargs)
+            regressor = ModelRegressor(**regressor_kwargs, random_seed=i)
 
             try:
                 regressor.load_state_dict(torch.load(pretrained_model))

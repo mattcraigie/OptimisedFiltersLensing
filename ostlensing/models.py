@@ -144,8 +144,12 @@ class ModelRegressor(nn.Module):
                  regressor_outputs=1,
                  regressor_activations=nn.ReLU,
                  regressor_batchnorm=False,
+                 random_seed=0,
                  ):
+
         super(ModelRegressor, self).__init__()
+
+        torch.manual_seed(random_seed)
 
         if regressor_type == 'patch':
             self.model = model_dict[model_type](**model_kwargs)
