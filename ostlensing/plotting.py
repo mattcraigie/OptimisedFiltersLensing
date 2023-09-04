@@ -86,9 +86,6 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
 
         if best_vals:
             best_val_idx = np.argmin(all_rmse_val, axis=0)
-            print(best_val_idx.shape)  # shape (subsets, params)
-            print(all_rmse_test.shape)  # shape (repeats, subsets, params)
-
             rmse_mid = []
             for p in range(num_params):
                 rmse_mids_p = []
@@ -96,9 +93,8 @@ def plot_scaling(scaling_paths, save_path=None, logy=True, logx=True, labels=Non
                     rmse_mids_p.append(all_rmse_test[best_val_idx[s, p], s, p])
                 rmse_mid.append(rmse_mids_p)
             rmse_mid = np.stack(rmse_mid)
-            print(rmse_mid.shape)
             rmse_mid = rmse_mid.swapaxes(0, 1)
-            print(rmse_mid.shape)
+
         elif quantiles:
             rmse_mid = np.median(all_rmse_test, axis=0)
             rmse_low = np.quantile(all_rmse_test, 0.25, axis=0)
