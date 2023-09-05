@@ -1,12 +1,12 @@
 load_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/patches/'                 # the folder to load from
 #load_path: '//pscratch/sd/m/mcraigie/dirac/patches/masked/'                 # the folder to load from
 save_path: '//pscratch/sd/m/mcraigie/cosmogrid/precalc/'
-file_name:  'mst_ang'
+file_name:  'mst_full'
 
 method: 'mst'
 kwargs:
   size: 128
   num_scales: 4
   num_angles: 4
-  reduction: 'ang_avg'
+  reduction: None
   device: 'cuda:0'
