@@ -1,6 +1,6 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'mst_full_std.npy'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'mst_ang_std.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
@@ -15,7 +15,7 @@ regressor:
     regressor_type: 'precalc'
     model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: null
-    regressor_inputs: 113                                    # Number of features  (4, 4: 11 rot /23 ang)
+    regressor_inputs: 23                                    # Number of features  (4, 4: 11 rot /23 ang)
     regressor_hiddens: [128, 128]
   pretrained_model: None
   unfreeze_filters: False
@@ -26,7 +26,7 @@ training:
   learning_rate: 0.0005                                     # Learning rate
 
 analysis:
-  analysis_name: 'oms8_full'
+  analysis_name: 'oms8_ang'
   data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
   cosmo_params: ['s8', 'Om']
