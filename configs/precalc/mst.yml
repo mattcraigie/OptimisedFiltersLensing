@@ -8,5 +8,5 @@ kwargs:
   size: 128
   num_scales: 4
   num_angles: 4
-  reduction: None
+  reduction: 'none'
   device: 'cuda:0'
