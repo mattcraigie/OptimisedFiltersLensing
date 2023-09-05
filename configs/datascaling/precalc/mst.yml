@@ -15,8 +15,8 @@ regressor:
     regressor_type: 'precalc'
     model_type: 'mst'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: null
-    regressor_inputs: 11                                    # Number of features  (4, 4: 11 rot /23 ang)
-    regressor_hiddens: [64, 64]
+    regressor_inputs: 113                                    # Number of features  (4, 4: 11 rot /23 ang)
+    regressor_hiddens: [128, 128]
   pretrained_model: None
   unfreeze_filters: False
 
