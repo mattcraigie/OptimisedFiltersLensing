@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
-from scattering_transform.filters import Morlet, FixedFilterBank, Box, BandPass, LowPass
+from scattering_transform.filters import Morlet, FixedFilterBank, Box, BandPass, LowPass, ClippedMorlet
 from scattering_transform.power_spectrum import PowerSpectrum
 
 from ostlensing.dataloading import load_and_apply, Scaler
@@ -31,6 +31,7 @@ def clipped_mst(size, num_scales, num_angles, reduction, device):
 
 def ost(filter_path, reduction, device):
     filters = torch.load(filter_path)
+    num_scales, num_angles, size, _ = filters.shape
     filter_bank = FixedFilterBank(filters)
     return st_func(filter_bank, reduction, device, clip_sizes=[size // 2 ** j for j in range(num_scales)])
 
