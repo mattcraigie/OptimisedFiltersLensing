@@ -195,3 +195,5 @@ def data_scaling(rank, args):
 
 if __name__ == '__main__':
     ddp_main(data_scaling)
+
+
