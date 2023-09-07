@@ -26,12 +26,12 @@ regressor:
   unfreeze_filters: False                                 # unfreeze the loaded filters from the pretrained_model
 
 training:
-  num_epochs: [5000, 10000, 20000]                                          # Number of training epochs
+  num_epochs: [10000, 15000, 20000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.001                                    # Learning rate
 
 analysis:
-  analysis_name: 's8'
+  analysis_name: 'oms8'
   data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
-  cosmo_params: ['s8'] # ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
+  cosmo_params: ['s8', 'Om'] # ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
   repeats: 4
