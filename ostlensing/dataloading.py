@@ -149,6 +149,11 @@ class DataHandler:
         assert self.data is not None and self.targets is not None, \
             'Data and targets must be loaded before getting dataloaders'
 
+        if subset is not None:
+            seed = subset
+        else:
+            seed = self.seed
+
         # make the samplers
         num_data = len(self.data)
         test_split = int(self.test_ratio * num_data)  # test set is unaffected by the subsetting
@@ -163,7 +168,7 @@ class DataHandler:
         # another layer of randomness to get the bootstrapping working between repeats
         leftover_data = self.data[test_split:num_remaining+test_split]
         leftover_targets = self.targets[test_split:num_remaining+test_split]
-        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets, seed=self.seed)
+        leftover_data, leftover_targets = data_shuffler(leftover_data, leftover_targets, seed=seed)
 
         val_split = int(self.val_ratio * num_remaining)
 
