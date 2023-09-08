@@ -1,10 +1,10 @@
 data:
   data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
-  data_subpath: 'ost_s2000_oms8_std.npy'                       # file name or folder (e.g. 'patches')
+  data_subpath: 'ost_s500_oms8_std.npy'                       # file name or folder (e.g. 'patches')
   data_type: 'precalc'                                      # patches or precalc
   datahandler_kwargs:
     load_subset: 2500                                       # Subset of cosmologies to load (saves memory), 2500 for all
-    patch_subset: 16                                    # Subset of patches per cosmology, 192 for all
+    patch_subset: 24                                    # Subset of patches per cosmology, 192 for all
     val_ratio: 0.2                                          # Portion of data to use for validation
     test_ratio: 0.2                                         # Portion of data to use for testing
     seed: 0                                                 # Random seed for data splitting
@@ -16,7 +16,7 @@ regressor:
     model_type: 'ost'                                       # Type of model to use: 'mst', 'ost', 'ps', 'resnet'
     model_kwargs: null
     regressor_inputs: 11                                    # Number of features
-    regressor_hiddens: [64, 64]
+    regressor_hiddens: [64, ]
 
 training:
   num_epochs: 6000                                          # Number of training epochs
@@ -24,6 +24,6 @@ training:
   learning_rate: 0.0005                                     # Learning rate
 
 analysis:
-  analysis_name: 'ost_s2000_oms8_deep'
+  analysis_name: 'oms8_s500'
   data_subsets: [30, 60, 125, 250, 500, 1000, 2000]   # Subsets of the data for the scaling analysis
   repeats: 10
