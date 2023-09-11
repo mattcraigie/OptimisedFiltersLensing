@@ -29,15 +29,16 @@ def process_cosmo_dir(cosmo_dir,
         f = h5py.File(p, 'r')
         full_map = f[map_type]['desy3metacal{}'.format(redshift_bin)][()]
 
-        if mask is not None:
+        full_map = np.log(full_map)
+        if map_type == 'kg':
+            # normalise to approximately mean 0, std 1 for the log convergence fields
+            full_map = (full_map + 4.5) / 0.05
+        elif map_type == 'dg':
+            # normalise to approximately mean 0, std 1 for the log density fields
+            full_map = (full_map + 0.03) / 0.07
 
-            # map normalisation -- I'm concerned this isn't the best way to do it. I should think about this.
-            full_map[mask] = np.log(full_map[mask])
-            full_map[mask] = (full_map[mask] - np.mean(full_map[mask])) / np.std(full_map[mask])
+        if mask is not None:
             full_map[~mask] = 0
-        else:
-            full_map = np.log(full_map)
-            full_map = (full_map - np.mean(full_map)) / np.std(full_map)
 
         cosmo_patches.append(healpix_map_to_patches(full_map, patch_centres, patch_size, resolution))
 
@@ -56,7 +57,7 @@ def make_patches_cosmogrid(output_path,
                            threshold=0.2,
                            num_perms=1,
                            map_type='kg',
-                           redshift_bin=3,
+                           redshift_bin=1,
                            subset=None):
 
     main_path = r'//global/cfs/cdirs/des/cosmogrid/DESY3/grid'
@@ -110,8 +111,8 @@ def main():
                            threshold=0.2,
                            num_perms=1,
                            map_type='kg',
-                           redshift_bin=2,
-                           subset=30,
+                           redshift_bin=1,
+                           subset=None,
                            )
 
 

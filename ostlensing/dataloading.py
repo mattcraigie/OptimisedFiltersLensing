@@ -191,8 +191,6 @@ class DataHandler:
         return train_loader, val_loader
 
 
-
-
 # Patch making functions
 
 def compute_patch_centres(patch_nside, mask=None, threshold=0.2):
