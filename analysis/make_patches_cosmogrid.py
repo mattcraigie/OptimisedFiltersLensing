@@ -103,14 +103,22 @@ def make_patches_cosmogrid(output_path,
 
 
 def main():
-    output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/clustering/unmasked/"
+    map_type = 'kg'
+
+    if map_type == 'kg':
+        output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/lensing/unmasked/"
+    elif map_type == 'dg':
+        output_path = "/pscratch/sd/m/mcraigie/cosmogrid/patches/clustering/unmasked/"
+    else:
+        raise ValueError("map_type must be 'kg' or 'dg'")
+
     make_patches_cosmogrid(output_path=output_path,
                            patch_nside=4,
                            patch_size=128,
                            resolution=7,  # arcmin
                            threshold=0.2,
                            num_perms=1,
-                           map_type='kg',
+                           map_type=map_type,
                            redshift_bin=1,
                            subset=None,
                            )

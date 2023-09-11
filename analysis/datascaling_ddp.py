@@ -171,7 +171,7 @@ def data_scaling(rank, args):
             if rank == 0:
                 logging.debug(f"Saving the results on rank {rank}")
 
-                # save the model and predictions if it's the first repeat
+                # save the model and predictions
                 repeat_padded = str(i).zfill(2)
                 subset_padded = str(subset).zfill(4)
                 subset_folder = os.path.join(out_folder, f'repeat_{repeat_padded}', f'subset_{subset_padded}')
