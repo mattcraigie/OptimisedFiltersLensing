@@ -1,5 +1,5 @@
 data:
-  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/lensing/'          # path to main data directory
+  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/patches/lensing/'          # path to main data directory
   data_subpath: 'unmasked'                                   # file name or folder (e.g. 'patches')
   data_type: 'patches'                                      # patches or precalc
   datahandler_kwargs:
