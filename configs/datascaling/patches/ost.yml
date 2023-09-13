@@ -1,5 +1,5 @@
 data:
-  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/'          # path to main data directory
+  data_path: '//pscratch/sd/m/mcraigie/cosmogrid/lensing/'          # path to main data directory
   data_subpath: 'unmasked'                                   # file name or folder (e.g. 'patches')
   data_type: 'patches'                                      # patches or precalc
   datahandler_kwargs:
@@ -26,7 +26,7 @@ regressor:
   unfreeze_filters: False                                 # unfreeze the loaded filters from the pretrained_model
 
 training:
-  num_epochs: [5000, 10000, 20000]                                          # Number of training epochs
+  num_epochs: [10000, 20000, 20000]                                          # Number of training epochs
   batch_size: 128                                           # Batch size
   learning_rate: 0.001                                    # Learning rate
 
