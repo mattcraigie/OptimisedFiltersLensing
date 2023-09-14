@@ -102,7 +102,7 @@ def data_scaling(rank, args):
     # load train+val and test data with DataHandler
     data_handler = DataHandler(**datahandler_kwargs, rank=rank, world_size=dist.get_world_size())
 
-    data_handler.add_data(os.path.join(data_path, data_type, data_subpath), patches=data_type == 'patches', normalise=False,
+    data_handler.add_data(os.path.join(data_path, data_subpath), patches=data_type == 'patches', normalise=False,
                           log=False)
 
     regressor_kwargs['regressor_outputs'] = len(cosmo_params)
