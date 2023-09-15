@@ -17,7 +17,7 @@ regressor:
     model_kwargs:
       reduction: 'rot_avg'
       ost_type: 'subnet'
-      init_morlet: False
+      init_morlet: True
       freeze_filters: False                                # freeze the filters in their present condition
     regressor_inputs: 11                                    # Number of features
     regressor_hiddens: [64,]
@@ -31,7 +31,7 @@ training:
   learning_rate: 0.001                                    # Learning rate
 
 analysis:
-  analysis_name: 's8'
+  analysis_name: 'oms8_initmorlet'
   data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
-  cosmo_params: ['s8'] # ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
-  repeats: 4
+  cosmo_params: ['s8', 'Om'] # ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
+  repeats: 1
