@@ -31,7 +31,7 @@ training:
   learning_rate: 0.001                                    # Learning rate
 
 analysis:
-  analysis_name: 'om_initmorlet'
+  analysis_name: 's8_initmorlet'
   data_subsets: [30, 125, 500]   # Subsets of the data for the scaling analysis
-  cosmo_params: ['Om'] # ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
+  cosmo_params: ['s8'] # ('s8', 'As', 'bary_Mc', 'bary_nu', 'H0', 'O_cdm', 'O_nu', 'Ob', 'Om', 'ns', 'w0')
   repeats: 1
