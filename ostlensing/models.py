@@ -3,8 +3,9 @@ import torch.nn as nn
 
 from transformers import ResNetModel, ResNetConfig
 
-from scattering_transform.scattering_transform import ScatteringTransform2d, Reducer
+from scattering_transform.scattering_transform import ScatteringTransform2d
 from scattering_transform.filters import FourierSubNetFilters, SubNet, FourierDirectFilters, TrainableMorlet
+from scattering_transform.reducer import Reducer
 
 
 # ~~~ General Models ~~~ #
@@ -94,7 +95,7 @@ class OSTWrapper(nn.Module):
                                  activation=subnet_activations)
             self.filters = FourierSubNetFilters(size, num_scales, num_angles, subnet=self.subnet,
                                                 scale_invariant=scale_invariant, init_morlet=init_morlet,
-                                                scaled_sizes=scaled_sizes, periodic=periodic)
+                                                clip_sizes=scaled_sizes, periodic=periodic)
             if freeze_filters:
                 for param in self.subnet.parameters():
                     param.requires_grad = False
@@ -106,7 +107,7 @@ class OSTWrapper(nn.Module):
             self.filters = TrainableMorlet(size, num_scales, num_angles, scale_invariant=scale_invariant,
                                            enforce_symmetry=enforce_symmetry)
 
-        self.st = ScatteringTransform2d(self.filters, clip_sizes=[size // 2 ** i for i in range(num_scales)])
+        self.st = ScatteringTransform2d(self.filters)
         self.reducer = Reducer(self.filters, reduction, normalise_s2=True)
         self.num_outputs = self.reducer.num_outputs
 
