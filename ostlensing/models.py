@@ -113,7 +113,6 @@ class OSTWrapper(nn.Module):
 
     def forward(self, x):
         self.filters.update_filters()
-        self.st.clip_filters()
         return self.reducer(self.st(x))
 
     def to(self, device):
